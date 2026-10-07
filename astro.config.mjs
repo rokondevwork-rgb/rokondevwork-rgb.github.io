@@ -7,7 +7,7 @@ export default defineConfig({
   integrations: [sitemap()],
   // Used for canonical URLs, social tags, RSS and the sitemap.
   // Hosted on GitHub Pages (user site, so no `base` path needed).
-  site: "https://roknuzzamanrokon.github.io",
+  site: "https://rokondevwork-rgb.github.io",
   trailingSlash: "always",
   markdown: {
     shikiConfig: {
