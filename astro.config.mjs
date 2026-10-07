@@ -1,8 +1,10 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
+  integrations: [sitemap()],
   // Used for canonical URLs, social tags, RSS and the sitemap.
   // Update this if Cloudflare assigns a different *.pages.dev name (or you add a custom domain).
   site: 'https://rokon-portfolio.pages.dev',

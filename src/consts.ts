@@ -7,6 +7,12 @@ export const SITE = {
     "Python backend developer in Dhaka building scalable APIs, hotel content platforms, data processing pipelines, and database-driven applications.",
 };
 
+// Shared by the blog index page and the RSS feed.
+export const BLOG = {
+  title: `${SITE.name} | Blog`,
+  description: "Notes on Python, FastAPI, MySQL, and building data pipelines.",
+};
+
 // Public contact details. The phone number is left out on purpose: public pages get scraped.
 export const CONTACT = {
   email: "rokon.raz@gmail.com",
