@@ -1,7 +1,8 @@
-/*
- * Theme: colours follow the OS setting by default. The toggle sets data-theme on <html>
- * to force one scheme, and light-dark() picks the matching value for every token.
- */
+/* ==========================================================================
+   Tokens
+   Colours follow the OS setting by default. The toggle sets data-theme on <html>
+   to force one scheme, and light-dark() picks the matching value for every token.
+   ========================================================================== */
 :root {
   color-scheme: light dark;
 
@@ -11,6 +12,14 @@
   --color-muted: light-dark(#59636e, #9aa3ad);
   --color-accent: light-dark(#0b57d0, #8ab4f8);
   --color-border: light-dark(#d1d9e0, #2b313a);
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, "Liberation Mono",
+    monospace;
+
+  --measure: 40rem; /* ~70 characters per line at body size */
+  --radius: 8px;
 }
 
 :root[data-theme="light"] {
@@ -21,24 +30,465 @@
   color-scheme: dark;
 }
 
+/* ==========================================================================
+   Base
+   ========================================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   margin: 0;
   background: var(--color-bg);
   color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 1.125rem;
+  line-height: 1.65;
+}
+
+main {
+  flex: 1;
+}
+
+.site-header,
+main,
+.site-footer {
+  width: min(100% - 2rem, var(--measure));
+  margin-inline: auto;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+h1 {
+  margin: 0 0 1rem;
+  font-size: clamp(1.875rem, 1.5rem + 1.5vw, 2.25rem);
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  margin: 2.5rem 0 0.75rem;
+  font-size: 1.5rem;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  margin: 1.75rem 0 0.5rem;
+  font-size: 1.2rem;
+}
+
+p,
+ul,
+ol,
+dl,
+pre,
+blockquote,
+table,
+figure {
+  margin: 0 0 1.25rem;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+  height: auto;
 }
 
 a {
   color: var(--color-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
 }
 
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+hr {
+  margin: 2.5rem 0;
+  border: 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.lead {
+  color: var(--color-muted);
+  font-size: 1.25rem;
+}
+
+/* ==========================================================================
+   Header and footer
+   ========================================================================== */
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  margin-bottom: 3rem;
+  padding-block: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.site-name {
+  margin-right: auto;
+  color: var(--color-text);
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.site-header ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-header nav a {
+  color: var(--color-muted);
+  text-decoration: none;
+}
+
+.site-header nav a:hover,
+.site-header nav a[aria-current] {
+  color: var(--color-text);
+}
+
+.site-header nav a[aria-current] {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.4em;
+}
+
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  background: var(--color-surface);
+}
+
+/* display: inline-grid above would otherwise override the hidden attribute. */
+.theme-toggle[hidden] {
+  display: none;
+}
+
+/* Small screens: name and toggle on the first row, nav on its own row below. */
+@media (max-width: 40rem) {
+  .site-header {
+    margin-bottom: 2rem;
+    padding-block: 1rem;
+  }
+
+  .site-header nav {
+    order: 1;
+    flex-basis: 100%;
+  }
+}
+
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  margin-top: 4rem;
+  padding-block: 2rem;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-muted);
+  font-size: 0.95rem;
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+.site-footer ul {
+  display: flex;
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ==========================================================================
+   Lists of posts and projects
+   ========================================================================== */
+.intro {
+  margin-bottom: 3rem;
+}
+
+.post-list,
+.project-list,
+.contact-links {
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.post-list > li + li {
+  margin-top: 1.75rem;
+}
+
+.post-list :is(h2, h3) {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+/* Title links in lists are clearly links from context; underline only on hover. */
+.post-list a,
+.project-card a {
+  text-decoration: none;
+}
+
+.post-list a:hover,
+.project-card a:hover {
+  text-decoration: underline;
+}
+
+.post-list time {
+  display: block;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.post-list p {
+  margin: 0.35rem 0 0;
+}
+
+.project-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.project-card {
+  position: relative;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.project-card:hover,
+.project-card:focus-within {
+  border-color: var(--color-accent);
+}
+
+.project-card :is(h2, h3) {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+}
+
+.project-card p {
+  margin: 0 0 0.75rem;
+}
+
+/* Make the whole card clickable via the heading link, without nesting other content in the link. */
+.project-card a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.stack,
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stack li,
+.tags li {
+  padding: 0.1rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-bg);
+  color: var(--color-muted);
+  font-size: 0.8rem;
+}
+
+.contact-links li + li {
+  margin-top: 0.5rem;
+}
+
+.contact-links a {
+  overflow-wrap: anywhere;
+}
+
+/* ==========================================================================
+   Article pages (blog posts and case studies)
+   ========================================================================== */
+article > header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.post-meta {
+  margin: 0 0 0.75rem;
+  color: var(--color-muted);
+  font-size: 0.95rem;
+}
+
+.project-meta {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.35rem 1.25rem;
+  margin: 1.25rem 0 0;
+  font-size: 0.95rem;
+}
+
+.project-meta dt {
+  color: var(--color-muted);
+  font-weight: 600;
+}
+
+.project-meta dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.prose :is(ul, ol) {
+  padding-left: 1.5rem;
+}
+
+.prose li + li,
+.prose li > :is(ul, ol) {
+  margin-top: 0.35rem;
+}
+
+.prose li > :is(ul, ol) {
+  margin-bottom: 0;
+}
+
+.prose blockquote {
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  border-left: 3px solid var(--color-border);
+  color: var(--color-muted);
+}
+
+.prose blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.prose img {
+  border-radius: var(--radius);
+}
+
+/* Wide tables scroll inside the article instead of widening the page. */
+.prose table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.prose :is(th, td) {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  text-align: left;
+}
+
+.prose th {
+  background: var(--color-surface);
+}
+
+/* On phones, keep rows on one line and scroll sideways rather than squeezing columns to one word. */
+@media (max-width: 40rem) {
+  .prose :is(th, td) {
+    white-space: nowrap;
+  }
+}
+
+/* ==========================================================================
+   Code
+   Shiki sets the colours of highlighted blocks inline (via light-dark()).
+   ========================================================================== */
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--font-mono);
+  /* Show code exactly as typed: no "<=" drawn as "≤" by fonts like Cascadia Code or Fira Code. */
+  font-variant-ligatures: none;
+}
+
+:not(pre) > code {
+  padding: 0.1em 0.35em;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-surface);
+  font-size: 0.875em;
+  overflow-wrap: break-word;
+}
+
+pre {
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  tab-size: 4;
+}
+
+pre code {
+  font-size: inherit;
+}
+
+/* ==========================================================================
+   Utilities and motion
+   ========================================================================== */
 /* Hidden until focused by keyboard, then shown at the top of the page. */
 .skip-link {
   position: absolute;
-  left: 1rem;
   top: -100%;
+  left: 1rem;
+  z-index: 10;
   padding: 0.5rem 1rem;
-  background: var(--color-bg);
   border: 2px solid var(--color-accent);
+  border-radius: var(--radius);
+  background: var(--color-bg);
 }
 
 .skip-link:focus {
@@ -52,4 +502,13 @@ a {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .project-card,
+  .theme-toggle {
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
 }

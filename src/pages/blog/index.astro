@@ -8,7 +8,7 @@ const posts = await getPublishedPosts();
 
 <Base title="Blog" description="Notes on Python, FastAPI, MySQL, and building data pipelines.">
   <h1>Blog</h1>
-  <p>Notes on Python, FastAPI, MySQL, and building data pipelines.</p>
+  <p class="lead">Notes on Python, FastAPI, MySQL, and building data pipelines.</p>
 
   {posts.length > 0 ? <PostList posts={posts} /> : <p>No posts yet.</p>}
 </Base>

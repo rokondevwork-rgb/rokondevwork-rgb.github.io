@@ -8,4 +8,11 @@ export default defineConfig({
   site: 'https://rokon-portfolio.pages.dev',
   // Match how Cloudflare Pages serves directory-style pages (/blog/), so dev and prod behave the same.
   trailingSlash: 'always',
+  markdown: {
+    shikiConfig: {
+      themes: { light: 'github-light-default', dark: 'github-dark-default' },
+      // Emit light-dark() colours so code blocks follow the site theme (OS or toggle) with no extra CSS/JS.
+      defaultColor: 'light-dark()',
+    },
+  },
 });
