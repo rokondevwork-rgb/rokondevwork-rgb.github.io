@@ -1,0 +1,75 @@
+---
+import { SITE } from "../consts";
+
+const navItems = [
+  { href: "/projects/", label: "Projects" },
+  { href: "/blog/", label: "Blog" },
+  { href: "/about/", label: "About" },
+  { href: "/contact/", label: "Contact" },
+];
+
+const path = Astro.url.pathname;
+
+// "page" marks the exact current page; "true" marks the section a nested page belongs to.
+function currentState(href: string) {
+  if (path === href) return "page";
+  if (path.startsWith(href)) return "true";
+  return undefined;
+}
+---
+
+<header class="site-header">
+  <a class="site-name" href="/" aria-current={path === "/" ? "page" : undefined}>{SITE.name}</a>
+
+  <nav aria-label="Main">
+    <ul>
+      {
+        navItems.map(({ href, label }) => (
+          <li>
+            <a href={href} aria-current={currentState(href)}>
+              {label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+
+  <!-- Hidden until the script below runs; without JS the OS colour scheme still applies. -->
+  <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false" hidden>
+    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"></circle>
+      <path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"></path>
+    </svg>
+    <span class="visually-hidden">Dark theme</span>
+  </button>
+</header>
+
+<script>
+  const root = document.documentElement;
+  const button = document.querySelector<HTMLButtonElement>("#theme-toggle");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+
+  const isDark = () =>
+    root.dataset.theme ? root.dataset.theme === "dark" : prefersDark.matches;
+
+  const sync = () => button?.setAttribute("aria-pressed", String(isDark()));
+
+  if (button) {
+    button.hidden = false;
+    sync();
+
+    button.addEventListener("click", () => {
+      const next = isDark() ? "light" : "dark";
+      root.dataset.theme = next;
+      try {
+        localStorage.setItem("theme", next);
+      } catch {
+        // Storage blocked (e.g. private mode): the choice lasts for this page only.
+      }
+      sync();
+    });
+
+    prefersDark.addEventListener("change", sync);
+  }
+</script>

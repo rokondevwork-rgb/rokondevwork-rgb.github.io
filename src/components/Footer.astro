@@ -1,0 +1,13 @@
+---
+import { CONTACT, SITE } from "../consts";
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <p>&copy; {year} {SITE.name}</p>
+  <ul aria-label="Elsewhere">
+    <li><a href={CONTACT.github} rel="me noopener">GitHub</a></li>
+    <li><a href={CONTACT.linkedin} rel="me noopener">LinkedIn</a></li>
+  </ul>
+</footer>

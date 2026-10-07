@@ -1,0 +1,55 @@
+/*
+ * Theme: colours follow the OS setting by default. The toggle sets data-theme on <html>
+ * to force one scheme, and light-dark() picks the matching value for every token.
+ */
+:root {
+  color-scheme: light dark;
+
+  --color-bg: light-dark(#ffffff, #0f1115);
+  --color-surface: light-dark(#f6f8fa, #171b21);
+  --color-text: light-dark(#1f2328, #e6e8eb);
+  --color-muted: light-dark(#59636e, #9aa3ad);
+  --color-accent: light-dark(#0b57d0, #8ab4f8);
+  --color-border: light-dark(#d1d9e0, #2b313a);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+a {
+  color: var(--color-accent);
+}
+
+/* Hidden until focused by keyboard, then shown at the top of the page. */
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -100%;
+  padding: 0.5rem 1rem;
+  background: var(--color-bg);
+  border: 2px solid var(--color-accent);
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

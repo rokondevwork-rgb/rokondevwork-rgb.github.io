@@ -18,7 +18,7 @@ const { title, description, pubDate, tags } = post.data;
 const { Content } = await render(post);
 ---
 
-<Base title={title} description={description}>
+<Base title={title} description={description} type="article" publishedDate={pubDate}>
   <article>
     <header>
       <h1>{title}</h1>
