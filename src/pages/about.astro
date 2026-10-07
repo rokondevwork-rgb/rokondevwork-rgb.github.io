@@ -1,31 +1,100 @@
 ---
 import Base from "../layouts/Base.astro";
+
+const experience = [
+  {
+    company: "Innovate Solution",
+    role: "Python Developer",
+    dates: "Oct 2024 – Present",
+    points: [
+      "Collect and process supplier XML/JSON static data for hotel content platforms.",
+      "Develop FastAPI-based APIs for data collection and business operations.",
+      "Integrate third-party hotel APIs and build business APIs on top of them.",
+      "Extract, process, and analyze data from web APIs.",
+      "Maintain database integrity, consistency, and performance.",
+    ],
+  },
+  {
+    company: "Artixcore Inc",
+    role: "Python Developer",
+    dates: "Oct 2023 – Sep 2024",
+    points: [
+      "Designed and developed Python-based software applications.",
+      "Deployed applications using AWS Lambda, DynamoDB, API Gateway, and EC2.",
+    ],
+  },
+  {
+    company: "GorillaMove",
+    role: "Junior Software Engineer",
+    dates: "Nov 2022 – Sep 2023",
+    points: [
+      "Developed and maintained frontend components and features using React.",
+      "Optimized web applications for performance and scalability.",
+    ],
+  },
+];
+
+const skills = [
+  ["Languages", "Python, JavaScript, PHP, C"],
+  ["Backend", "FastAPI, Django, Flask, REST APIs, JWT authentication"],
+  ["Frontend", "React.js, Next.js"],
+  ["Database & ORM", "MySQL, PostgreSQL, SQLite, DynamoDB, SQLAlchemy"],
+  ["Cloud & DevOps", "AWS (EC2, Lambda, API Gateway), Docker, Linux, Redis, Git, GitHub, CI/CD"],
+  ["Data & formats", "XML, JSON"],
+  ["AI-assisted dev", "Claude, Cursor, Codex, Ollama, Mistral"],
+];
 ---
 
 <Base
   title="About"
-  description="About Rokon, a Python and backend developer in Dhaka working on data pipelines, FastAPI, and MySQL."
+  description="About Rokunuzzaman Rokon, a Python backend developer in Dhaka building APIs, hotel content platforms, and data pipelines."
 >
   <h1>About</h1>
 
-  <p>
-    I'm Rokon, a Python and backend developer based in Dhaka, Bangladesh, with 6+ years of
-    experience.
+  <p class="lead">
+    I'm Rokunuzzaman Rokon, a Python backend developer based in Dhaka, Bangladesh, with nearly 6
+    years of professional experience.
   </p>
   <p>
-    Most of my work is in hotel and travel technology. I build data pipelines that ingest and clean
-    large datasets, FastAPI services that serve that data, and MySQL systems designed to handle it
-    at scale.
+    I build scalable APIs, hotel content platforms, data processing pipelines, and database-driven
+    applications. Most of my recent work is in hotel and travel tech: ingesting supplier XML/JSON
+    data, integrating third-party hotel APIs, and serving clean, normalized content through FastAPI
+    services backed by MySQL and PostgreSQL.
   </p>
 
-  <h2>What I work with</h2>
-  <ul>
-    <li>Python</li>
-    <li>FastAPI</li>
-    <li>MySQL</li>
-    <li>Data pipelines and ETL</li>
-    <!-- PLACEHOLDER: add other tools you use day to day. -->
+  <h2>Experience</h2>
+  <ul class="experience">
+    {
+      experience.map(({ company, role, dates, points }) => (
+        <li>
+          <h3>{company}</h3>
+          <p class="experience-meta">
+            {role} · {dates}
+          </p>
+          <ul>
+            {points.map((point) => (
+              <li>{point}</li>
+            ))}
+          </ul>
+        </li>
+      ))
+    }
   </ul>
+
+  <h2>Skills</h2>
+  <dl class="skills">
+    {
+      skills.map(([group, items]) => (
+        <>
+          <dt>{group}</dt>
+          <dd>{items}</dd>
+        </>
+      ))
+    }
+  </dl>
+
+  <h2>Education</h2>
+  <p>B.Sc. in Computer Science and Engineering, European University of Bangladesh</p>
 
   <h2>How I work</h2>
   <p>
@@ -35,7 +104,7 @@ import Base from "../layouts/Base.astro";
 
   <h2>Work with me</h2>
   <p>
-    I'm open to full-time backend roles and freelance or contract work on APIs and data
+    I'm open to backend roles and freelance or contract work on APIs and data
     pipelines. <a href="/contact/">Get in touch</a>.
   </p>
 </Base>

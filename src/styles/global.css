@@ -315,6 +315,8 @@ hr {
 
 .project-card p {
   margin: 0 0 0.75rem;
+  /* Short summaries look oddly narrow with "pretty" wrapping; use normal line filling. */
+  text-wrap: wrap;
 }
 
 /* Make the whole card clickable via the heading link, without nesting other content in the link. */
@@ -349,6 +351,40 @@ hr {
   margin-top: 0.5rem;
 }
 
+/* ==========================================================================
+   About page
+   ========================================================================== */
+.experience {
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.experience > li + li {
+  margin-top: 1.75rem;
+}
+
+.experience h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.experience-meta {
+  margin: 0 0 0.5rem;
+  color: var(--color-muted);
+  font-size: 0.95rem;
+}
+
+.experience ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  list-style: disc;
+}
+
+.experience ul li + li {
+  margin-top: 0.25rem;
+}
+
 .contact-links a {
   overflow-wrap: anywhere;
 }
@@ -368,22 +404,42 @@ article > header {
   font-size: 0.95rem;
 }
 
-.project-meta {
+.project-meta,
+.skills {
   display: grid;
   grid-template-columns: max-content 1fr;
   gap: 0.35rem 1.25rem;
-  margin: 1.25rem 0 0;
   font-size: 0.95rem;
 }
 
-.project-meta dt {
+.project-meta {
+  margin: 1.25rem 0 0;
+}
+
+.skills {
+  gap: 0.6rem 1.5rem;
+}
+
+:is(.project-meta, .skills) dt {
   color: var(--color-muted);
   font-weight: 600;
 }
 
-.project-meta dd {
+:is(.project-meta, .skills) dd {
   margin: 0;
   overflow-wrap: anywhere;
+}
+
+/* Very narrow screens: stack each skill group above its items. */
+@media (max-width: 30rem) {
+  .skills {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .skills dd + dt {
+    margin-top: 0.6rem;
+  }
 }
 
 .prose :is(ul, ol) {

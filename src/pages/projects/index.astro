@@ -6,9 +6,12 @@ import { getProjects } from "../../lib/content";
 const projects = await getProjects();
 ---
 
-<Base title="Projects" description="Case studies of backend and data engineering work by Rokon.">
+<Base
+  title="Projects"
+  description="Selected backend projects by Rokunuzzaman Rokon: hotel content APIs, booking systems, data ingestion, and full-stack apps."
+>
   <h1>Projects</h1>
-  <p class="lead">Selected case studies: the problem, what I built, and what came of it.</p>
+  <p class="lead">Selected work: APIs, hotel content platforms, and data-driven applications.</p>
 
   {
     projects.length > 0 ? (
