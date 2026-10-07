@@ -1,0 +1,18 @@
+---
+import Base from "../layouts/Base.astro";
+import { CONTACT } from "../consts";
+---
+
+<Base title="Contact" description="How to get in touch with Rokon about backend roles or freelance work.">
+  <h1>Contact</h1>
+  <p>
+    I'm open to backend roles and freelance projects. Email is the best way to reach me. I'm based
+    in Dhaka, Bangladesh (UTC+6).
+  </p>
+
+  <ul class="contact-links">
+    <li>Email: <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a></li>
+    <li>GitHub: <a href={CONTACT.github} rel="me noopener">{CONTACT.github.replace("https://", "")}</a></li>
+    <li>LinkedIn: <a href={CONTACT.linkedin} rel="me noopener">{CONTACT.linkedin.replace("https://www.", "")}</a></li>
+  </ul>
+</Base>

@@ -1,0 +1,43 @@
+---
+import { render, type CollectionEntry } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import { getPublishedPosts } from "../../lib/content";
+import { formatDate } from "../../lib/format";
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+interface Props {
+  post: CollectionEntry<"blog">;
+}
+
+const { post } = Astro.props;
+const { title, description, pubDate, tags } = post.data;
+const { Content } = await render(post);
+---
+
+<Base title={title} description={description}>
+  <article>
+    <header>
+      <h1>{title}</h1>
+      <p class="post-meta">
+        <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+      </p>
+      {
+        tags.length > 0 && (
+          <ul class="tags" aria-label="Tags">
+            {tags.map((tag) => (
+              <li>{tag}</li>
+            ))}
+          </ul>
+        )
+      }
+    </header>
+
+    <Content />
+  </article>
+
+  <p><a href="/blog/">Back to all posts</a></p>
+</Base>

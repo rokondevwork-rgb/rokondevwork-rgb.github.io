@@ -1,0 +1,30 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { formatDate } from "../lib/format";
+
+interface Props {
+  posts: CollectionEntry<"blog">[];
+  /** Keeps the heading outline correct: 2 under a page h1, 3 under a section h2. */
+  headingLevel?: 2 | 3;
+}
+
+const { posts, headingLevel = 2 } = Astro.props;
+const Heading = `h${headingLevel}` as const;
+---
+
+<ul class="post-list">
+  {
+    posts.map((post) => (
+      <li>
+        <article>
+          <Heading>
+            <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+            {post.data.draft && " (draft)"}
+          </Heading>
+          <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+          <p>{post.data.description}</p>
+        </article>
+      </li>
+    ))
+  }
+</ul>

@@ -1,0 +1,47 @@
+---
+import Base from "../layouts/Base.astro";
+import PostList from "../components/PostList.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import { getFeaturedProjects, getPublishedPosts } from "../lib/content";
+
+const featuredProjects = await getFeaturedProjects();
+const latestPosts = (await getPublishedPosts()).slice(0, 3);
+---
+
+<Base>
+  <section class="intro" aria-labelledby="intro-heading">
+    <h1 id="intro-heading">Hi, I'm Rokon.</h1>
+    <p>
+      I'm a Python and backend developer based in Dhaka, with 6+ years of experience. I build data
+      pipelines, FastAPI services, and MySQL systems that process large datasets, mostly in hotel and
+      travel tech.
+    </p>
+    <p><a href="/projects/">See my work</a> or <a href="/contact/">get in touch</a>.</p>
+  </section>
+
+  {
+    featuredProjects.length > 0 && (
+      <section aria-labelledby="featured-heading">
+        <h2 id="featured-heading">Featured projects</h2>
+        <ul class="project-list">
+          {featuredProjects.map((project) => (
+            <li>
+              <ProjectCard project={project} headingLevel={3} />
+            </li>
+          ))}
+        </ul>
+        <p><a href="/projects/">All projects</a></p>
+      </section>
+    )
+  }
+
+  {
+    latestPosts.length > 0 && (
+      <section aria-labelledby="latest-heading">
+        <h2 id="latest-heading">Latest posts</h2>
+        <PostList posts={latestPosts} headingLevel={3} />
+        <p><a href="/blog/">All posts</a></p>
+      </section>
+    )
+  }
+</Base>

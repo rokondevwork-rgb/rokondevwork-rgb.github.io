@@ -1,0 +1,28 @@
+---
+// Minimal shell for now. Header nav, footer, SEO meta and theme toggle are added in step 3.
+import { SITE } from "../consts";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description = SITE.description } = Astro.props;
+const pageTitle = title ? `${title} | ${SITE.name}` : SITE.title;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>

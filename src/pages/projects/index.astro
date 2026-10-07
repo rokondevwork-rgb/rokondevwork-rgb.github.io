@@ -1,0 +1,26 @@
+---
+import Base from "../../layouts/Base.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+import { getProjects } from "../../lib/content";
+
+const projects = await getProjects();
+---
+
+<Base title="Projects" description="Case studies of backend and data engineering work by Rokon.">
+  <h1>Projects</h1>
+  <p>Selected case studies: the problem, what I built, and what came of it.</p>
+
+  {
+    projects.length > 0 ? (
+      <ul class="project-list">
+        {projects.map((project) => (
+          <li>
+            <ProjectCard project={project} />
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>No projects yet.</p>
+    )
+  }
+</Base>
