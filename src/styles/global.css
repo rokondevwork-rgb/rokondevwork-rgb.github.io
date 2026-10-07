@@ -1,33 +1,64 @@
 /* ==========================================================================
-   Tokens
-   Colours follow the OS setting by default. The toggle sets data-theme on <html>
-   to force one scheme, and light-dark() picks the matching value for every token.
+   Design tokens
+   Dark is the default. The toggle sets data-theme="light" on <html>, which flips
+   color-scheme, and light-dark() then picks the light value of every colour token.
+   Fonts (--font-display, --font-body, --font-mono) are defined by Astro's <Font>
+   components in Base.astro, so they are not declared here.
    ========================================================================== */
 :root {
-  color-scheme: light dark;
+  color-scheme: dark;
 
-  --color-bg: light-dark(#ffffff, #0f1115);
-  --color-surface: light-dark(#f6f8fa, #171b21);
-  --color-text: light-dark(#1f2328, #e6e8eb);
-  --color-muted: light-dark(#59636e, #9aa3ad);
-  --color-accent: light-dark(#0b57d0, #8ab4f8);
-  --color-border: light-dark(#d1d9e0, #2b313a);
+  /* Colour: light value first, dark value second. */
+  --color-bg: light-dark(#f7f5f0, #0e0f11);
+  --color-surface: light-dark(#efece5, #16181b);
+  --color-surface-2: light-dark(#e7e3da, #1d2024);
+  --color-text: light-dark(#17181b, #ece8e1);
+  --color-muted: light-dark(#5f5b54, #9c978f);
+  --color-border: light-dark(#ddd8ce, #26292e);
+  --color-border-strong: light-dark(#c5bfb3, #3a3e45);
+  --color-accent: light-dark(#8c5200, #f2a93b);
+  --color-accent-contrast: light-dark(#f7f5f0, #0e0f11);
+  --color-accent-soft: color-mix(in srgb, var(--color-accent) 14%, transparent);
 
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
-    "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-  --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, "Liberation Mono",
-    monospace;
+  /* Type scale (fluid where it matters). */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-xl: clamp(1.375rem, 1.2rem + 0.75vw, 1.75rem);
+  --text-2xl: clamp(1.875rem, 1.4rem + 2vw, 2.75rem);
+  --text-3xl: clamp(2.5rem, 1.6rem + 3.5vw, 4rem);
+  --text-hero: clamp(3rem, 1.2rem + 7.5vw, 6.75rem);
 
-  --measure: 40rem; /* ~70 characters per line at body size */
+  /* Spacing. */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+
+  /* Layout. */
+  --container: 72rem; /* wide pages: home, projects */
+  --measure: 42rem; /* reading column: posts, case studies */
+  --gutter: clamp(1rem, 4vw, 2rem);
+  --header-h: 4rem;
+
+  --radius-sm: 4px;
   --radius: 8px;
+  --radius-lg: 14px;
+
+  /* Motion. */
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration: 300ms;
 }
 
 :root[data-theme="light"] {
   color-scheme: light;
-}
-
-:root[data-theme="dark"] {
-  color-scheme: dark;
 }
 
 /* ==========================================================================
@@ -39,9 +70,15 @@
   box-sizing: border-box;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* Keep anchor targets clear of the sticky header. */
+  scroll-padding-top: calc(var(--header-h) + var(--space-4));
 }
 
 body {
@@ -51,44 +88,75 @@ body {
   margin: 0;
   background: var(--color-bg);
   color: var(--color-text);
-  font-family: var(--font-sans);
-  font-size: 1.125rem;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
   line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 main {
   flex: 1;
 }
 
-.site-header,
-main,
-.site-footer {
-  width: min(100% - 2rem, var(--measure));
-  margin-inline: auto;
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 35%, transparent);
 }
 
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ==========================================================================
+   Typography
+   Display face for page and section titles; body face for everything else.
+   Instrument Serif ships one weight, so titles stay at 400 (no faux bold).
+   ========================================================================== */
 h1,
 h2,
-h3 {
-  line-height: 1.25;
+h3,
+h4 {
+  margin: 0;
   text-wrap: balance;
 }
 
-h1 {
-  margin: 0 0 1rem;
-  font-size: clamp(1.875rem, 1.5rem + 1.5vw, 2.25rem);
-  letter-spacing: -0.02em;
-}
-
+h1,
 h2 {
-  margin: 2.5rem 0 0.75rem;
-  font-size: 1.5rem;
+  font-family: var(--font-display);
+  font-weight: 400;
   letter-spacing: -0.01em;
 }
 
+h1 {
+  margin-bottom: var(--space-5);
+  font-size: var(--text-3xl);
+  line-height: 1.05;
+}
+
+h2 {
+  margin: var(--space-7) 0 var(--space-4);
+  font-size: var(--text-2xl);
+  line-height: 1.1;
+}
+
+h3,
+h4 {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
 h3 {
-  margin: 1.75rem 0 0.5rem;
-  font-size: 1.2rem;
+  margin: var(--space-6) 0 var(--space-3);
+  font-size: var(--text-lg);
 }
 
 p,
@@ -99,208 +167,418 @@ pre,
 blockquote,
 table,
 figure {
-  margin: 0 0 1.25rem;
+  margin: 0 0 var(--space-5);
 }
 
 p {
   text-wrap: pretty;
 }
 
-img,
-svg,
-video {
-  max-width: 100%;
-  height: auto;
-}
-
 a {
   color: var(--color-accent);
+  text-decoration-line: underline;
   text-decoration-thickness: 1px;
-  text-underline-offset: 0.15em;
+  text-decoration-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color var(--duration-fast) ease;
 }
 
 a:hover {
-  text-decoration-thickness: 2px;
+  text-decoration-color: currentColor;
 }
 
-:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 3px;
-  border-radius: 2px;
+strong {
+  font-weight: 600;
 }
 
 hr {
-  margin: 2.5rem 0;
+  margin: var(--space-7) 0;
   border: 0;
   border-top: 1px solid var(--color-border);
 }
 
 .lead {
   color: var(--color-muted);
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
+  line-height: 1.55;
+}
+
+/* Small monospace label, e.g. section kickers and metadata. */
+.eyebrow {
+  display: block;
+  margin: 0 0 var(--space-3);
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 /* ==========================================================================
-   Header and footer
+   Layout
+   ========================================================================== */
+.container {
+  width: 100%;
+  max-width: calc(var(--container) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.container--narrow {
+  max-width: calc(var(--measure) + 2 * var(--gutter));
+}
+
+.page {
+  padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(3rem, 8vw, 6rem);
+}
+
+/* ==========================================================================
+   Header
    ========================================================================== */
 .site-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem 1.5rem;
-  margin-bottom: 3rem;
-  padding-block: 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 50;
   border-bottom: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-bg) 85%, transparent);
+  backdrop-filter: saturate(140%) blur(12px);
+  -webkit-backdrop-filter: saturate(140%) blur(12px);
 }
 
-.site-name {
+.header-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: var(--header-h);
+}
+
+.brand {
   margin-right: auto;
   color: var(--color-text);
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1;
   text-decoration: none;
+  white-space: nowrap;
 }
 
-.site-header ul {
+.brand-dot {
+  color: var(--color-accent);
+}
+
+.site-nav ul {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem 1.25rem;
+  gap: var(--space-1);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.site-header nav a {
+.site-nav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45em;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
   color: var(--color-muted);
+  font-size: var(--text-sm);
+  font-weight: 500;
   text-decoration: none;
+  transition:
+    color var(--duration-fast) ease,
+    background-color var(--duration-fast) ease;
 }
 
-.site-header nav a:hover,
-.site-header nav a[aria-current] {
+.site-nav a:hover {
+  background: var(--color-surface);
   color: var(--color-text);
 }
 
-.site-header nav a[aria-current] {
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 0.4em;
+.site-nav a[aria-current] {
+  color: var(--color-text);
 }
 
-.theme-toggle {
+.nav-index {
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+}
+
+.site-nav a[aria-current] .nav-index,
+.site-nav a:hover .nav-index {
+  color: var(--color-accent);
+}
+
+.site-nav a[aria-current] .nav-label {
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.55em;
+}
+
+.header-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.icon-button {
   display: inline-grid;
   place-items: center;
   width: 2.5rem;
   height: 2.5rem;
   padding: 0;
   border: 1px solid var(--color-border);
-  border-radius: 50%;
+  border-radius: var(--radius);
   background: transparent;
   color: var(--color-text);
   cursor: pointer;
+  transition:
+    border-color var(--duration-fast) ease,
+    background-color var(--duration-fast) ease;
 }
 
-.theme-toggle:hover {
+.icon-button:hover {
+  border-color: var(--color-border-strong);
   background: var(--color-surface);
 }
 
-/* display: inline-grid above would otherwise override the hidden attribute. */
-.theme-toggle[hidden] {
+/* Theme toggle shows the current theme: moon in dark, sun in light. */
+.theme-toggle .icon-sun,
+:root[data-theme="light"] .theme-toggle .icon-moon {
   display: none;
 }
 
-/* Small screens: name and toggle on the first row, nav on its own row below. */
-@media (max-width: 40rem) {
-  .site-header {
-    margin-bottom: 2rem;
-    padding-block: 1rem;
+:root[data-theme="light"] .theme-toggle .icon-sun {
+  display: block;
+}
+
+.nav-toggle .icon-close,
+.nav-toggle[aria-expanded="true"] .icon-menu {
+  display: none;
+}
+
+.nav-toggle[aria-expanded="true"] .icon-close {
+  display: block;
+}
+
+/* Small screens. */
+@media (max-width: 47.99rem) {
+  .brand {
+    font-size: 1.3rem;
   }
 
-  .site-header nav {
-    order: 1;
+  /* With JS: the nav becomes a drop-down panel under the header, opened by the menu button. */
+  .js .site-nav {
+    display: none;
+    position: absolute;
+    /* Below the header's 1px bottom border (100% is measured inside the border). */
+    top: calc(100% + 1px);
+    right: 0;
+    left: 0;
+    padding: var(--space-2) var(--gutter) var(--space-5);
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-bg);
+  }
+
+  .js .site-nav.is-open {
+    display: block;
+  }
+
+  .js .site-nav ul {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .js .site-nav li + li {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .js .site-nav a {
+    padding: var(--space-4) 0;
+    border-radius: 0;
+    font-size: var(--text-lg);
+  }
+
+  .js .site-nav a:hover {
+    background: none;
+  }
+
+  /* Without JS: the links wrap onto their own row under the name. */
+  html:not(.js) .header-inner {
+    flex-wrap: wrap;
+    padding-block: var(--space-3);
+  }
+
+  html:not(.js) .site-nav {
+    order: 3;
     flex-basis: 100%;
   }
+
+  html:not(.js) .site-nav ul {
+    flex-wrap: wrap;
+  }
 }
 
+@media (min-width: 48rem) {
+  .nav-toggle {
+    display: none !important;
+  }
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
 .site-footer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.5rem 1.5rem;
-  margin-top: 4rem;
-  padding-block: 2rem;
+  padding-block: var(--space-8) var(--space-5);
   border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
   color: var(--color-muted);
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
 }
 
-.site-footer p {
+/* Phones: intro on top, the two link lists side by side. Wider: three columns. */
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+}
+
+.footer-intro {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 48rem) {
+  .footer-grid {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+
+  .footer-intro {
+    grid-column: auto;
+  }
+}
+
+.footer-intro p {
+  max-width: 28rem;
   margin: 0;
 }
 
-.site-footer ul {
-  display: flex;
-  gap: 1.25rem;
+.footer-intro .footer-name {
+  margin-bottom: var(--space-2);
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  line-height: 1.2;
+}
+
+.footer-label {
+  margin: 0 0 var(--space-3);
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.footer-links {
+  display: grid;
+  gap: var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+.footer-links a {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  color: var(--color-accent);
+}
+
+.footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-5);
+  margin-top: var(--space-7);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.footer-bottom p {
+  margin: 0;
+}
+
 /* ==========================================================================
    Lists of posts and projects
+   (restyled with the new tokens; redesigned in later steps)
    ========================================================================== */
 .intro {
-  margin-bottom: 3rem;
+  margin-bottom: var(--space-7);
 }
 
 .post-list,
 .project-list,
 .contact-links {
-  margin: 0 0 1.5rem;
+  margin: 0 0 var(--space-5);
   padding: 0;
   list-style: none;
 }
 
 .post-list > li + li {
-  margin-top: 1.75rem;
+  margin-top: var(--space-5);
 }
 
 .post-list :is(h2, h3) {
   margin: 0;
-  font-size: 1.25rem;
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0;
 }
 
-/* Title links in lists are clearly links from context; underline only on hover. */
+.post-list time {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.post-list p {
+  margin: var(--space-2) 0 0;
+}
+
 .post-list a,
 .project-card a {
+  color: var(--color-text);
   text-decoration: none;
 }
 
 .post-list a:hover,
 .project-card a:hover {
-  text-decoration: underline;
-}
-
-.post-list time {
-  display: block;
-  color: var(--color-muted);
-  font-size: 0.9rem;
-}
-
-.post-list p {
-  margin: 0.35rem 0 0;
+  color: var(--color-accent);
 }
 
 .project-list {
   display: grid;
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 .project-card {
   position: relative;
-  padding: 1.25rem 1.5rem;
+  padding: var(--space-5);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   background: var(--color-surface);
+  transition: border-color var(--duration) var(--ease-out);
 }
 
 .project-card:hover,
@@ -309,12 +587,17 @@ hr {
 }
 
 .project-card :is(h2, h3) {
-  margin: 0 0 0.5rem;
-  font-size: 1.25rem;
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0;
 }
 
 .project-card p {
-  margin: 0 0 0.75rem;
+  margin: 0 0 var(--space-4);
+  color: var(--color-muted);
   /* Short summaries look oddly narrow with "pretty" wrapping; use normal line filling. */
   text-wrap: wrap;
 }
@@ -327,11 +610,12 @@ hr {
   border-radius: inherit;
 }
 
+/* Chips: tech stack and tags. */
 .stack,
 .tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -339,50 +623,17 @@ hr {
 
 .stack li,
 .tags li {
-  padding: 0.1rem 0.6rem;
+  padding: 0.15rem 0.5rem;
   border: 1px solid var(--color-border);
-  border-radius: 999px;
-  background: var(--color-bg);
+  border-radius: var(--radius-sm);
   color: var(--color-muted);
-  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1.6;
 }
 
 .contact-links li + li {
-  margin-top: 0.5rem;
-}
-
-/* ==========================================================================
-   About page
-   ========================================================================== */
-.experience {
-  margin: 0 0 1.5rem;
-  padding: 0;
-  list-style: none;
-}
-
-.experience > li + li {
-  margin-top: 1.75rem;
-}
-
-.experience h3 {
-  margin: 0;
-  font-size: 1.15rem;
-}
-
-.experience-meta {
-  margin: 0 0 0.5rem;
-  color: var(--color-muted);
-  font-size: 0.95rem;
-}
-
-.experience ul {
-  margin: 0;
-  padding-left: 1.5rem;
-  list-style: disc;
-}
-
-.experience ul li + li {
-  margin-top: 0.25rem;
+  margin-top: var(--space-2);
 }
 
 .contact-links a {
@@ -390,39 +641,79 @@ hr {
 }
 
 /* ==========================================================================
+   About page
+   ========================================================================== */
+.experience {
+  margin: 0 0 var(--space-5);
+  padding: 0;
+  list-style: none;
+}
+
+.experience > li + li {
+  margin-top: var(--space-6);
+}
+
+.experience h3 {
+  margin: 0;
+}
+
+.experience-meta {
+  margin: var(--space-1) 0 var(--space-3);
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.experience ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+
+.experience ul li + li {
+  margin-top: var(--space-1);
+}
+
+/* ==========================================================================
    Article pages (blog posts and case studies)
    ========================================================================== */
 article > header {
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-5);
   border-bottom: 1px solid var(--color-border);
 }
 
 .post-meta {
-  margin: 0 0 0.75rem;
+  margin: 0 0 var(--space-3);
   color: var(--color-muted);
-  font-size: 0.95rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
 }
 
 .project-meta,
 .skills {
   display: grid;
   grid-template-columns: max-content 1fr;
-  gap: 0.35rem 1.25rem;
-  font-size: 0.95rem;
+  gap: var(--space-2) var(--space-5);
+  font-size: var(--text-sm);
 }
 
 .project-meta {
-  margin: 1.25rem 0 0;
+  margin: var(--space-5) 0 0;
 }
 
 .skills {
-  gap: 0.6rem 1.5rem;
+  gap: var(--space-3) var(--space-6);
 }
 
 :is(.project-meta, .skills) dt {
+  padding-top: 0.15em;
   color: var(--color-muted);
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 :is(.project-meta, .skills) dd {
@@ -430,7 +721,7 @@ article > header {
   overflow-wrap: anywhere;
 }
 
-/* Very narrow screens: stack each skill group above its items. */
+/* Very narrow screens: stack each label above its value. */
 @media (max-width: 30rem) {
   .skills {
     grid-template-columns: 1fr;
@@ -438,8 +729,18 @@ article > header {
   }
 
   .skills dd + dt {
-    margin-top: 0.6rem;
+    margin-top: var(--space-3);
   }
+}
+
+.prose {
+  font-size: 1.125rem;
+  line-height: 1.75;
+}
+
+.prose h2 {
+  margin-top: var(--space-7);
+  font-size: var(--text-xl);
 }
 
 .prose :is(ul, ol) {
@@ -448,16 +749,21 @@ article > header {
 
 .prose li + li,
 .prose li > :is(ul, ol) {
-  margin-top: 0.35rem;
+  margin-top: var(--space-2);
 }
 
 .prose li > :is(ul, ol) {
   margin-bottom: 0;
 }
 
+.prose li::marker {
+  color: var(--color-muted);
+}
+
 .prose blockquote {
-  padding: 0.25rem 0 0.25rem 1.25rem;
-  border-left: 3px solid var(--color-border);
+  margin-inline: 0;
+  padding: var(--space-1) 0 var(--space-1) var(--space-5);
+  border-left: 2px solid var(--color-accent);
   color: var(--color-muted);
 }
 
@@ -475,17 +781,18 @@ article > header {
   max-width: 100%;
   overflow-x: auto;
   border-collapse: collapse;
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
 }
 
 .prose :is(th, td) {
-  padding: 0.5rem 0.75rem;
+  padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-border);
   text-align: left;
 }
 
 .prose th {
   background: var(--color-surface);
+  font-weight: 600;
 }
 
 /* On phones, keep rows on one line and scroll sideways rather than squeezing columns to one word. */
@@ -504,27 +811,27 @@ kbd,
 samp,
 pre {
   font-family: var(--font-mono);
-  /* Show code exactly as typed: no "<=" drawn as "≤" by fonts like Cascadia Code or Fira Code. */
+  /* Show code exactly as typed: no "<=" drawn as "≤" by fonts with ligatures. */
   font-variant-ligatures: none;
 }
 
 :not(pre) > code {
   padding: 0.1em 0.35em;
   border: 1px solid var(--color-border);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   background: var(--color-surface);
-  font-size: 0.875em;
+  font-size: 0.85em;
   overflow-wrap: break-word;
 }
 
 pre {
-  padding: 1rem 1.25rem;
+  padding: var(--space-4) var(--space-5);
   overflow-x: auto;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   background: var(--color-surface);
-  font-size: 0.875rem;
-  line-height: 1.6;
+  font-size: var(--text-sm);
+  line-height: 1.65;
   tab-size: 4;
 }
 
@@ -533,22 +840,25 @@ pre code {
 }
 
 /* ==========================================================================
-   Utilities and motion
+   Utilities
    ========================================================================== */
 /* Hidden until focused by keyboard, then shown at the top of the page. */
 .skip-link {
-  position: absolute;
-  top: -100%;
-  left: 1rem;
-  z-index: 10;
-  padding: 0.5rem 1rem;
+  position: fixed;
+  top: var(--space-3);
+  left: var(--space-3);
+  z-index: 100;
+  padding: var(--space-2) var(--space-4);
   border: 2px solid var(--color-accent);
   border-radius: var(--radius);
   background: var(--color-bg);
+  color: var(--color-text);
+  font-weight: 500;
+  transform: translateY(-200%);
 }
 
 .skip-link:focus {
-  top: 1rem;
+  transform: none;
 }
 
 .visually-hidden {
@@ -560,11 +870,16 @@ pre code {
   white-space: nowrap;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .project-card,
-  .theme-toggle {
-    transition:
-      border-color 0.15s ease,
-      background-color 0.15s ease;
+/* ==========================================================================
+   Motion: honour reduced-motion preferences everywhere.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

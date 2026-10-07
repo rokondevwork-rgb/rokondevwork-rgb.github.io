@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { Font } from "astro:assets";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { BLOG, SITE } from "../consts";
@@ -12,6 +13,11 @@ interface Props {
   publishedDate?: Date;
   /** Keep the page out of search results (e.g. the 404 page). */
   noindex?: boolean;
+  /**
+   * Content width: "narrow" reading column (default), "wide" grid, or "full" when the page
+   * lays out its own full-bleed sections and containers.
+   */
+  width?: "narrow" | "wide" | "full";
 }
 
 const {
@@ -20,10 +26,16 @@ const {
   type = "website",
   publishedDate,
   noindex = false,
+  width = "narrow",
 } = Astro.props;
 
 const pageTitle = title ? `${title} | ${SITE.name}` : SITE.title;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const mainClass = {
+  narrow: "container container--narrow page",
+  wide: "container page",
+  full: undefined,
+}[width];
 ---
 
 <!doctype html>
@@ -39,6 +51,11 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <link rel="alternate" type="application/rss+xml" title={BLOG.title} href={new URL("rss.xml", Astro.site)} />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
+    <!-- Self-hosted fonts. Only the faces used above the fold are preloaded. -->
+    <Font cssVariable="--font-display" preload={[{ style: "normal" }]} />
+    <Font cssVariable="--font-body" preload={[{ weight: 400, style: "normal" }]} />
+    <Font cssVariable="--font-mono" />
+
     <!-- Social previews (LinkedIn, X, Slack, etc.) -->
     <meta property="og:type" content={type} />
     <meta property="og:site_name" content={SITE.name} />
@@ -53,8 +70,12 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     }
     <meta name="twitter:card" content="summary" />
 
-    <!-- Apply a saved theme before first paint so the page never flashes the wrong colours. -->
+    <!--
+      Runs before first paint: marks JS as available (enables the mobile menu) and applies a saved
+      theme so the page never flashes the wrong colours. Dark is the default when nothing is saved.
+    -->
     <script is:inline>
+      document.documentElement.classList.add("js");
       try {
         const theme = localStorage.getItem("theme");
         if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
@@ -64,7 +85,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     <Header />
-    <main id="main">
+    <main id="main" class={mainClass}>
       <slot />
     </main>
     <Footer />
