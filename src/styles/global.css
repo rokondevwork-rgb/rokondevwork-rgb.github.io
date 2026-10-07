@@ -1,7 +1,8 @@
 /* ==========================================================================
    Design tokens
-   Dark is the default. The toggle sets data-theme="light" on <html>, which flips
-   color-scheme, and light-dark() then picks the light value of every colour token.
+   Dark unless the visitor (or their OS) chooses light: Base.astro sets
+   data-theme="light" on <html>, which flips color-scheme, and light-dark()
+   then picks the light value of every colour token.
    Fonts (--font-display, --font-body, --font-mono) are defined by Astro's <Font>
    components in Base.astro, so they are not declared here.
    ========================================================================== */
@@ -9,26 +10,24 @@
   color-scheme: dark;
 
   /* Colour: light value first, dark value second. */
-  --color-bg: light-dark(#f7f5f0, #0e0f11);
-  --color-surface: light-dark(#efece5, #16181b);
-  --color-surface-2: light-dark(#e7e3da, #1d2024);
-  --color-text: light-dark(#17181b, #ece8e1);
-  --color-muted: light-dark(#5f5b54, #9c978f);
-  --color-border: light-dark(#ddd8ce, #26292e);
-  --color-border-strong: light-dark(#c5bfb3, #3a3e45);
-  --color-accent: light-dark(#8c5200, #f2a93b);
-  --color-accent-contrast: light-dark(#f7f5f0, #0e0f11);
-  --color-accent-soft: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  --color-bg: light-dark(#f4f6f7, #0b1014);
+  --color-surface: light-dark(#e8ecee, #121a21);
+  --color-text: light-dark(#0d151b, #e9eef2);
+  --color-muted: light-dark(#566570, #8795a1);
+  --color-border: light-dark(#d2d9dd, #1f2a33);
+  --color-border-strong: light-dark(#b3bec4, #33424e);
+  --color-accent: light-dark(#2f4fe0, #7d98ff);
+  --color-accent-contrast: light-dark(#ffffff, #0b1014);
 
-  /* Type scale (fluid where it matters). */
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1.0625rem;
-  --text-lg: 1.25rem;
+  /* Type scale. */
+  --text-xs: 0.8125rem; /* 13px */
+  --text-sm: 0.875rem; /* 14px */
+  --text-base: 1rem;
+  --text-md: 1.125rem; /* 18px */
+  --text-lg: 1.25rem; /* 20px */
   --text-xl: clamp(1.375rem, 1.2rem + 0.75vw, 1.75rem);
-  --text-2xl: clamp(1.875rem, 1.4rem + 2vw, 2.75rem);
-  --text-3xl: clamp(2.5rem, 1.6rem + 3.5vw, 4rem);
-  --text-hero: clamp(3rem, 1.2rem + 7.5vw, 6.75rem);
+  --text-2xl: clamp(1.75rem, 1.2rem + 2vw, 2.75rem);
+  --text-mono: 0.78125rem; /* 12.5px */
 
   /* Spacing. */
   --space-1: 0.25rem;
@@ -42,19 +41,18 @@
   --space-9: 6rem;
 
   /* Layout. */
-  --container: 72rem; /* wide pages: home, projects */
-  --measure: 42rem; /* reading column: posts, case studies */
-  --gutter: clamp(1rem, 4vw, 2rem);
+  --container: 70rem; /* 1120px including gutters */
+  --measure: 42rem; /* reading column for posts */
+  --gutter: clamp(1.25rem, 4vw, 2.5rem);
   --header-h: 4rem;
 
-  --radius-sm: 4px;
+  --radius-sm: 5px;
   --radius: 8px;
-  --radius-lg: 14px;
 
   /* Motion. */
   --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
-  --duration-fast: 150ms;
-  --duration: 300ms;
+  --duration-fast: 200ms;
+  --duration: 250ms;
 }
 
 :root[data-theme="light"] {
@@ -81,6 +79,12 @@ html {
   scroll-padding-top: calc(var(--header-h) + var(--space-4));
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 body {
   display: flex;
   flex-direction: column;
@@ -90,7 +94,7 @@ body {
   color: var(--color-text);
   font-family: var(--font-body);
   font-size: var(--text-base);
-  line-height: 1.65;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -106,7 +110,6 @@ main {
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
-  border-radius: 2px;
 }
 
 img,
@@ -118,45 +121,37 @@ video {
 
 /* ==========================================================================
    Typography
-   Display face for page and section titles; body face for everything else.
-   Instrument Serif ships one weight, so titles stay at 400 (no faux bold).
+   Bricolage Grotesque for titles, Geist for text, Geist Mono for code and chips.
    ========================================================================== */
 h1,
 h2,
 h3,
 h4 {
   margin: 0;
-  text-wrap: balance;
-}
-
-h1,
-h2 {
   font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  font-weight: 700;
+  text-wrap: balance;
 }
 
 h1 {
   margin-bottom: var(--space-5);
-  font-size: var(--text-3xl);
-  line-height: 1.05;
+  font-size: clamp(2.75rem, 8vw, 6rem);
+  line-height: 0.92;
+  letter-spacing: -0.045em;
 }
 
 h2 {
-  margin: var(--space-7) 0 var(--space-4);
-  font-size: var(--text-2xl);
+  margin: var(--space-7) 0 var(--space-5);
+  font-size: 1.75rem;
   line-height: 1.1;
-}
-
-h3,
-h4 {
-  font-weight: 600;
-  line-height: 1.3;
+  letter-spacing: -0.02em;
 }
 
 h3 {
   margin: var(--space-6) 0 var(--space-3);
   font-size: var(--text-lg);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
 }
 
 p,
@@ -174,6 +169,7 @@ p {
   text-wrap: pretty;
 }
 
+/* Links in running text; navigation, cards and rows override this. */
 a {
   color: var(--color-accent);
   text-decoration-line: underline;
@@ -199,20 +195,24 @@ hr {
 
 .lead {
   color: var(--color-muted);
-  font-size: var(--text-lg);
+  font-size: var(--text-md);
   line-height: 1.55;
 }
 
-/* Small monospace label, e.g. section kickers and metadata. */
+/* Small monospace label, e.g. section kickers ("01 / Selected work"). */
 .eyebrow {
   display: block;
   margin: 0 0 var(--space-3);
   color: var(--color-muted);
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: var(--text-mono);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.5;
+}
+
+.eyebrow-index {
+  color: var(--color-accent);
 }
 
 /* ==========================================================================
@@ -220,7 +220,7 @@ hr {
    ========================================================================== */
 .container {
   width: 100%;
-  max-width: calc(var(--container) + 2 * var(--gutter));
+  max-width: var(--container);
   margin-inline: auto;
   padding-inline: var(--gutter);
 }
@@ -230,7 +230,7 @@ hr {
 }
 
 .page {
-  padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(3rem, 8vw, 6rem);
+  padding-block: clamp(3.5rem, 9vw, 7rem) clamp(3.5rem, 8vw, 6rem);
 }
 
 /* ==========================================================================
@@ -241,15 +241,15 @@ hr {
   top: 0;
   z-index: 50;
   border-bottom: 1px solid var(--color-border);
-  background: color-mix(in srgb, var(--color-bg) 85%, transparent);
-  backdrop-filter: saturate(140%) blur(12px);
-  -webkit-backdrop-filter: saturate(140%) blur(12px);
+  background: color-mix(in srgb, var(--color-bg) 82%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 
 .header-inner {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: 1.75rem;
   min-height: var(--header-h);
 }
 
@@ -257,64 +257,38 @@ hr {
   margin-right: auto;
   color: var(--color-text);
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: var(--text-md);
+  font-weight: 700;
   line-height: 1;
+  letter-spacing: -0.02em;
   text-decoration: none;
   white-space: nowrap;
 }
 
-.brand-dot {
-  color: var(--color-accent);
-}
-
 .site-nav ul {
   display: flex;
-  gap: var(--space-1);
+  gap: 1.75rem;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .site-nav a {
-  display: flex;
-  align-items: baseline;
-  gap: 0.45em;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-sm);
+  display: block;
   color: var(--color-muted);
   font-size: var(--text-sm);
-  font-weight: 500;
   text-decoration: none;
-  transition:
-    color var(--duration-fast) ease,
-    background-color var(--duration-fast) ease;
+  transition: color var(--duration-fast) ease;
 }
 
-.site-nav a:hover {
-  background: var(--color-surface);
-  color: var(--color-text);
-}
-
+.site-nav a:hover,
 .site-nav a[aria-current] {
   color: var(--color-text);
 }
 
-.nav-index {
-  color: var(--color-muted);
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-}
-
-.site-nav a[aria-current] .nav-index,
-.site-nav a:hover .nav-index {
-  color: var(--color-accent);
-}
-
-.site-nav a[aria-current] .nav-label {
-  text-decoration: underline;
-  text-decoration-color: var(--color-accent);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 0.55em;
+.site-nav a[aria-current] {
+  padding-bottom: 4px;
+  box-shadow: 0 2px 0 var(--color-accent);
 }
 
 .header-actions {
@@ -323,34 +297,21 @@ hr {
 }
 
 .icon-button {
-  display: inline-grid;
+  display: grid;
   place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.25rem;
+  height: 2.25rem;
   padding: 0;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
-  background: transparent;
+  background: none;
   color: var(--color-text);
   cursor: pointer;
-  transition:
-    border-color var(--duration-fast) ease,
-    background-color var(--duration-fast) ease;
+  transition: border-color var(--duration-fast) ease;
 }
 
 .icon-button:hover {
-  border-color: var(--color-border-strong);
-  background: var(--color-surface);
-}
-
-/* Theme toggle shows the current theme: moon in dark, sun in light. */
-.theme-toggle .icon-sun,
-:root[data-theme="light"] .theme-toggle .icon-moon {
-  display: none;
-}
-
-:root[data-theme="light"] .theme-toggle .icon-sun {
-  display: block;
+  border-color: var(--color-muted);
 }
 
 .nav-toggle .icon-close,
@@ -364,8 +325,8 @@ hr {
 
 /* Small screens. */
 @media (max-width: 47.99rem) {
-  .brand {
-    font-size: 1.3rem;
+  .header-inner {
+    gap: var(--space-4);
   }
 
   /* With JS: the nav becomes a drop-down panel under the header, opened by the menu button. */
@@ -396,12 +357,16 @@ hr {
 
   .js .site-nav a {
     padding: var(--space-4) 0;
-    border-radius: 0;
+    font-family: var(--font-display);
     font-size: var(--text-lg);
+    font-weight: 700;
+    letter-spacing: -0.02em;
   }
 
-  .js .site-nav a:hover {
-    background: none;
+  .js .site-nav a[aria-current] {
+    padding-bottom: var(--space-4);
+    padding-left: var(--space-3);
+    box-shadow: inset 2px 0 0 var(--color-accent);
   }
 
   /* Without JS: the links wrap onto their own row under the name. */
@@ -417,6 +382,7 @@ hr {
 
   html:not(.js) .site-nav ul {
     flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
   }
 }
 
@@ -430,7 +396,7 @@ hr {
    Footer
    ========================================================================== */
 .site-footer {
-  padding-block: var(--space-8) var(--space-5);
+  padding-block: 2.75rem 1.75rem;
   border-top: 1px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-muted);
@@ -448,9 +414,9 @@ hr {
   grid-column: 1 / -1;
 }
 
-@media (min-width: 48rem) {
+@media (min-width: 51.25rem) {
   .footer-grid {
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 1.5fr 1fr 1fr;
   }
 
   .footer-intro {
@@ -464,55 +430,39 @@ hr {
 }
 
 .footer-intro .footer-name {
-  margin-bottom: var(--space-2);
+  margin-bottom: 0.625rem;
   color: var(--color-text);
   font-family: var(--font-display);
-  font-size: var(--text-xl);
-  line-height: 1.2;
-}
-
-.footer-label {
-  margin: 0 0 var(--space-3);
-  color: var(--color-muted);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  line-height: 1.4;
-  text-transform: uppercase;
+  font-size: var(--text-md);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 
 .footer-links {
   display: grid;
   gap: var(--space-2);
+  align-content: start;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .footer-links a {
-  color: var(--color-text);
+  color: inherit;
   text-decoration: none;
+  transition: color var(--duration-fast) ease;
 }
 
 .footer-links a:hover {
   color: var(--color-accent);
 }
 
-.footer-bottom {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: var(--space-2) var(--space-5);
-  margin-top: var(--space-7);
-  padding-top: var(--space-4);
+.footer-base {
+  margin: 2.25rem 0 0;
+  padding-top: 1.125rem;
   border-top: 1px solid var(--color-border);
-  font-family: var(--font-mono);
   font-size: var(--text-xs);
-}
-
-.footer-bottom p {
-  margin: 0;
 }
 
 /* ==========================================================================
@@ -522,7 +472,7 @@ hr {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  padding: 0.8rem 1.25rem;
+  padding: 0.75rem 1.125rem;
   border: 1px solid transparent;
   border-radius: var(--radius);
   font-size: var(--text-sm);
@@ -531,8 +481,7 @@ hr {
   text-decoration: none;
   transition:
     background-color var(--duration-fast) ease,
-    border-color var(--duration-fast) ease,
-    color var(--duration-fast) ease;
+    border-color var(--duration-fast) ease;
 }
 
 .button svg {
@@ -553,13 +502,12 @@ hr {
 }
 
 .button--secondary {
-  border-color: var(--color-border-strong);
+  border-color: var(--color-border);
   color: var(--color-text);
 }
 
 .button--secondary:hover {
-  border-color: var(--color-text);
-  background: var(--color-surface);
+  border-color: var(--color-muted);
 }
 
 /* ==========================================================================
@@ -569,7 +517,7 @@ hr {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  padding-block: clamp(3.5rem, 10vw, 7.5rem) clamp(3rem, 7vw, 5.5rem);
+  padding-block: clamp(3.5rem, 9vw, 7rem) clamp(3rem, 6vw, 4.5rem);
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -603,13 +551,13 @@ hr {
   align-items: center;
   gap: var(--space-2);
   margin: 0 0 var(--space-5);
-  padding: 0.3rem 0.8rem 0.3rem 0.65rem;
+  padding: 0.35rem 0.8rem 0.35rem 0.65rem;
   border: 1px solid var(--color-border);
   border-radius: 999px;
   background: var(--color-bg);
   color: var(--color-muted);
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
+  font-size: var(--text-mono);
 }
 
 .status-dot {
@@ -617,14 +565,14 @@ hr {
   height: 0.5rem;
   border-radius: 50%;
   background: var(--color-accent);
-  box-shadow: 0 0 0 3px var(--color-accent-soft);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 20%, transparent);
 }
 
 .hero-title {
   margin: 0 0 var(--space-5);
-  font-size: var(--text-hero);
-  line-height: 0.95;
-  letter-spacing: -0.02em;
+  font-size: clamp(2.5rem, 0.9rem + 7.5vw, 6rem);
+  line-height: 0.92;
+  letter-spacing: -0.045em;
 }
 
 .hero-title > span {
@@ -634,7 +582,7 @@ hr {
 .hero-tagline {
   max-width: 36rem;
   margin: 0 0 var(--space-6);
-  font-size: clamp(1.2rem, 1rem + 0.8vw, 1.5rem);
+  font-size: clamp(1.125rem, 1rem + 0.6vw, 1.375rem);
   line-height: 1.45;
 }
 
@@ -647,7 +595,7 @@ hr {
 /* "Spec sheet" panel beside the hero (below it on small screens). */
 .spec-card {
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   background: color-mix(in srgb, var(--color-surface) 85%, transparent);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
@@ -660,9 +608,7 @@ hr {
   border-bottom: 1px solid var(--color-border);
   color: var(--color-muted);
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: var(--text-mono);
 }
 
 .spec-card dl {
@@ -681,12 +627,9 @@ hr {
 }
 
 .spec-card dt {
-  padding-top: 0.2em;
   color: var(--color-muted);
-  font-family: var(--font-mono);
   font-size: var(--text-xs);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  line-height: 1.7;
 }
 
 .spec-card dd {
@@ -717,7 +660,7 @@ hr {
   margin: 0;
   padding: 0;
   font-family: var(--font-mono);
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   list-style: none;
 }
 
@@ -733,7 +676,7 @@ hr {
   gap: var(--space-6);
   padding: clamp(1.5rem, 5vw, 3.5rem);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   background: var(--color-surface);
 }
 
@@ -758,6 +701,8 @@ hr {
   color: var(--color-text);
   font-family: var(--font-display);
   font-size: var(--text-xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
   line-height: 1.3;
   text-decoration-color: var(--color-accent);
   overflow-wrap: anywhere;
@@ -774,10 +719,8 @@ hr {
   margin: var(--space-4) 0 0;
   padding: 0;
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  letter-spacing: 0.08em;
+  font-size: var(--text-mono);
   list-style: none;
-  text-transform: uppercase;
 }
 
 .contact-band-links a {
@@ -811,28 +754,21 @@ hr {
 
 .section-head h2 {
   margin: 0;
-}
-
-.eyebrow-index {
-  color: var(--color-accent);
+  font-size: var(--text-2xl);
+  letter-spacing: -0.03em;
 }
 
 .section-link {
   display: inline-flex;
   align-items: center;
   gap: 0.5em;
-  padding-bottom: 2px;
-  border-bottom: 1px solid var(--color-border-strong);
-  color: var(--color-text);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  letter-spacing: 0.08em;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
   text-decoration: none;
-  text-transform: uppercase;
+  transition: color var(--duration-fast) ease;
 }
 
 .section-link:hover {
-  border-color: var(--color-accent);
   color: var(--color-accent);
 }
 
@@ -845,19 +781,15 @@ hr {
 }
 
 /* ==========================================================================
-   Project cards
+   Project cards (home page)
    ========================================================================== */
-.project-grid,
-.project-list {
+.project-grid {
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
   gap: var(--space-4);
-  margin: 0 0 var(--space-5);
+  margin: 0;
   padding: 0;
   list-style: none;
-}
-
-.project-grid {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
 }
 
 /* Cards in a row share the tallest card's height. */
@@ -875,7 +807,7 @@ hr {
   flex-direction: column;
   padding: var(--space-5);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   background: var(--color-surface);
   transition:
     border-color var(--duration) var(--ease-out),
@@ -895,7 +827,7 @@ hr {
   margin-bottom: var(--space-6);
   color: var(--color-muted);
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
+  font-size: var(--text-mono);
 }
 
 .project-arrow {
@@ -912,10 +844,9 @@ hr {
 
 .project-title {
   margin: 0 0 var(--space-2);
-  font-family: var(--font-display);
-  font-size: var(--text-xl);
-  font-weight: 400;
-  line-height: 1.15;
+  font-size: 1.375rem;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 
 .project-title a {
@@ -943,6 +874,346 @@ hr {
 }
 
 /* ==========================================================================
+   Projects index: hero, technology filters, project rows
+   ========================================================================== */
+.page-hero {
+  display: grid;
+  gap: 1.75rem;
+  align-items: end;
+  padding-block: clamp(3.5rem, 9vw, 7rem) clamp(2rem, 5vw, 3.5rem);
+}
+
+@media (min-width: 51.25rem) {
+  .page-hero {
+    grid-template-columns: 1.4fr 1fr;
+  }
+}
+
+.page-hero h1 {
+  margin: 0;
+  font-size: clamp(3.5rem, 11vw, 8rem);
+}
+
+.page-hero .lead {
+  max-width: 34ch;
+  margin: 0;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding-block: 1.25rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.filters button {
+  padding: 0.5625rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: none;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease;
+}
+
+.filters button:hover {
+  border-color: var(--color-muted);
+  color: var(--color-text);
+}
+
+.filters button[aria-pressed="true"] {
+  border-color: var(--color-text);
+  background: var(--color-text);
+  color: var(--color-bg);
+}
+
+.filters sup {
+  margin-left: 5px;
+  font-size: 0.625rem;
+  opacity: 0.7;
+}
+
+.project-rows {
+  margin: 0 0 clamp(3.5rem, 8vw, 6rem);
+  padding: 0;
+  border-bottom: 1px solid var(--color-border);
+  list-style: none;
+}
+
+.project-row {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  gap: 0.625rem 2rem;
+  align-items: start;
+  padding-block: 2.125rem;
+  border-top: 1px solid var(--color-border);
+}
+
+@media (min-width: 51.25rem) {
+  .project-row {
+    grid-template-columns: 5fr 4fr 3fr 24px;
+    padding-block: 2.5rem;
+  }
+}
+
+/* Hover/focus background, extended to the container's edges. */
+.project-row::before {
+  content: "";
+  position: absolute;
+  inset: 0 calc(var(--gutter) * -1);
+  z-index: -1;
+  background: var(--color-surface);
+  opacity: 0;
+  transition: opacity var(--duration-fast) ease;
+}
+
+.project-row:hover::before,
+.project-row:focus-within::before {
+  opacity: 1;
+}
+
+.project-row h2 {
+  margin: 0;
+  font-size: clamp(1.875rem, 4vw, 2.875rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  transition: color var(--duration-fast) ease;
+}
+
+.project-row h2 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* The whole row is clickable via the title link. */
+.project-row h2 a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.project-row:hover h2,
+.project-row:focus-within h2 {
+  color: var(--color-accent);
+}
+
+.project-row p {
+  max-width: 42ch;
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.project-row .project-row-stack {
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
+  line-height: 1.9;
+}
+
+.project-row-go {
+  display: none;
+  color: var(--color-muted);
+  font-size: 1.375rem;
+  line-height: 1;
+  transition:
+    transform var(--duration) ease,
+    color var(--duration-fast) ease;
+}
+
+@media (min-width: 51.25rem) {
+  .project-row-go {
+    display: block;
+  }
+}
+
+.project-row:hover .project-row-go,
+.project-row:focus-within .project-row-go {
+  color: var(--color-accent);
+  transform: translate(4px, -4px);
+}
+
+/* Titles rise into view on page load, one after another. */
+@keyframes rise {
+  from {
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(14px);
+  }
+  to {
+    clip-path: inset(0);
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .project-row h2 {
+    /* "backwards": once finished, no clip-path/transform stays applied (keeps the row link full size). */
+    animation: rise 0.7s var(--ease-out) backwards;
+    animation-delay: calc(var(--i) * 70ms);
+  }
+}
+
+/* ==========================================================================
+   Case study (project detail)
+   ========================================================================== */
+.back {
+  display: inline-block;
+  margin-top: 2.5rem;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+  text-decoration: none;
+  transition: color var(--duration-fast) ease;
+}
+
+.back:hover {
+  color: var(--color-accent);
+}
+
+.case h1 {
+  max-width: 14ch;
+  margin: 1.75rem 0 var(--space-5);
+  font-size: clamp(2.75rem, 8vw, 6rem);
+}
+
+.case-lead {
+  max-width: 46ch;
+  margin: 0;
+  color: color-mix(in srgb, var(--color-text) 80%, var(--color-bg));
+  font-size: var(--text-lg);
+  line-height: 1.5;
+}
+
+.case-cols {
+  display: grid;
+  gap: var(--space-7);
+  margin-top: var(--space-8);
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+@media (min-width: 51.25rem) {
+  .case-cols {
+    grid-template-columns: 15rem minmax(0, 1fr);
+    gap: 4.5rem;
+  }
+}
+
+.case-meta {
+  display: grid;
+  gap: 1.75rem;
+  align-content: start;
+  margin: 0;
+}
+
+@media (min-width: 51.25rem) {
+  .case-meta {
+    position: sticky;
+    top: 6rem;
+  }
+}
+
+.case-meta dt {
+  margin-bottom: var(--space-2);
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+}
+
+.case-meta dd {
+  margin: 0;
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+}
+
+.case-body h2 {
+  margin: 0 0 var(--space-5);
+  font-size: 1.75rem;
+}
+
+.case-body > :last-child {
+  margin-bottom: 0;
+}
+
+/* A list right after a section title ("What I built", "Results") gets the large, ruled style. */
+.case-body h2 + ul {
+  display: grid;
+  margin: 0 0 3.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.case-body h2 + ul > li {
+  max-width: 34ch;
+  padding: 1.375rem 0 1.375rem var(--space-5);
+  border-left: 2px solid var(--color-border);
+  font-size: clamp(1.1875rem, 1rem + 0.9vw, 1.5rem);
+  line-height: 1.4;
+  transition: border-color var(--duration-fast) ease;
+}
+
+.case-body h2 + ul > li:hover {
+  border-color: var(--color-accent);
+}
+
+/* Dev-only reminder boxes (never rendered in production builds). */
+.placeholder-box {
+  max-width: 52ch;
+  margin: 0 0 3.5rem;
+  padding: 1.375rem;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius);
+  color: var(--color-muted);
+}
+
+.next-project {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin: var(--space-9) 0;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.next-project small {
+  display: block;
+  margin-bottom: 0.375rem;
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+}
+
+.next-project strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(1.625rem, 4vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  transition: color var(--duration-fast) ease;
+}
+
+.next-project:hover strong {
+  color: var(--color-accent);
+}
+
+.next-project-arrow {
+  font-size: 1.75rem;
+  line-height: 1;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.next-project:hover .next-project-arrow {
+  transform: translateX(4px);
+}
+
+/* ==========================================================================
    Post rows (home, blog index)
    ========================================================================== */
 .post-list {
@@ -965,23 +1236,22 @@ hr {
 
 @media (min-width: 48rem) {
   .post-row {
-    grid-template-columns: 8.5rem minmax(0, 1fr);
+    grid-template-columns: 8rem minmax(0, 1fr);
   }
 }
 
 .post-row-date {
-  padding-top: 0.45em;
+  padding-top: 0.5em;
   color: var(--color-muted);
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
+  font-size: var(--text-mono);
 }
 
 .post-row-title {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: var(--text-xl);
-  font-weight: 400;
-  line-height: 1.2;
+  font-size: 1.5rem;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
 }
 
 .post-row-title a {
@@ -1016,24 +1286,30 @@ hr {
    Chips: tech stack and tags
    ========================================================================== */
 .stack,
-.tags {
+.tags,
+.chips {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: 6px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .stack li,
-.tags li {
-  padding: 0.15rem 0.5rem;
+.tags li,
+.chips li {
+  padding: 7px 9px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  color: var(--color-muted);
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  line-height: 1.6;
+  font-size: var(--text-mono);
+  line-height: 1;
+}
+
+.stack li,
+.tags li {
+  color: var(--color-muted);
 }
 
 .contact-links {
@@ -1048,28 +1324,6 @@ hr {
 
 .contact-links a {
   overflow-wrap: anywhere;
-}
-
-/* ==========================================================================
-   Scroll reveal: elements marked data-reveal fade and rise as they enter the
-   viewport. Pure CSS (scroll-driven animations): browsers without support, and
-   anyone who prefers reduced motion, simply see the content with no animation.
-   ========================================================================== */
-@keyframes reveal {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: view()) {
-    [data-reveal] {
-      animation: reveal var(--ease-out) both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 160px;
-    }
-  }
 }
 
 /* ==========================================================================
@@ -1093,7 +1347,7 @@ hr {
   margin: var(--space-1) 0 var(--space-3);
   color: var(--color-muted);
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
+  font-size: var(--text-mono);
 }
 
 .experience ul {
@@ -1106,49 +1360,19 @@ hr {
   margin-top: var(--space-1);
 }
 
-/* ==========================================================================
-   Article pages (blog posts and case studies)
-   ========================================================================== */
-article > header {
-  margin-bottom: var(--space-6);
-  padding-bottom: var(--space-5);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.post-meta {
-  margin: 0 0 var(--space-3);
-  color: var(--color-muted);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-}
-
-.project-meta,
 .skills {
   display: grid;
   grid-template-columns: max-content 1fr;
-  gap: var(--space-2) var(--space-5);
-  font-size: var(--text-sm);
-}
-
-.project-meta {
-  margin: var(--space-5) 0 0;
-}
-
-.skills {
   gap: var(--space-3) var(--space-6);
 }
 
-:is(.project-meta, .skills) dt {
-  padding-top: 0.15em;
+.skills dt {
   color: var(--color-muted);
-  font-family: var(--font-mono);
   font-size: var(--text-xs);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  line-height: 1.85;
 }
 
-:is(.project-meta, .skills) dd {
+.skills dd {
   margin: 0;
   overflow-wrap: anywhere;
 }
@@ -1165,14 +1389,30 @@ article > header {
   }
 }
 
+/* ==========================================================================
+   Blog posts
+   ========================================================================== */
+article > header {
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.post-meta {
+  margin: 0 0 var(--space-3);
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
+}
+
 .prose {
-  font-size: 1.125rem;
+  font-size: 1.0625rem;
   line-height: 1.75;
 }
 
 .prose h2 {
   margin-top: var(--space-7);
-  font-size: var(--text-xl);
+  font-size: 1.625rem;
 }
 
 .prose :is(ul, ol) {
@@ -1300,6 +1540,28 @@ pre code {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+/* ==========================================================================
+   Scroll reveal: elements marked data-reveal fade and rise as they enter the
+   viewport. Pure CSS (scroll-driven animations): browsers without support, and
+   anyone who prefers reduced motion, simply see the content with no animation.
+   ========================================================================== */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    [data-reveal] {
+      animation: reveal var(--ease-out) both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 160px;
+    }
+  }
 }
 
 /* ==========================================================================

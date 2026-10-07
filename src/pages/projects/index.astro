@@ -1,29 +1,87 @@
 ---
 import Base from "../../layouts/Base.astro";
-import ProjectCard from "../../components/ProjectCard.astro";
+import { PROJECT_FILTERS } from "../../consts";
 import { getProjects } from "../../lib/content";
 
 const projects = await getProjects();
+const filters = ["All", ...PROJECT_FILTERS].map((name) => ({
+  name,
+  count:
+    name === "All" ? projects.length : projects.filter((p) => p.data.stack.includes(name)).length,
+}));
 ---
 
 <Base
   title="Projects"
   description="Selected backend projects by Rokunuzzaman Rokon: hotel content APIs, booking systems, data ingestion, and full-stack apps."
+  width="full"
 >
-  <h1>Projects</h1>
-  <p class="lead">Selected work: APIs, hotel content platforms, and data-driven applications.</p>
+  <div class="container">
+    <section class="page-hero">
+      <h1>Projects</h1>
+      <p class="lead">Selected work: APIs, hotel content platforms, and data-driven applications.</p>
+    </section>
 
-  {
-    projects.length > 0 ? (
-      <ul class="project-list">
-        {projects.map((project) => (
-          <li>
-            <ProjectCard project={project} />
+    <!-- Filters only work with JS, so they stay hidden until the script below runs. -->
+    <div class="filters" role="group" aria-label="Filter by technology" hidden>
+      {
+        filters.map(({ name, count }, i) => (
+          <button
+            type="button"
+            data-filter={name}
+            aria-pressed={i === 0 ? "true" : "false"}
+            aria-label={`${name} (${count} ${count === 1 ? "project" : "projects"})`}
+          >
+            {name}
+            <sup>{count}</sup>
+          </button>
+        ))
+      }
+    </div>
+    <p class="visually-hidden" id="filter-status" aria-live="polite"></p>
+
+    <ul class="project-rows">
+      {
+        projects.map((project, i) => (
+          <li class="project-row" style={`--i: ${i}`} data-stack={project.data.stack.join("|")}>
+            <h2>
+              <a href={`/projects/${project.id}/`}>{project.data.title}</a>
+            </h2>
+            <p>{project.data.summary}</p>
+            <p class="project-row-stack">{project.data.stack.join(", ")}</p>
+            <span class="project-row-go" aria-hidden="true">↗</span>
           </li>
-        ))}
-      </ul>
-    ) : (
-      <p>No projects yet.</p>
-    )
-  }
+        ))
+      }
+    </ul>
+  </div>
 </Base>
+
+<script>
+  const group = document.querySelector<HTMLElement>(".filters");
+  const rows = [...document.querySelectorAll<HTMLElement>(".project-row")];
+  const status = document.querySelector<HTMLElement>("#filter-status");
+
+  if (group) {
+    const buttons = [...group.querySelectorAll<HTMLButtonElement>("button")];
+    group.hidden = false;
+
+    group.addEventListener("click", (event) => {
+      const button = (event.target as Element).closest("button");
+      if (!button) return;
+      const filter = button.dataset.filter ?? "All";
+
+      buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === button)));
+      let shown = 0;
+      for (const row of rows) {
+        const match = filter === "All" || (row.dataset.stack ?? "").split("|").includes(filter);
+        row.hidden = !match;
+        if (match) shown++;
+      }
+      if (status) {
+        const noun = shown === 1 ? "project" : "projects";
+        status.textContent = filter === "All" ? `Showing all ${shown} ${noun}.` : `Showing ${shown} ${noun} using ${filter}.`;
+      }
+    });
+  }
+</script>

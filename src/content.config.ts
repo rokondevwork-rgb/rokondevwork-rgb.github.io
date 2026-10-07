@@ -24,6 +24,10 @@ const projects = defineCollection({
     link: z.url({ protocol: /^https?$/ }).optional(),
     featured: z.boolean().default(false),
     order: z.number().default(99),
+    /** Shown in the case-study sidebar, e.g. "Hotel and travel tech". */
+    domain: z.string().optional(),
+    /** Outcomes you can share publicly. The Results section only appears when this is set. */
+    results: z.array(z.string()).optional(),
   }),
 });
 

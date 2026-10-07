@@ -5,51 +5,104 @@ import { getProjects } from "../../lib/content";
 
 export async function getStaticPaths() {
   const projects = await getProjects();
-  return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
+  return projects.map((project, i) => ({
+    params: { slug: project.id },
+    // The last project links back round to the first.
+    props: { project, next: projects[(i + 1) % projects.length] },
+  }));
 }
 
 interface Props {
   project: CollectionEntry<"projects">;
+  next: CollectionEntry<"projects">;
 }
 
-const { project } = Astro.props;
-const { title, summary, stack, role, link } = project.data;
+const { project, next } = Astro.props;
+const { title, summary, stack, role, domain, link, results } = project.data;
 const { Content } = await render(project);
+const hasBody = Boolean(project.body?.trim());
 ---
 
-<Base title={title} description={summary}>
-  <article>
-    <header>
+<Base title={title} description={summary} width="full">
+  <div class="container">
+    <article class="case">
+      <a class="back" href="/projects/"><span aria-hidden="true">←</span> All projects</a>
       <h1>{title}</h1>
-      <p class="lead">{summary}</p>
-      <dl class="project-meta">
-        {
-          role && (
-            <>
-              <dt>Role</dt>
-              <dd>{role}</dd>
-            </>
-          )
-        }
-        <dt>Stack</dt>
-        <dd>{stack.join(", ")}</dd>
-        {
-          link && (
-            <>
-              <dt>Link</dt>
-              <dd>
-                <a href={link} rel="noopener">{link}</a>
-              </dd>
-            </>
-          )
-        }
-      </dl>
-    </header>
+      <p class="case-lead">{summary}</p>
 
-    <div class="prose">
-      <Content />
-    </div>
-  </article>
+      <div class="case-cols">
+        <dl class="case-meta">
+          <div>
+            <dt>Stack</dt>
+            <dd>
+              <ul class="chips">
+                {stack.map((tech) => <li>{tech}</li>)}
+              </ul>
+            </dd>
+          </div>
+          {
+            role && (
+              <div>
+                <dt>Role</dt>
+                <dd>{role}</dd>
+              </div>
+            )
+          }
+          {
+            domain && (
+              <div>
+                <dt>Domain</dt>
+                <dd>{domain}</dd>
+              </div>
+            )
+          }
+          {
+            link && (
+              <div>
+                <dt>Link</dt>
+                <dd>
+                  <a href={link} rel="noopener">{new URL(link).hostname}</a>
+                </dd>
+              </div>
+            )
+          }
+        </dl>
 
-  <p><a href="/projects/">Back to all projects</a></p>
+        <div class="case-body">
+          {hasBody ? <Content /> : import.meta.env.DEV && <p class="placeholder-box">Case study coming soon. Add it in <code>src/content/projects/{project.id}.md</code>. (Only shown in dev.)</p>}
+
+          {
+            results ? (
+              <>
+                <h2>Results</h2>
+                <ul>
+                  {results.map((result) => (
+                    <li>{result}</li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              import.meta.env.DEV && (
+                <>
+                  <h2>Results</h2>
+                  <p class="placeholder-box">
+                    Placeholder (only shown in dev): add a <code>results</code> list to this project's
+                    frontmatter, such as records processed, response time, or cost saved. Only what you can
+                    share.
+                  </p>
+                </>
+              )
+            )
+          }
+        </div>
+      </div>
+
+      <a class="next-project" href={`/projects/${next.id}/`}>
+        <span>
+          <small>Next project</small>{" "}<strong>{next.data.title}</strong>
+        </span>
+        <span class="next-project-arrow" aria-hidden="true">→</span>
+      </a>
+    </article>
+  </div>
 </Base>

@@ -10,6 +10,9 @@ export const SITE = {
     "I build the backend that keeps hotel data moving: the APIs, pipelines and databases behind it.",
 };
 
+/** Technology filters on the projects page ("All" is added automatically). */
+export const PROJECT_FILTERS = ["FastAPI", "Django", "MySQL", "PostgreSQL", "React.js"];
+
 /** Core stack shown on the home page (from the CV's core skills). */
 export const TECH_STACK = [
   "Python",

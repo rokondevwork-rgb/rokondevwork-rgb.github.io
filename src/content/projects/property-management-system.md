@@ -4,6 +4,7 @@ summary: "Hotel booking system API for bookings, availability, and reservations.
 stack: ["FastAPI", "PostgreSQL", "SQLAlchemy"]
 featured: true
 order: 2
+domain: "Hotel and travel tech"
 ---
 
 ## What I built

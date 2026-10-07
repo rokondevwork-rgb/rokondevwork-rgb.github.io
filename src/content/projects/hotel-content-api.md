@@ -4,6 +4,7 @@ summary: "Content provider API platform serving normalized hotel content to B2B 
 stack: ["FastAPI", "MySQL", "SQLAlchemy", "JWT", "Redis", "Docker"]
 featured: true
 order: 1
+domain: "Hotel and travel tech"
 ---
 
 ## What I built

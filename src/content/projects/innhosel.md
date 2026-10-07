@@ -4,6 +4,7 @@ summary: "Hotel content management system for supplier hotel data, mappings, and
 stack: ["Python", "FastAPI", "MySQL", "React.js", "Linux"]
 featured: true
 order: 3
+domain: "Hotel and travel tech"
 ---
 
 ## What I built

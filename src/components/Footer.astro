@@ -9,37 +9,28 @@ const year = new Date().getFullYear();
   <div class="container">
     <div class="footer-grid">
       <div class="footer-intro">
-        <p class="footer-name">{SITE.name}<span class="brand-dot" aria-hidden="true">.</span></p>
+        <p class="footer-name">{SITE.name}</p>
         <p>Python backend developer in Dhaka, Bangladesh. Open to backend roles and freelance work.</p>
       </div>
 
-      <nav aria-labelledby="footer-nav-label">
-        <h2 class="footer-label" id="footer-nav-label">Navigate</h2>
-        <ul class="footer-links">
-          {
-            NAV_ITEMS.map(({ href, label }) => (
-              <li>
-                <a href={href}>{label}</a>
-              </li>
-            ))
-          }
-        </ul>
-      </nav>
+      <ul class="footer-links" aria-label="Site">
+        {
+          NAV_ITEMS.map(({ href, label }) => (
+            <li>
+              <a href={href}>{label}</a>
+            </li>
+          ))
+        }
+      </ul>
 
-      <div>
-        <h2 class="footer-label">Elsewhere</h2>
-        <ul class="footer-links">
-          <li><a href={`mailto:${CONTACT.email}`}>Email</a></li>
-          <li><a href={CONTACT.github} rel="me noopener">GitHub</a></li>
-          <li><a href={CONTACT.linkedin} rel="me noopener">LinkedIn</a></li>
-          <li><a href="/rss.xml">RSS</a></li>
-        </ul>
-      </div>
+      <ul class="footer-links" aria-label="Elsewhere">
+        <li><a href={`mailto:${CONTACT.email}`}>Email</a></li>
+        <li><a href={CONTACT.github} rel="me noopener">GitHub</a></li>
+        <li><a href={CONTACT.linkedin} rel="me noopener">LinkedIn</a></li>
+        <li><a href="/rss.xml">RSS</a></li>
+      </ul>
     </div>
 
-    <div class="footer-bottom">
-      <p>&copy; {year} {SITE.name}</p>
-      <p>Dhaka · UTC+6 · Built with Astro</p>
-    </div>
+    <p class="footer-base">&copy; {year} {SITE.name}. Built with Astro.</p>
   </div>
 </footer>
