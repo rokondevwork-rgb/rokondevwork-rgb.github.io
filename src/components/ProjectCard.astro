@@ -3,18 +3,26 @@ import type { CollectionEntry } from "astro:content";
 
 interface Props {
   project: CollectionEntry<"projects">;
+  /** Position in the list, shown as "01", "02"… */
+  index?: number;
   /** Keeps the heading outline correct: 2 under a page h1, 3 under a section h2. */
   headingLevel?: 2 | 3;
 }
 
-const { project, headingLevel = 2 } = Astro.props;
+const { project, index, headingLevel = 2 } = Astro.props;
 const { title, summary, stack } = project.data;
 const Heading = `h${headingLevel}` as const;
 ---
 
 <article class="project-card">
-  <Heading><a href={`/projects/${project.id}/`}>{title}</a></Heading>
-  <p>{summary}</p>
+  <div class="project-card-top" aria-hidden="true">
+    <span class="project-index">{index !== undefined ? String(index).padStart(2, "0") : ""}</span>
+    <svg class="project-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M7 17L17 7M8 7h9v9"></path>
+    </svg>
+  </div>
+  <Heading class="project-title"><a href={`/projects/${project.id}/`}>{title}</a></Heading>
+  <p class="project-summary">{summary}</p>
   <ul class="stack" aria-label="Tech stack">
     {stack.map((tech) => <li>{tech}</li>)}
   </ul>

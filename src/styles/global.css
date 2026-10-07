@@ -516,101 +516,505 @@ hr {
 }
 
 /* ==========================================================================
-   Lists of posts and projects
-   (restyled with the new tokens; redesigned in later steps)
+   Buttons
    ========================================================================== */
-.intro {
-  margin-bottom: var(--space-7);
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.8rem 1.25rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  transition:
+    background-color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
 }
 
-.post-list,
-.project-list,
-.contact-links {
+.button svg {
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.button:hover svg {
+  transform: translateX(3px);
+}
+
+.button--primary {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+
+.button--primary:hover {
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--color-text));
+}
+
+.button--secondary {
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+
+.button--secondary:hover {
+  border-color: var(--color-text);
+  background: var(--color-surface);
+}
+
+/* ==========================================================================
+   Home: hero, stack strip, contact band
+   ========================================================================== */
+.hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding-block: clamp(3.5rem, 10vw, 7.5rem) clamp(3rem, 7vw, 5.5rem);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Faint dot grid, fading out from the top right. Decorative only. */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(var(--color-border-strong) 1px, transparent 1.5px);
+  background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(ellipse 75% 85% at 90% 15%, #000 10%, transparent 70%);
+  mask-image: radial-gradient(ellipse 75% 85% at 90% 15%, #000 10%, transparent 70%);
+}
+
+.hero-grid {
+  display: grid;
+  gap: var(--space-7);
+  align-items: end;
+}
+
+@media (min-width: 60rem) {
+  .hero-grid {
+    grid-template-columns: minmax(0, 1fr) 21rem;
+    gap: var(--space-8);
+  }
+}
+
+.hero-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
   margin: 0 0 var(--space-5);
-  padding: 0;
-  list-style: none;
-}
-
-.post-list > li + li {
-  margin-top: var(--space-5);
-}
-
-.post-list :is(h2, h3) {
-  margin: 0;
-  font-family: var(--font-body);
-  font-size: var(--text-lg);
-  font-weight: 600;
-  line-height: 1.35;
-  letter-spacing: 0;
-}
-
-.post-list time {
-  display: block;
-  margin-top: var(--space-1);
+  padding: 0.3rem 0.8rem 0.3rem 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-bg);
   color: var(--color-muted);
   font-family: var(--font-mono);
   font-size: var(--text-xs);
 }
 
-.post-list p {
-  margin: var(--space-2) 0 0;
+.status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
 }
 
-.post-list a,
-.project-card a {
+.hero-title {
+  margin: 0 0 var(--space-5);
+  font-size: var(--text-hero);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.hero-title > span {
+  display: block;
+}
+
+.hero-tagline {
+  max-width: 36rem;
+  margin: 0 0 var(--space-6);
+  font-size: clamp(1.2rem, 1rem + 0.8vw, 1.5rem);
+  line-height: 1.45;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+/* "Spec sheet" panel beside the hero (below it on small screens). */
+.spec-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-surface) 85%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  font-size: var(--text-sm);
+}
+
+.spec-card-title {
+  margin: 0;
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.spec-card dl {
+  margin: 0;
+}
+
+.spec-card dl > div {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr);
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+}
+
+.spec-card dl > div + div {
+  border-top: 1px dashed var(--color-border);
+}
+
+.spec-card dt {
+  padding-top: 0.2em;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.spec-card dd {
+  margin: 0;
+}
+
+.stack-strip {
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.stack-strip-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-6);
+  padding-block: var(--space-5);
+}
+
+.stack-strip-label {
+  margin: 0;
+}
+
+.stack-strip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) 0;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  list-style: none;
+}
+
+.stack-strip-list li:not(:last-child)::after {
+  content: "/";
+  content: "/" / ""; /* decorative: hidden from screen readers where supported */
+  margin-inline: var(--space-3);
+  color: var(--color-border-strong);
+}
+
+.contact-band {
+  display: grid;
+  gap: var(--space-6);
+  padding: clamp(1.5rem, 5vw, 3.5rem);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+@media (min-width: 60rem) {
+  .contact-band {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    align-items: end;
+  }
+}
+
+.contact-band h2 {
+  margin: 0 0 var(--space-4);
+}
+
+.contact-band-text {
+  max-width: 34rem;
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.contact-email {
   color: var(--color-text);
-  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  line-height: 1.3;
+  text-decoration-color: var(--color-accent);
+  overflow-wrap: anywhere;
 }
 
-.post-list a:hover,
-.project-card a:hover {
+.contact-email:hover {
   color: var(--color-accent);
 }
 
+.contact-band-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  list-style: none;
+  text-transform: uppercase;
+}
+
+.contact-band-links a {
+  color: var(--color-muted);
+  text-decoration: none;
+}
+
+.contact-band-links a:hover {
+  color: var(--color-accent);
+}
+
+/* ==========================================================================
+   Sections: spacing and numbered headings
+   ========================================================================== */
+.section {
+  padding-block: clamp(3.5rem, 7vw, 5.5rem);
+}
+
+.section + .section {
+  border-top: 1px solid var(--color-border);
+}
+
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4) var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.section-head h2 {
+  margin: 0;
+}
+
+.eyebrow-index {
+  color: var(--color-accent);
+}
+
+.section-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--color-border-strong);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.section-link:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.section-link span {
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.section-link:hover span {
+  transform: translateX(3px);
+}
+
+/* ==========================================================================
+   Project cards
+   ========================================================================== */
+.project-grid,
 .project-list {
   display: grid;
   gap: var(--space-4);
+  margin: 0 0 var(--space-5);
+  padding: 0;
+  list-style: none;
+}
+
+.project-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+}
+
+/* Cards in a row share the tallest card's height. */
+.project-grid > li {
+  display: flex;
+}
+
+.project-grid .project-card {
+  flex: 1;
 }
 
 .project-card {
   position: relative;
+  display: flex;
+  flex-direction: column;
   padding: var(--space-5);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   background: var(--color-surface);
-  transition: border-color var(--duration) var(--ease-out);
+  transition:
+    border-color var(--duration) var(--ease-out),
+    transform var(--duration) var(--ease-out);
 }
 
 .project-card:hover,
 .project-card:focus-within {
   border-color: var(--color-accent);
+  transform: translateY(-3px);
 }
 
-.project-card :is(h2, h3) {
-  margin: 0 0 var(--space-2);
-  font-family: var(--font-body);
-  font-size: var(--text-lg);
-  font-weight: 600;
-  line-height: 1.35;
-  letter-spacing: 0;
-}
-
-.project-card p {
-  margin: 0 0 var(--space-4);
+.project-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
   color: var(--color-muted);
-  /* Short summaries look oddly narrow with "pretty" wrapping; use normal line filling. */
-  text-wrap: wrap;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
 }
 
-/* Make the whole card clickable via the heading link, without nesting other content in the link. */
-.project-card a::after {
+.project-arrow {
+  transition:
+    color var(--duration) var(--ease-out),
+    transform var(--duration) var(--ease-out);
+}
+
+.project-card:hover .project-arrow,
+.project-card:focus-within .project-arrow {
+  color: var(--color-accent);
+  transform: translate(2px, -2px);
+}
+
+.project-title {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.project-title a {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+/* The whole card is clickable via the title link, without nesting other content in the link. */
+.project-title a::after {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
 }
 
-/* Chips: tech stack and tags. */
+.project-summary {
+  margin: 0 0 var(--space-5);
+  color: var(--color-muted);
+  /* Short summaries look oddly narrow with "pretty" wrapping; use normal line filling. */
+  text-wrap: wrap;
+}
+
+.project-card .stack {
+  margin-top: auto;
+}
+
+/* ==========================================================================
+   Post rows (home, blog index)
+   ========================================================================== */
+.post-list {
+  margin: 0 0 var(--space-5);
+  padding: 0;
+  border-top: 1px solid var(--color-border);
+  list-style: none;
+}
+
+.post-list > li {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.post-row {
+  position: relative;
+  display: grid;
+  gap: var(--space-2) var(--space-6);
+  padding-block: var(--space-5);
+}
+
+@media (min-width: 48rem) {
+  .post-row {
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+  }
+}
+
+.post-row-date {
+  padding-top: 0.45em;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.post-row-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.post-row-title a {
+  color: var(--color-text);
+  text-decoration: none;
+  transition: color var(--duration-fast) ease;
+}
+
+/* The whole row is clickable via the title link. */
+.post-row-title a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.post-row:hover .post-row-title a,
+.post-row-title a:focus-visible {
+  color: var(--color-accent);
+}
+
+.post-row-description {
+  max-width: 40rem;
+  margin: var(--space-2) 0 var(--space-3);
+  color: var(--color-muted);
+}
+
+.post-row .tags:last-child {
+  margin-bottom: 0;
+}
+
+/* ==========================================================================
+   Chips: tech stack and tags
+   ========================================================================== */
 .stack,
 .tags {
   display: flex;
@@ -632,12 +1036,40 @@ hr {
   line-height: 1.6;
 }
 
+.contact-links {
+  margin: 0 0 var(--space-5);
+  padding: 0;
+  list-style: none;
+}
+
 .contact-links li + li {
   margin-top: var(--space-2);
 }
 
 .contact-links a {
   overflow-wrap: anywhere;
+}
+
+/* ==========================================================================
+   Scroll reveal: elements marked data-reveal fade and rise as they enter the
+   viewport. Pure CSS (scroll-driven animations): browsers without support, and
+   anyone who prefers reduced motion, simply see the content with no animation.
+   ========================================================================== */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    [data-reveal] {
+      animation: reveal var(--ease-out) both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 160px;
+    }
+  }
 }
 
 /* ==========================================================================

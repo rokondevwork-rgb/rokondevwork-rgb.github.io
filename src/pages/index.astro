@@ -2,45 +2,134 @@
 import Base from "../layouts/Base.astro";
 import PostList from "../components/PostList.astro";
 import ProjectCard from "../components/ProjectCard.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import { CONTACT, SITE, TECH_STACK } from "../consts";
 import { getFeaturedProjects, getPublishedPosts } from "../lib/content";
 
 const featuredProjects = await getFeaturedProjects();
 const latestPosts = (await getPublishedPosts()).slice(0, 3);
 ---
 
-<Base>
-  <section class="intro" aria-labelledby="intro-heading">
-    <h1 id="intro-heading">Hi, I'm Rokon.</h1>
-    <p class="lead">
-      I'm a Python backend developer in Dhaka with nearly 6 years of experience building scalable
-      APIs, hotel content platforms, data processing pipelines, and database-driven applications.
-    </p>
-    <p><a href="/projects/">See my work</a> or <a href="/contact/">get in touch</a>.</p>
+<Base width="full">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="container hero-grid">
+      <div class="hero-main">
+        <p class="hero-status">
+          <span class="status-dot" aria-hidden="true"></span>
+          Open to roles &amp; freelance work
+        </p>
+        <h1 class="hero-title" id="hero-title">
+          <span>Rokunuzzaman</span>{" "}<span>Rokon<span class="brand-dot" aria-hidden="true">.</span></span>
+        </h1>
+        <p class="hero-tagline">{SITE.tagline}</p>
+        <div class="hero-actions">
+          <a class="button button--primary" href="/projects/">
+            View projects
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+          </a>
+          <a class="button button--secondary" href="/blog/">Read the blog</a>
+        </div>
+      </div>
+
+      <aside class="spec-card" aria-label="At a glance">
+        <p class="spec-card-title">Spec sheet</p>
+        <dl>
+          <div>
+            <dt>Role</dt>
+            <dd>Python backend developer</dd>
+          </div>
+          <div>
+            <dt>Focus</dt>
+            <dd>APIs, data pipelines, MySQL &amp; PostgreSQL</dd>
+          </div>
+          <div>
+            <dt>Domain</dt>
+            <dd>Hotel &amp; travel tech</dd>
+          </div>
+          <div>
+            <dt>Experience</dt>
+            <dd>Nearly 6 years</dd>
+          </div>
+          <div>
+            <dt>Based in</dt>
+            <dd>Dhaka, Bangladesh · UTC+6</dd>
+          </div>
+        </dl>
+      </aside>
+    </div>
+  </section>
+
+  <section class="stack-strip" aria-labelledby="stack-label">
+    <div class="container stack-strip-inner">
+      <h2 class="eyebrow stack-strip-label" id="stack-label">Core stack</h2>
+      <ul class="stack-strip-list">
+        {TECH_STACK.map((tech) => <li>{tech}</li>)}
+      </ul>
+    </div>
   </section>
 
   {
     featuredProjects.length > 0 && (
-      <section aria-labelledby="featured-heading">
-        <h2 id="featured-heading">Featured projects</h2>
-        <ul class="project-list">
-          {featuredProjects.map((project) => (
-            <li>
-              <ProjectCard project={project} headingLevel={3} />
-            </li>
-          ))}
-        </ul>
-        <p><a href="/projects/">All projects</a></p>
+      <section class="section" aria-labelledby="work-heading">
+        <div class="container">
+          <SectionHeading
+            id="work-heading"
+            index="01"
+            kicker="Selected work"
+            title="Featured projects"
+            link={{ href: "/projects/", label: "All projects" }}
+          />
+          <ul class="project-grid">
+            {featuredProjects.map((project, i) => (
+              <li data-reveal style={`--reveal-delay: ${i * 80}ms`}>
+                <ProjectCard project={project} index={i + 1} headingLevel={3} />
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
     )
   }
 
   {
     latestPosts.length > 0 && (
-      <section aria-labelledby="latest-heading">
-        <h2 id="latest-heading">Latest posts</h2>
-        <PostList posts={latestPosts} headingLevel={3} />
-        <p><a href="/blog/">All posts</a></p>
+      <section class="section" aria-labelledby="writing-heading">
+        <div class="container">
+          <SectionHeading
+            id="writing-heading"
+            index="02"
+            kicker="Writing"
+            title="Latest posts"
+            link={{ href: "/blog/", label: "All posts" }}
+          />
+          <div data-reveal>
+            <PostList posts={latestPosts} headingLevel={3} />
+          </div>
+        </div>
       </section>
     )
   }
+
+  <section class="section" aria-labelledby="contact-heading">
+    <div class="container">
+      <div class="contact-band" data-reveal>
+        <div>
+          <p class="eyebrow"><span class="eyebrow-index">03</span> / Contact</p>
+          <h2 id="contact-heading">Let's build something reliable.</h2>
+          <p class="contact-band-text">
+            I'm open to backend roles and freelance work on APIs, data pipelines and database
+            performance. Email is the fastest way to reach me.
+          </p>
+        </div>
+        <div class="contact-band-actions">
+          <a class="contact-email" href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
+          <ul class="contact-band-links">
+            <li><a href={CONTACT.github} rel="me noopener">GitHub</a></li>
+            <li><a href={CONTACT.linkedin} rel="me noopener">LinkedIn</a></li>
+            <li><a href="/contact/">Contact page</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
 </Base>

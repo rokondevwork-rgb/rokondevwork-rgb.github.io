@@ -16,13 +16,24 @@ const Heading = `h${headingLevel}` as const;
   {
     posts.map((post) => (
       <li>
-        <article>
-          <Heading>
-            <a href={`/blog/${post.id}/`}>{post.data.title}</a>
-            {post.data.draft && " (draft)"}
-          </Heading>
-          <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
-          <p>{post.data.description}</p>
+        <article class="post-row">
+          <time class="post-row-date" datetime={post.data.pubDate.toISOString()}>
+            {formatDate(post.data.pubDate)}
+          </time>
+          <div class="post-row-body">
+            <Heading class="post-row-title">
+              <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+              {post.data.draft && " (draft)"}
+            </Heading>
+            <p class="post-row-description">{post.data.description}</p>
+            {post.data.tags.length > 0 && (
+              <ul class="tags" aria-label="Tags">
+                {post.data.tags.map((tag) => (
+                  <li>{tag}</li>
+                ))}
+              </ul>
+            )}
+          </div>
         </article>
       </li>
     ))

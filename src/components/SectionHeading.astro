@@ -1,0 +1,28 @@
+---
+// Numbered section header: "01 / Selected work" kicker, display title, optional "see all" link.
+interface Props {
+  /** id for the <h2>, so the section can use aria-labelledby. */
+  id: string;
+  index: string;
+  kicker: string;
+  title: string;
+  link?: { href: string; label: string };
+}
+
+const { id, index, kicker, title, link } = Astro.props;
+---
+
+<div class="section-head">
+  <div>
+    <p class="eyebrow"><span class="eyebrow-index">{index}</span> / {kicker}</p>
+    <h2 id={id}>{title}</h2>
+  </div>
+  {
+    link && (
+      <a class="section-link" href={link.href}>
+        {link.label}
+        <span aria-hidden="true">→</span>
+      </a>
+    )
+  }
+</div>
