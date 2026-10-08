@@ -31,7 +31,19 @@ function currentState(href: string) {
     </nav>
 
     <div class="header-actions">
-      <!-- Both buttons stay hidden until the script below runs. Without JS: dark theme, nav always visible. -->
+      <!--
+        The buttons stay hidden until a script reveals them: the snake button by Snake.astro (mouse
+        devices only), the others by the script below. Without JS: dark theme, nav always visible.
+      -->
+      <button type="button" class="icon-button snake-toggle" id="snake-toggle" aria-pressed="true" hidden>
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M1.75 8.5c1.6-3 3.4-3 5 0s3.4 3 5 0"></path>
+          <circle cx="12.75" cy="6.5" r="1.75" fill="currentColor" stroke="none"></circle>
+          <path class="snake-toggle-off" d="M2.5 2.5l11 11"></path>
+        </svg>
+        <span class="visually-hidden">Snake that follows the mouse</span>
+      </button>
+
       <button type="button" class="icon-button theme-toggle" id="theme-toggle" aria-pressed="true" hidden>
         <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16">
           <circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor"></circle>

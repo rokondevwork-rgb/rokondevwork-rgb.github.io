@@ -1,0 +1,432 @@
+---
+/**
+ * A small snake that lives on top of the page and follows the mouse: it slithers towards the
+ * cursor, and once the cursor rests it coils up beside it and falls asleep. Mouse only (never on
+ * touch screens), off for anyone who prefers reduced motion, and switchable with the header's
+ * snake button (#snake-toggle).
+ */
+---
+
+<canvas class="snake-canvas" id="snake-canvas" aria-hidden="true" hidden></canvas>
+
+<script>
+  type Point = { x: number; y: number };
+  type Mode = "chase" | "coiling" | "coiled";
+
+  // Body (px). The head records the path it travels and the body is laid along that path.
+  const BODY_LEN = 110;
+  const BODY_W = 9;
+  const SEG = 3; // spacing of the body samples along the path
+  const STEP = 2; // spacing of the recorded path points
+  const SAMPLES = Math.floor(BODY_LEN / SEG) + 1;
+  // Full width behind the head, tapering to a thin tail.
+  const WIDTHS = Array.from({ length: SAMPLES }, (_, i) =>
+    Math.max(1.5, BODY_W * (1 - i / (SAMPLES - 1)) ** 0.6),
+  );
+
+  // Chasing.
+  const MAX_SPEED = 300; // px/s, when far from the cursor
+  const MIN_SPEED = 40;
+  const EASE = 2.2; // speed per px of distance left, so it slows down as it arrives
+  const TURN_RATE = 5.5; // rad/s
+  const ARRIVE = 30; // stops this far from the cursor
+  const WIGGLE = 0.5; // rad either side of its heading
+  const WIGGLE_LEN = 48; // px per side-to-side wave
+
+  // Coiling.
+  const IDLE_MS = 900; // cursor still this long: coil up
+  const WAKE_DIST = 20; // cursor must move this far to wake it
+  const SLEEP_MS = 1200; // coiled this long: eyes close
+  const COIL_SPEED = 55; // px/s
+  const COIL_PITCH = BODY_W + 2.5; // distance between the loops
+  const COIL_INNER = 6; // radius where the head ends up
+  // Outer radius of a spiral whose length fits the whole body.
+  const COIL_OUTER = Math.sqrt(COIL_INNER ** 2 + (COIL_PITCH * BODY_LEN) / Math.PI);
+
+  const FLICK_MS = 350;
+
+  const PREF_KEY = "snake"; // localStorage: "off" once switched off
+  const STATE_KEY = "snake-state"; // sessionStorage: carries it over from page to page
+
+  const dist = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
+  /** The signed turn (-π..π) from angle `from` to angle `to`. */
+  const turn = (from: number, to: number) => Math.atan2(Math.sin(to - from), Math.cos(to - from));
+
+  const canvas = document.querySelector<HTMLCanvasElement>("#snake-canvas");
+  const ctx = canvas?.getContext("2d");
+  if (canvas && ctx) start(canvas, ctx, document.querySelector<HTMLButtonElement>("#snake-toggle"));
+
+  function start(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, toggle: HTMLButtonElement | null) {
+    const root = document.documentElement;
+    const finePointer = matchMedia("(hover: hover) and (pointer: fine)");
+    const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+
+    let width = 0;
+    let height = 0;
+    let bodyColor = "";
+    let eyeColor = "";
+    let tongueColor = "";
+
+    // The path the head has travelled, head first; always long enough to hold the body.
+    let trail: Point[] = [];
+    const body: Point[] = Array.from({ length: SAMPLES }, () => ({ x: 0, y: 0 }));
+    let heading = 0;
+    let wave = 0;
+    let mode: Mode = "coiled";
+    let coilPath: Point[] = [];
+    let coilPos = 0;
+    let coiledAt = -Infinity;
+    let asleep = false;
+    let tongue = 0; // flick progress 0..1; 0 when the tongue is in
+    let nextFlick = 0;
+
+    let mouse: Point | null = null;
+    let mouseAtCoil: Point | null = null; // where the cursor was when it coiled up
+    let lastMove = 0;
+
+    let wanted = true; // the visitor's on/off choice
+    let enabled = false;
+    let running = false;
+    let dirty = true;
+    let frameId = 0;
+    let last = 0;
+
+    /** An inward spiral that starts at `from` heading along `angle` and curls towards `side` (±1). */
+    function spiral(from: Point, angle: number, side: number): Point[] {
+      const cx = from.x - side * COIL_OUTER * Math.sin(angle);
+      const cy = from.y + side * COIL_OUTER * Math.cos(angle);
+      const start = Math.atan2(from.y - cy, from.x - cx);
+      const points: Point[] = [];
+      let prev = from;
+      let length = 0;
+      for (let theta = 0; length < BODY_LEN; ) {
+        const r = COIL_OUTER - (COIL_PITCH * theta) / (2 * Math.PI);
+        const a = start + side * theta;
+        const p = { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
+        length += dist(prev, p);
+        points.push(p);
+        prev = p;
+        theta += STEP / r;
+      }
+      return points;
+    }
+
+    function coil() {
+      const head = trail[0];
+      // Curl away from the cursor, unless that would put the coil off screen.
+      const across = mouse
+        ? Math.cos(heading) * (mouse.y - head.y) - Math.sin(heading) * (mouse.x - head.x)
+        : 0;
+      let side = across > 0 ? -1 : 1;
+      const cx = head.x - side * COIL_OUTER * Math.sin(heading);
+      const cy = head.y + side * COIL_OUTER * Math.cos(heading);
+      const margin = COIL_OUTER + BODY_W;
+      if (cx < margin || cy < margin || cx > width - margin || cy > height - margin) side = -side;
+
+      coilPath = spiral(head, heading, side);
+      coilPos = 0;
+      mode = "coiling";
+      mouseAtCoil = mouse && { ...mouse };
+    }
+
+    /** Before the mouse has moved: asleep, coiled up in the bottom-right corner. */
+    function curlUpInCorner() {
+      trail = spiral({ x: width - 64, y: height - 64 - COIL_OUTER }, 0, 1).reverse();
+      heading = Math.atan2(trail[0].y - trail[1].y, trail[0].x - trail[1].x);
+      mode = "coiled";
+    }
+
+    function restore(): boolean {
+      try {
+        const saved = JSON.parse(sessionStorage.getItem(STATE_KEY) ?? "null");
+        if (!Array.isArray(saved?.trail) || saved.trail.length < 2) return false;
+        const points: Point[] = saved.trail.map(([x, y]: number[]) => ({ x, y }));
+        if (!points.every((p) => Number.isFinite(p.x) && Number.isFinite(p.y))) return false;
+
+        trail = points;
+        heading = Number(saved.heading) || 0;
+        mode = saved.coiled ? "coiled" : "chase";
+        if (Array.isArray(saved.mouse) && saved.mouse.length === 2 && saved.mouse.every(Number.isFinite)) {
+          mouse = { x: saved.mouse[0], y: saved.mouse[1] };
+        }
+        mouseAtCoil = mouse && { ...mouse };
+        lastMove = performance.now();
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    function save() {
+      const round = (n: number) => Math.round(n * 10) / 10;
+      try {
+        sessionStorage.setItem(
+          STATE_KEY,
+          JSON.stringify({
+            trail: trail.map((p) => [round(p.x), round(p.y)]),
+            heading,
+            coiled: mode === "coiled",
+            mouse: mouse && [mouse.x, mouse.y],
+          }),
+        );
+      } catch {
+        // Storage blocked: it starts in the corner on the next page.
+      }
+    }
+
+    /** Lays the body along the trail, then drops the part of the trail it no longer covers. */
+    function layBody() {
+      let seg = 0;
+      let covered = 0; // path length from the head to trail[seg]
+      body[0].x = trail[0].x;
+      body[0].y = trail[0].y;
+      for (let i = 1; i < SAMPLES; i++) {
+        const target = i * SEG;
+        while (seg < trail.length - 1 && covered + dist(trail[seg], trail[seg + 1]) < target) {
+          covered += dist(trail[seg], trail[seg + 1]);
+          seg++;
+        }
+        const a = trail[seg];
+        const b = trail[Math.min(seg + 1, trail.length - 1)];
+        const length = dist(a, b);
+        const t = length > 0 ? Math.min(1, (target - covered) / length) : 0;
+        body[i].x = a.x + (b.x - a.x) * t;
+        body[i].y = a.y + (b.y - a.y) * t;
+      }
+      trail.length = Math.min(trail.length, seg + 2);
+    }
+
+    /** Moves the snake on by `dt` seconds. Returns whether anything visible changed. */
+    function update(dt: number, now: number): boolean {
+      const head = trail[0];
+      let changed = false;
+
+      if (mode !== "chase" && mouse && (!mouseAtCoil || dist(mouse, mouseAtCoil) > WAKE_DIST)) {
+        mode = "chase";
+        tongue = 0.01; // wakes up with a flick of the tongue
+      }
+
+      if (mode === "chase") {
+        const d = mouse ? dist(head, mouse) : 0;
+        if (mouse && d > ARRIVE + 1) {
+          const diff = turn(heading, Math.atan2(mouse.y - head.y, mouse.x - head.x));
+          heading += Math.max(-TURN_RATE * dt, Math.min(TURN_RATE * dt, diff));
+          // Slow down to turn, so it curls round to the cursor instead of circling it.
+          const facing = Math.max(0.25, (1 + Math.cos(diff)) / 2);
+          const speed = Math.max(MIN_SPEED, Math.min(MAX_SPEED, (d - ARRIVE) * EASE)) * facing;
+          const step = Math.min(speed * dt, d - ARRIVE);
+          wave += (step / WIGGLE_LEN) * 2 * Math.PI;
+          const angle = heading + Math.sin(wave) * WIGGLE * Math.min(1, speed / 120);
+          head.x += Math.cos(angle) * step;
+          head.y += Math.sin(angle) * step;
+          changed = true;
+        } else if (now - lastMove > IDLE_MS) {
+          coil();
+        }
+      } else if (mode === "coiling") {
+        const end = coilPath.length - 1;
+        coilPos = Math.min(coilPos + (COIL_SPEED * dt) / STEP, end);
+        const i = Math.floor(coilPos);
+        const a = coilPath[i];
+        const b = coilPath[Math.min(i + 1, end)];
+        const x = a.x + (b.x - a.x) * (coilPos - i);
+        const y = a.y + (b.y - a.y) * (coilPos - i);
+        if (x !== head.x || y !== head.y) heading = Math.atan2(y - head.y, x - head.x);
+        head.x = x;
+        head.y = y;
+        changed = true;
+        if (coilPos === end) {
+          mode = "coiled";
+          coiledAt = now;
+        }
+      }
+
+      const sleepy = mode === "coiled" && now - coiledAt > SLEEP_MS;
+      if (sleepy !== asleep) {
+        asleep = sleepy;
+        changed = true;
+      }
+
+      if (tongue > 0) {
+        tongue = tongue + (dt * 1000) / FLICK_MS;
+        if (tongue >= 1) tongue = 0;
+        changed = true;
+      } else if (!asleep && now > nextFlick) {
+        tongue = 0.01;
+        nextFlick = now + 1500 + Math.random() * 2500;
+        changed = true;
+      }
+
+      if (changed) {
+        // trail[0] is the head itself: once it has moved a STEP on, leave a copy behind.
+        if (dist(trail[0], trail[1]) >= STEP) trail.unshift({ ...trail[0] });
+        layBody();
+      }
+      return changed;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, width, height);
+      ctx.lineCap = "round";
+
+      // Body, tail first, as short round-capped strokes that narrow towards the tail.
+      ctx.strokeStyle = bodyColor;
+      for (let i = SAMPLES - 1; i > 0; i--) {
+        ctx.lineWidth = WIDTHS[i];
+        ctx.beginPath();
+        ctx.moveTo(body[i].x, body[i].y);
+        ctx.lineTo(body[i - 1].x, body[i - 1].y);
+        ctx.stroke();
+      }
+
+      const angle = Math.atan2(body[0].y - body[2].y, body[0].x - body[2].x);
+      const ux = Math.cos(angle);
+      const uy = Math.sin(angle);
+      const hx = body[0].x + ux * 1.5;
+      const hy = body[0].y + uy * 1.5;
+
+      // Tongue, drawn first so its root hides under the head.
+      if (tongue > 0) {
+        const reach = 5 + Math.sin(tongue * Math.PI) * 7;
+        const tx = hx + ux * reach;
+        const ty = hy + uy * reach;
+        ctx.strokeStyle = tongueColor;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(hx, hy);
+        ctx.lineTo(tx, ty);
+        for (const fork of [-0.6, 0.6]) {
+          ctx.moveTo(tx, ty);
+          ctx.lineTo(tx + Math.cos(angle + fork) * 2.5, ty + Math.sin(angle + fork) * 2.5);
+        }
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = bodyColor;
+      ctx.beginPath();
+      ctx.ellipse(hx, hy, 6.5, 5.2, angle, 0, 2 * Math.PI);
+      ctx.fill();
+
+      // Eyes: open dots, or short closed lids while it sleeps.
+      ctx.fillStyle = eyeColor;
+      ctx.strokeStyle = eyeColor;
+      ctx.lineWidth = 1.1;
+      for (const side of [-1, 1]) {
+        const ex = hx + ux * 2 - uy * 2.7 * side;
+        const ey = hy + uy * 2 + ux * 2.7 * side;
+        ctx.beginPath();
+        if (asleep) {
+          ctx.moveTo(ex - ux * 1.3, ey - uy * 1.3);
+          ctx.lineTo(ex + ux * 1.3, ey + uy * 1.3);
+          ctx.stroke();
+        } else {
+          ctx.arc(ex, ey, 1.35, 0, 2 * Math.PI);
+          ctx.fill();
+        }
+      }
+    }
+
+    function frame(now: number) {
+      const dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
+      if (update(dt, now)) dirty = true;
+      if (dirty) {
+        draw();
+        dirty = false;
+      }
+      // Asleep: nothing left to animate, so stop until the mouse moves again.
+      if (asleep && tongue === 0) {
+        running = false;
+        return;
+      }
+      frameId = requestAnimationFrame(frame);
+    }
+
+    function wake() {
+      if (!enabled || running) return;
+      running = true;
+      last = performance.now();
+      frameId = requestAnimationFrame(frame);
+    }
+
+    function measure() {
+      const ratio = Math.min(devicePixelRatio || 1, 2);
+      // The viewport without scrollbars, which is what the fixed canvas covers.
+      width = root.clientWidth;
+      height = root.clientHeight;
+      canvas.width = Math.round(width * ratio);
+      canvas.height = Math.round(height * ratio);
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      dirty = true;
+    }
+
+    /** Colours come from CSS (see .snake-canvas), so they follow the theme. */
+    function readColors() {
+      const style = getComputedStyle(canvas);
+      bodyColor = style.color;
+      eyeColor = style.borderTopColor;
+      tongueColor = style.outlineColor;
+      dirty = true;
+    }
+
+    /** Shows the snake when the visitor wants it and the device suits it. */
+    function sync() {
+      const supported = finePointer.matches && !reducedMotion.matches;
+      if (toggle) {
+        toggle.hidden = !supported;
+        toggle.setAttribute("aria-pressed", String(wanted));
+      }
+      const on = supported && wanted;
+      if (on === enabled) return;
+      enabled = on;
+      canvas.hidden = !on;
+      if (on) {
+        dirty = true;
+        wake();
+      } else {
+        cancelAnimationFrame(frameId);
+        running = false;
+      }
+    }
+
+    try {
+      wanted = localStorage.getItem(PREF_KEY) !== "off";
+    } catch {
+      // Storage blocked: on by default.
+    }
+    measure();
+    readColors();
+    if (!restore()) curlUpInCorner();
+    layBody();
+    nextFlick = performance.now() + 2000;
+    sync();
+
+    addEventListener("pointermove", (event) => {
+      if (event.pointerType === "touch") return;
+      mouse = { x: event.clientX, y: event.clientY };
+      lastMove = performance.now();
+      wake();
+    });
+    addEventListener("resize", () => {
+      measure();
+      wake();
+    });
+    addEventListener("pagehide", save);
+    new MutationObserver(() => {
+      readColors();
+      wake();
+    }).observe(root, { attributes: true, attributeFilter: ["data-theme"] });
+    finePointer.addEventListener("change", sync);
+    reducedMotion.addEventListener("change", sync);
+
+    toggle?.addEventListener("click", () => {
+      wanted = !wanted;
+      try {
+        localStorage.setItem(PREF_KEY, wanted ? "on" : "off");
+      } catch {
+        // Storage blocked: the choice lasts for this page only.
+      }
+      sync();
+    });
+  }
+</script>
