@@ -39,4 +39,6 @@ export const CONTACT = {
   email: "rokon.raz@gmail.com",
   github: "https://github.com/RoknuzzamanRokon",
   linkedin: "https://www.linkedin.com/in/rokon-raz",
+  /** CV served from public/. Replace the file there to update it; keep the name. */
+  cv: "/rokunuzzaman-rokon-cv.pdf",
 };
