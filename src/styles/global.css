@@ -254,6 +254,9 @@ hr {
 }
 
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
   margin-right: auto;
   color: var(--color-text);
   font-family: var(--font-display);
@@ -263,6 +266,30 @@ hr {
   letter-spacing: -0.02em;
   text-decoration: none;
   white-space: nowrap;
+}
+
+/* The logo is drawn in currentColor: near-black on the light theme, near-white on the dark one. */
+.brand-logo {
+  flex: none;
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+/* Narrow phones: a smaller name and logo, so they still fit on one line with the buttons. */
+@media (max-width: 26rem) {
+  .header-inner {
+    gap: 1rem;
+  }
+
+  .brand {
+    gap: 0.5rem;
+    font-size: var(--text-base);
+  }
+
+  .brand-logo {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
 }
 
 .site-nav ul {
