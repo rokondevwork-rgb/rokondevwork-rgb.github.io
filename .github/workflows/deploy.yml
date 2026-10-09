@@ -3,6 +3,11 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [master]
+  # Rebuild every 6 hours so the News page keeps showing the last 24 hours of stories:
+  # 00:17, 06:17, 12:17 and 18:17 UTC (06:17, 12:17, 18:17 and 00:17 in Dhaka). Off the top of
+  # the hour, when GitHub's scheduler is busiest and runs start late.
+  schedule:
+    - cron: "17 */6 * * *"
   workflow_dispatch:
 
 permissions:
@@ -23,7 +28,13 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
       - run: npm ci
+      # Fetches the News page data. If Hacker News can't be reached, this fails and nothing is
+      # deployed, so the last good version of the site stays live.
+      - run: npm run news
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:

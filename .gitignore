@@ -4,6 +4,9 @@ dist/
 # generated types
 .astro/
 
+# News page data, fetched by scripts/fetch_hn_ai_news.py before each build
+src/data/news.json
+
 # dependencies
 node_modules/
 

@@ -9,6 +9,7 @@
     "dev": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
+    "news": "python scripts/fetch_hn_ai_news.py",
     "astro": "astro"
   },
   "dependencies": {

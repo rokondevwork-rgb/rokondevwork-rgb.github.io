@@ -1,0 +1,111 @@
+---
+import Base from "../layouts/Base.astro";
+import { timeAgo } from "../lib/format";
+
+interface Story {
+  id: string;
+  title: string;
+  /** The article; for Ask HN and similar posts, the discussion itself. */
+  url: string;
+  domain: string;
+  hnUrl: string;
+  author: string;
+  points: number;
+  comments: number;
+  /** Unix seconds. */
+  time: number;
+}
+
+interface News {
+  /** When the stories were fetched, in Unix seconds. */
+  updated: number;
+  minPoints: number;
+  stories: Story[];
+}
+
+// Written by scripts/fetch_hn_ai_news.py (`npm run news`), which the deploy workflow runs every
+// 6 hours before building. A glob rather than an import, so a missing file doesn't break the build.
+const files = import.meta.glob<News>("../data/news.json", { eager: true, import: "default" });
+const news = files["../data/news.json"];
+if (!news) console.warn("[news] src/data/news.json is missing: run `npm run news` to fetch it.");
+const stories = news?.stories ?? [];
+const fetchedAt = news?.updated ?? 0;
+const iso = (seconds: number) => new Date(seconds * 1000).toISOString();
+---
+
+<Base
+  title="News"
+  description="AI news from Hacker News: the most upvoted AI stories of the last 24 hours, updated every 6 hours."
+  width="full"
+>
+  <div class="container">
+    <section class="page-hero">
+      <h1>News</h1>
+      <div>
+        <p class="lead">The most upvoted AI stories on Hacker News from the last 24 hours, updated every 6 hours.</p>
+        {
+          news && (
+            <p class="hero-status">
+              <span class="status-dot" aria-hidden="true" />
+              Updated <time datetime={iso(fetchedAt)} data-time={fetchedAt}>{timeAgo(fetchedAt, fetchedAt)}</time>
+              · {stories.length} {stories.length === 1 ? "story" : "stories"}
+            </p>
+          )
+        }
+      </div>
+    </section>
+
+    {
+      stories.length > 0 ? (
+        <ol class="news-list">
+          {stories.map((story, i) => (
+            <li class="news-item">
+              <span class="news-rank" aria-hidden="true">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <div>
+                <h2 class="news-title">
+                  <a href={story.url} rel="noopener">{story.title}</a>
+                </h2>
+                <p class="news-meta">
+                  <span>{story.domain}</span>
+                  <span>{story.points} points</span>
+                  <span>
+                    <a href={story.hnUrl} rel="noopener">
+                      {story.comments} {story.comments === 1 ? "comment" : "comments"}
+                    </a>
+                  </span>
+                  <span>
+                    <time datetime={iso(story.time)} data-time={story.time}>{timeAgo(story.time, fetchedAt)}</time>
+                  </span>
+                </p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <p class="news-empty">
+          {news
+            ? `No AI stories with ${news.minPoints}+ points in the last 24 hours yet. Check back in a few hours.`
+            : "News isn't available right now. Check back in a few hours."}
+        </p>
+      )
+    }
+
+    <p class="news-source">
+      Stories and points from <a href="https://news.ycombinator.com/">Hacker News</a>, via the
+      <a href="https://hn.algolia.com/api">HN Search API</a>. Titles link to the original articles;
+      comment counts open the discussion on Hacker News.
+    </p>
+  </div>
+</Base>
+
+<script>
+  import { timeAgo } from "../lib/format";
+
+  // The page is built every 6 hours but read any time after: keep the "… ago" labels current.
+  const now = Math.floor(Date.now() / 1000);
+  for (const el of document.querySelectorAll<HTMLElement>("time[data-time]")) {
+    el.textContent = timeAgo(Number(el.dataset.time), now);
+  }
+</script>
