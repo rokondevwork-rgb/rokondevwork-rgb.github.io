@@ -1326,7 +1326,7 @@ hr {
 }
 
 /* ==========================================================================
-   Contact page: email panel, topics, checklist, channels, services
+   Contact page: email panel, topics, checklist, channels
    The hero reuses the home page's .hero, .spec-card and .button styles.
    ========================================================================== */
 .contact-panel {
@@ -1558,7 +1558,10 @@ hr {
   transform: translate(2px, -2px);
 }
 
-.service-grid {
+/* ==========================================================================
+   Numbered feature grid: contact page services, about page principles
+   ========================================================================== */
+.feature-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
   gap: var(--space-6) var(--space-5);
@@ -1567,89 +1570,241 @@ hr {
   list-style: none;
 }
 
-.service {
+.feature {
   padding-top: var(--space-5);
   border-top: 1px solid var(--color-border-strong);
 }
 
-.service-index {
+.feature-index {
   color: var(--color-accent);
   font-family: var(--font-mono);
   font-size: var(--text-mono);
 }
 
-.service h3 {
+.feature h3 {
   margin: var(--space-4) 0 var(--space-2);
   font-size: 1.375rem;
   letter-spacing: -0.02em;
 }
 
-.service p {
+.feature p {
   margin: 0;
   color: var(--color-muted);
 }
 
 /* ==========================================================================
-   About page
+   About page: photo with quote, intro, experience timeline, skills
    ========================================================================== */
-.experience {
-  margin: 0 0 var(--space-5);
+.about-photo {
+  /* Lets the quote's type scale with the photo's width (cqi units). */
+  container-type: inline-size;
+  position: relative;
+  margin: 0;
+  /* Quote colours: the theme's below the photo; fixed ones on top of it (see below). */
+  --quote-text: var(--color-text);
+  --quote-muted: var(--color-muted);
+  --quote-accent: var(--color-accent);
+}
+
+.about-photo picture {
+  display: block;
+}
+
+.about-photo img {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.about-quote {
+  margin-top: var(--space-5);
+  color: var(--quote-text);
+}
+
+.about-quote blockquote {
+  margin: 0 0 0.75em;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+/* Large opening quote mark. Decorative only. */
+.about-quote blockquote::before {
+  content: "\201C";
+  content: "\201C" / "";
+  display: block;
+  height: 0.55em;
+  color: var(--quote-accent);
+  font-size: 2.5em;
+  line-height: 1;
+}
+
+.about-quote blockquote p {
+  margin: 0;
+  text-wrap: balance;
+}
+
+.about-quote-by {
+  margin: 0;
+  color: var(--quote-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
+}
+
+/* Phones: crop the photo to the person and show the quote below it. */
+@media (max-width: 47.99rem) {
+  .about-photo img {
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    object-position: 6% center;
+  }
+}
+
+/*
+  Wider screens: the quote sits on the empty wall the hand points at. The photo is light in both
+  themes, so the quote keeps dark-on-light colours there.
+*/
+@media (min-width: 48rem) {
+  .about-photo {
+    --quote-text: #0d151b;
+    --quote-muted: #4f5d68;
+    --quote-accent: #2f4fe0;
+  }
+
+  .about-quote {
+    position: absolute;
+    top: 50%;
+    right: 9%;
+    left: 44%;
+    margin: 0;
+    transform: translateY(-50%);
+  }
+
+  .about-quote blockquote {
+    font-size: clamp(1rem, 2.7cqi, 2rem);
+  }
+
+  .about-quote-by {
+    font-size: clamp(0.6875rem, 1.15cqi, 0.875rem);
+  }
+}
+
+.about-intro {
+  display: grid;
+  gap: var(--space-7);
+}
+
+@media (min-width: 60rem) {
+  .about-intro {
+    grid-template-columns: minmax(0, 1fr) 22rem;
+    gap: var(--space-8);
+    align-items: end;
+  }
+}
+
+.about-intro-text {
+  max-width: var(--measure);
+  font-size: var(--text-md);
+}
+
+.about-intro-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* Experience and skills share one row layout: a narrow mono label column, then the content. */
+.timeline,
+.skill-list {
+  margin: 0;
   padding: 0;
+  border-bottom: 1px solid var(--color-border);
   list-style: none;
 }
 
-.experience > li + li {
-  margin-top: var(--space-6);
+.timeline-item,
+.skill-row {
+  display: grid;
+  gap: var(--space-3) var(--space-6);
+  border-top: 1px solid var(--color-border);
 }
 
-.experience h3 {
+@media (min-width: 48rem) {
+  .timeline-item,
+  .skill-row {
+    grid-template-columns: 12rem minmax(0, 1fr);
+  }
+}
+
+.timeline-item {
+  padding-block: var(--space-6);
+}
+
+@media (min-width: 48rem) {
+  .timeline-item {
+    padding-block: var(--space-7);
+  }
+}
+
+.timeline-dates {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
   margin: 0;
-}
-
-.experience-meta {
-  margin: var(--space-1) 0 var(--space-3);
   color: var(--color-muted);
   font-family: var(--font-mono);
   font-size: var(--text-mono);
 }
 
-.experience ul {
+@media (min-width: 48rem) {
+  .timeline-dates {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: 0.6em;
+  }
+}
+
+.timeline-current {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-accent);
+}
+
+.timeline-item h3 {
+  margin: 0;
+  font-size: clamp(1.375rem, 1.1rem + 1vw, 1.75rem);
+  letter-spacing: -0.02em;
+}
+
+.timeline-role {
+  margin: var(--space-1) 0 var(--space-4);
+  color: var(--color-muted);
+}
+
+.timeline-item ul {
+  max-width: var(--measure);
   margin: 0;
   padding-left: 1.25rem;
-  list-style: disc;
 }
 
-.experience ul li + li {
-  margin-top: var(--space-1);
+.timeline-item ul li + li {
+  margin-top: var(--space-2);
 }
 
-.skills {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: var(--space-3) var(--space-6);
-}
-
-.skills dt {
+.timeline-item ul li::marker {
   color: var(--color-muted);
-  font-size: var(--text-xs);
-  line-height: 1.85;
 }
 
-.skills dd {
+.skill-row {
+  align-items: center;
+  padding-block: var(--space-5);
+}
+
+.skill-row .eyebrow {
   margin: 0;
-  overflow-wrap: anywhere;
-}
-
-/* Very narrow screens: stack each label above its value. */
-@media (max-width: 30rem) {
-  .skills {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-
-  .skills dd + dt {
-    margin-top: var(--space-3);
-  }
 }
 
 /* ==========================================================================

@@ -177,11 +177,11 @@ const services = [
         title="How I can help"
         link={{ href: "/projects/", label: "See projects" }}
       />
-      <ol class="service-grid">
+      <ol class="feature-grid">
         {
           services.map(({ title, text }, i) => (
-            <li class="service" data-reveal>
-              <span class="service-index" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+            <li class="feature" data-reveal>
+              <span class="feature-index" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
               <h3>{title}</h3>
               <p>{text}</p>
             </li>
