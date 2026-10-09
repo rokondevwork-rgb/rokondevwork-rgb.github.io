@@ -314,8 +314,28 @@ hr {
 }
 
 .site-nav a[aria-current] {
+  position: relative;
   padding-bottom: 4px;
-  box-shadow: 0 2px 0 var(--color-accent);
+}
+
+/*
+  The current page is marked by a little snake instead of a straight underline, a nod to the one
+  that follows the mouse. It is a mask over the accent colour, so it follows the theme.
+*/
+.site-nav a[aria-current]::after {
+  --nav-snake: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 8'%3E%3Cpath d='M1.05 2.72L1.47 2.5L1.92 2.34L2.4 2.27L2.89 2.3L3.36 2.41L3.83 2.61L4.28 2.86L4.72 3.16L5.15 3.49L5.56 3.82L5.96 4.14L6.35 4.43L6.73 4.67L7.08 4.86L7.4 4.98L7.69 5.03L7.97 5.03L8.24 4.97L8.53 4.86L8.85 4.69L9.18 4.45L9.54 4.16L9.91 3.84L10.3 3.48L10.71 3.13L11.13 2.78L11.58 2.46L12.06 2.19L12.57 1.98L13.12 1.86L13.68 1.85L14.24 1.94L14.77 2.13L15.27 2.38L15.74 2.68L16.18 3.01L16.61 3.35L17.02 3.68L17.4 3.98L17.76 4.24L18.1 4.44L18.39 4.58L18.64 4.65L18.85 4.67L19.05 4.64L19.27 4.58L19.52 4.46L19.82 4.27L20.14 4.03L20.5 3.73L20.88 3.39L21.28 3.03L21.7 2.67L22.16 2.33L22.65 2.01L23.19 1.75L23.78 1.57L24.28 1.51L24.52 3.89L24.22 3.91L24.01 3.96L23.75 4.06L23.44 4.24L23.1 4.48L22.72 4.77L22.32 5.09L21.9 5.44L21.46 5.77L20.98 6.09L20.48 6.37L19.93 6.58L19.35 6.71L18.75 6.73L18.16 6.63L17.61 6.43L17.1 6.17L16.64 5.85L16.2 5.5L15.78 5.15L15.39 4.79L15.02 4.46L14.66 4.17L14.33 3.93L14.03 3.75L13.76 3.63L13.52 3.57L13.28 3.56L13.03 3.59L12.74 3.69L12.42 3.85L12.07 4.07L11.69 4.35L11.3 4.66L10.89 4.99L10.46 5.33L10.02 5.64L9.55 5.92L9.07 6.15L8.56 6.3L8.03 6.37L7.51 6.32L7 6.19L6.52 5.97L6.07 5.69L5.65 5.37L5.24 5.03L4.84 4.67L4.45 4.32L4.08 3.99L3.72 3.7L3.37 3.47L3.04 3.29L2.71 3.18L2.4 3.13L2.08 3.14L1.73 3.21L1.35 3.36A0.35 0.35 0 0 1 1.05 2.72Z'/%3E%3Cpath fill-rule='evenodd' d='M23.2 2.7a2.9 2.15 0 1 0 5.8 0a2.9 2.15 0 1 0 -5.8 0ZM26.55 2.1a0.55 0.55 0 1 0 1.1 0a0.55 0.55 0 1 0 -1.1 0Z'/%3E%3C/svg%3E");
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 34px;
+  height: 9px;
+  margin-top: -3px;
+  background: var(--color-accent);
+  transform: translateX(-50%);
+  -webkit-mask: var(--nav-snake) center / contain no-repeat;
+  mask: var(--nav-snake) center / contain no-repeat;
+  pointer-events: none;
 }
 
 .header-actions {
@@ -403,6 +423,11 @@ hr {
     padding-bottom: var(--space-4);
     padding-left: var(--space-3);
     box-shadow: inset 2px 0 0 var(--color-accent);
+  }
+
+  /* In the drop-down list the bar on the left marks the current page instead of the snake. */
+  .js .site-nav a[aria-current]::after {
+    display: none;
   }
 
   /* Without JS: the links wrap onto their own row under the name. */
