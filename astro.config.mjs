@@ -34,7 +34,7 @@ export default defineConfig({
       fallbacks: ["monospace"],
     },
   ],
-  // Used for canonical URLs, social tags, RSS and the sitemap.
+  // Used for canonical URLs, social tags and the sitemap.
   // Hosted on GitHub Pages (user site, so no `base` path needed).
   site: "https://rokondevwork-rgb.github.io",
   trailingSlash: "always",

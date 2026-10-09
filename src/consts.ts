@@ -1,4 +1,4 @@
-// Site-wide details, used by the layout, pages and (later) RSS/SEO tags.
+// Site-wide details, used by the layout, pages and SEO tags.
 
 export const SITE = {
   name: "Rokunuzzaman Rokon",
@@ -28,9 +28,8 @@ export const TECH_STACK = [
   "Linux",
 ];
 
-// Shared by the blog index page and the RSS feed.
+// Blog index page details.
 export const BLOG = {
-  title: `${SITE.name} | Blog`,
   description: "Notes on Python, FastAPI, MySQL, and building data pipelines.",
 };
 

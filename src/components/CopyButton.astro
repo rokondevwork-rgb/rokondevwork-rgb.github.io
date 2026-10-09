@@ -1,0 +1,53 @@
+---
+/**
+ * A small "Copy" button that puts `text` on the clipboard, then reads "Copied" for a moment.
+ * Copying needs JS and the Clipboard API, so the button stays hidden until the script runs.
+ */
+interface Props {
+  text: string;
+  /** What gets copied, for screen readers, e.g. "email address". */
+  label: string;
+}
+
+const { text, label } = Astro.props;
+---
+
+<button type="button" class="copy-button" data-copy={text} data-copy-what={label} hidden>
+  <svg class="copy-icon" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"></rect><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path></svg>
+  <svg class="copied-icon" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+  <span class="copy-label">Copy</span>
+  <span class="visually-hidden">{label}</span>
+</button>
+<span class="visually-hidden" aria-live="polite"></span>
+
+<script>
+  if (navigator.clipboard) {
+    for (const button of document.querySelectorAll<HTMLButtonElement>("button[data-copy]")) {
+      const label = button.querySelector<HTMLElement>(".copy-label");
+      // The live region rendered right after the button announces the result.
+      const status = button.nextElementSibling as HTMLElement | null;
+      const what = button.dataset.copyWhat ?? "text";
+      let reset: number | undefined;
+
+      button.hidden = false;
+      button.addEventListener("click", async () => {
+        let copied = true;
+        try {
+          await navigator.clipboard.writeText(button.dataset.copy ?? "");
+        } catch {
+          copied = false;
+        }
+        button.toggleAttribute("data-copied", copied);
+        if (label) label.textContent = copied ? "Copied" : "Copy failed";
+        if (status) status.textContent = copied ? `Copied the ${what}.` : `Couldn't copy the ${what}.`;
+
+        clearTimeout(reset);
+        reset = window.setTimeout(() => {
+          button.removeAttribute("data-copied");
+          if (label) label.textContent = "Copy";
+          if (status) status.textContent = "";
+        }, 2000);
+      });
+    }
+  }
+</script>

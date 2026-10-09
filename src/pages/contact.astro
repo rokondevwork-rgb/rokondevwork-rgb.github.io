@@ -1,5 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
+import CopyButton from "../components/CopyButton.astro";
 import SectionHeading from "../components/SectionHeading.astro";
 import { CONTACT } from "../consts";
 
@@ -111,14 +112,8 @@ const services = [
           <p class="eyebrow">Email</p>
           <div class="contact-email-row">
             <a class="contact-email contact-email--large" href={mailto}>{CONTACT.email}</a>
-            <!-- Copying needs JS (and the Clipboard API), so the button stays hidden until the script runs. -->
-            <button type="button" class="copy-button" id="copy-email" data-email={CONTACT.email} hidden>
-              <svg class="copy-icon" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"></rect><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path></svg>
-              <svg class="copied-icon" aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
-              <span class="copy-label">Copy</span>
-            </button>
+            <CopyButton text={CONTACT.email} label="email address" />
           </div>
-          <p class="visually-hidden" id="copy-status" aria-live="polite"></p>
 
           <p class="eyebrow" id="topics-label">Or start with a topic</p>
           <ul class="topic-list" aria-labelledby="topics-label">
@@ -206,33 +201,5 @@ const services = [
       setTimeout(tick, 60_000 - (Date.now() % 60_000));
     };
     tick();
-  }
-
-  // Copy-to-clipboard for the email address.
-  const copyButton = document.querySelector<HTMLButtonElement>("#copy-email");
-  const copyStatus = document.querySelector<HTMLElement>("#copy-status");
-  if (copyButton && navigator.clipboard) {
-    const label = copyButton.querySelector<HTMLElement>(".copy-label");
-    let reset: number | undefined;
-
-    copyButton.hidden = false;
-    copyButton.addEventListener("click", async () => {
-      let copied = true;
-      try {
-        await navigator.clipboard.writeText(copyButton.dataset.email ?? "");
-      } catch {
-        copied = false;
-      }
-      copyButton.toggleAttribute("data-copied", copied);
-      if (label) label.textContent = copied ? "Copied" : "Copy failed";
-      if (copyStatus) copyStatus.textContent = copied ? "Email address copied." : "Couldn't copy the email address.";
-
-      clearTimeout(reset);
-      reset = window.setTimeout(() => {
-        copyButton.removeAttribute("data-copied");
-        if (label) label.textContent = "Copy";
-        if (copyStatus) copyStatus.textContent = "";
-      }, 2000);
-    });
   }
 </script>
