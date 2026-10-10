@@ -553,8 +553,18 @@ hr {
   transform: translateX(3px);
 }
 
-.button--download:hover svg {
+.button--download:hover svg,
+.button--down:hover svg {
   transform: translateY(2px);
+}
+
+/* WhatsApp's green on the icon, so the button is recognised at a glance. */
+.button--whatsapp svg {
+  color: light-dark(#1c9d4f, #25d366);
+}
+
+.button--whatsapp:hover svg {
+  transform: none;
 }
 
 .button--primary {
@@ -1531,6 +1541,18 @@ hr {
   background: var(--color-surface);
 }
 
+/* Reached from the hero's "Email me" button: a brief accent outline shows where you landed. */
+@keyframes landed {
+  from {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-accent) 25%, transparent);
+  }
+}
+
+.contact-panel:target {
+  animation: landed 1.8s ease-out;
+}
+
 .contact-panel-aside {
   padding-top: var(--space-6);
   border-top: 1px dashed var(--color-border-strong);
@@ -1562,7 +1584,15 @@ hr {
   line-height: 1.15;
 }
 
-.copy-button {
+.contact-email-tools {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Small bordered buttons beside the email address: Copy, and the "Open in Gmail" link. */
+.copy-button,
+.mini-button {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
@@ -1580,9 +1610,14 @@ hr {
     border-color var(--duration-fast) ease;
 }
 
-.copy-button:hover {
+.copy-button:hover,
+.mini-button:hover {
   border-color: var(--color-muted);
   color: var(--color-text);
+}
+
+.mini-button {
+  text-decoration: none;
 }
 
 .copy-button[data-copied] {
@@ -1709,6 +1744,10 @@ hr {
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   background: var(--color-surface);
+}
+
+.channel-icon--whatsapp {
+  color: light-dark(#1c9d4f, #25d366);
 }
 
 .channel-card h3 {

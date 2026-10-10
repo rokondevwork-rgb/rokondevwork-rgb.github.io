@@ -33,9 +33,14 @@ export const BLOG = {
   description: "Notes on Python, FastAPI, MySQL, and building data pipelines.",
 };
 
-// Public contact details. The phone number is left out on purpose: public pages get scraped.
+// Public contact details. The number is shown on purpose, for WhatsApp, on the contact page.
 export const CONTACT = {
   email: "rokon.raz@gmail.com",
+  whatsapp: {
+    /** Digits only, international format, as wa.me links need it. */
+    number: "8801739933258",
+    display: "+880 1739-933258",
+  },
   github: "https://github.com/RoknuzzamanRokon",
   linkedin: "https://www.linkedin.com/in/rokon-raz",
   /** CV served from public/. Replace the file there to update it; keep the name. */
