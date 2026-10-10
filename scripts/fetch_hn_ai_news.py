@@ -129,8 +129,9 @@ def main() -> int:
         return 1
 
     stories = [to_story(hit) for hit in hits if hit.get("title") and is_ai(hit["title"])]
-    stories.sort(key=lambda story: (-story["points"], -story["time"]))
-    stories = stories[:MAX_STORIES]
+    # If there are too many, keep the most upvoted; then list them newest first.
+    stories.sort(key=lambda story: -story["points"])
+    stories = sorted(stories[:MAX_STORIES], key=lambda story: -story["time"])
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(

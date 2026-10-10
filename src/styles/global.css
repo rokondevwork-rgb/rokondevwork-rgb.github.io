@@ -1292,14 +1292,20 @@ hr {
   list-style: none;
 }
 
+/* Age on the left (above the title on phones), then the story. */
 .news-item {
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-columns: 2.25rem minmax(0, 1fr);
-  gap: var(--space-3);
+  gap: var(--space-2) var(--space-5);
   padding-block: var(--space-5);
   border-top: 1px solid var(--color-border);
+}
+
+@media (min-width: 40rem) {
+  .news-item {
+    grid-template-columns: 6rem minmax(0, 1fr);
+  }
 }
 
 /* Hover/focus background, extended to the container's edges (like the project rows). */
@@ -1318,11 +1324,17 @@ hr {
   opacity: 1;
 }
 
-.news-rank {
-  padding-top: 0.4em;
+.news-time {
   color: var(--color-muted);
   font-family: var(--font-mono);
   font-size: var(--text-mono);
+  white-space: nowrap;
+}
+
+@media (min-width: 40rem) {
+  .news-time {
+    padding-top: 0.45em;
+  }
 }
 
 .news-title {
@@ -1347,7 +1359,23 @@ hr {
   color: var(--color-accent);
 }
 
-/* Domain · points · comments · age. Lines only break between items, never inside one. */
+/* "Opens elsewhere" arrow after the title. */
+.news-go {
+  display: inline-block;
+  margin-left: 0.3em;
+  color: var(--color-muted);
+  font-size: 0.8em;
+  transition:
+    color var(--duration-fast) ease,
+    transform var(--duration) var(--ease-out);
+}
+
+.news-title a:hover .news-go {
+  color: inherit;
+  transform: translate(2px, -2px);
+}
+
+/* Domain · points · comments. Lines only break between items, never inside one. */
 .news-meta {
   display: flex;
   flex-wrap: wrap;

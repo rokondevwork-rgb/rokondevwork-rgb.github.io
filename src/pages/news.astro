@@ -28,21 +28,22 @@ interface News {
 const files = import.meta.glob<News>("../data/news.json", { eager: true, import: "default" });
 const news = files["../data/news.json"];
 if (!news) console.warn("[news] src/data/news.json is missing: run `npm run news` to fetch it.");
-const stories = news?.stories ?? [];
+// Newest first, so the list reads "1 h ago", "2 h ago", ...
+const stories = (news?.stories ?? []).toSorted((a, b) => b.time - a.time);
 const fetchedAt = news?.updated ?? 0;
 const iso = (seconds: number) => new Date(seconds * 1000).toISOString();
 ---
 
 <Base
   title="News"
-  description="AI news from Hacker News: the most upvoted AI stories of the last 24 hours, updated every 6 hours."
+  description="AI news from Hacker News: the last 24 hours of upvoted AI stories, newest first, updated every 6 hours."
   width="full"
 >
   <div class="container">
     <section class="page-hero">
       <h1>News</h1>
       <div>
-        <p class="lead">The most upvoted AI stories on Hacker News from the last 24 hours, updated every 6 hours.</p>
+        <p class="lead">AI stories from Hacker News in the last 24 hours, newest first. Updated every 6 hours.</p>
         {
           news && (
             <p class="hero-status">
@@ -58,25 +59,25 @@ const iso = (seconds: number) => new Date(seconds * 1000).toISOString();
     {
       stories.length > 0 ? (
         <ol class="news-list">
-          {stories.map((story, i) => (
+          {stories.map((story) => (
             <li class="news-item">
-              <span class="news-rank" aria-hidden="true">
-                {String(i + 1).padStart(2, "0")}
-              </span>
+              <time class="news-time" datetime={iso(story.time)} data-time={story.time}>
+                {timeAgo(story.time, fetchedAt)}
+              </time>
               <div>
                 <h2 class="news-title">
-                  <a href={story.url} rel="noopener">{story.title}</a>
+                  <a href={story.url} target="_blank" rel="noopener noreferrer" aria-describedby="news-new-tab">
+                    {story.title}
+                    <span class="news-go" aria-hidden="true">↗</span>
+                  </a>
                 </h2>
                 <p class="news-meta">
                   <span>{story.domain}</span>
                   <span>{story.points} points</span>
                   <span>
-                    <a href={story.hnUrl} rel="noopener">
+                    <a href={story.hnUrl} target="_blank" rel="noopener noreferrer" aria-describedby="news-new-tab">
                       {story.comments} {story.comments === 1 ? "comment" : "comments"}
                     </a>
-                  </span>
-                  <span>
-                    <time datetime={iso(story.time)} data-time={story.time}>{timeAgo(story.time, fetchedAt)}</time>
                   </span>
                 </p>
               </div>
@@ -94,9 +95,11 @@ const iso = (seconds: number) => new Date(seconds * 1000).toISOString();
 
     <p class="news-source">
       Stories and points from <a href="https://news.ycombinator.com/">Hacker News</a>, via the
-      <a href="https://hn.algolia.com/api">HN Search API</a>. Titles link to the original articles;
-      comment counts open the discussion on Hacker News.
+      <a href="https://hn.algolia.com/api">HN Search API</a>. Titles open the original article in a
+      new tab; comment counts open the discussion on Hacker News.
     </p>
+    <!-- Read out with every story link (aria-describedby), so screen reader users know too. -->
+    <span id="news-new-tab" hidden>Opens in a new tab</span>
   </div>
 </Base>
 
