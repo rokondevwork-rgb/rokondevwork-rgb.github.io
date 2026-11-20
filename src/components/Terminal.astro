@@ -3,11 +3,11 @@
  * The intercom: a small terminal for visitors who like typing. Every command has a clickable
  * chip too, and the log already shows a short session, so nothing here needs a keyboard.
  * Commands: help, whoami, ls projects, open <project>, goto <floor>, stack --uses <tool>,
- * cat cv.pdf, contact --email|--whatsapp, theme day|night, snake on|off, clear.
+ * cat cv.pdf, contact --email|--whatsapp, games, play <game>, theme day|night, snake on|off, clear.
  * ⌘K / Ctrl+K (or "/") jumps to the terminal on the page, or opens it in a dialog.
  */
 import { CONTACT, SITE } from "../consts";
-import { FLOORS, SHEETS } from "../lib/data";
+import { FLOORS, GAMES, SHEETS } from "../lib/data";
 import { getProjects } from "../lib/content";
 
 interface Props {
@@ -25,6 +25,7 @@ const data = {
   cv: CONTACT.cv,
   projects,
   floors: [...FLOORS.map((f) => ({ code: f.code, href: `/#${f.id}`, name: f.name })), ...SHEETS],
+  games: GAMES.map((g) => ({ id: g.id, no: g.no, title: g.title, playable: g.status === "playable" })),
 };
 const id = `term-${mode}`;
 ---
@@ -49,7 +50,7 @@ const id = `term-${mode}`;
     <input id={id} name="command" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="send" placeholder="help…" />
   </form>
   <div class="terminal-chips mono" data-chips hidden>
-    {["help", "whoami", "ls projects", "cat cv.pdf", "snake on"].map((c) => <button type="button" data-run={c}>{c}</button>)}
+    {["help", "whoami", "ls projects", "games", "cat cv.pdf", "snake on"].map((c) => <button type="button" data-run={c}>{c}</button>)}
     <!-- Always offers the other theme: "theme day" at night, "theme night" by day. -->
     <button type="button" data-run="theme day" data-theme-chip>theme day</button>
   </div>
@@ -64,6 +65,7 @@ const id = `term-${mode}`;
     cv: string;
     projects: { slug: string; title: string; stack: string[] }[];
     floors: { code: string; href: string; name: string }[];
+    games: { id: string; no: string; title: string; playable: boolean }[];
   };
   type Part = string | { text: string; href: string; download?: boolean };
 
@@ -116,7 +118,7 @@ const id = `term-${mode}`;
         case "help":
           line("whoami · ls projects · open <project> · goto <floor>");
           line("stack --uses <tool> · cat cv.pdf · contact --email · contact --whatsapp");
-          line("theme day|night · snake on|off · clear");
+          line("games · play <game> · theme day|night · snake on|off · clear");
           break;
         case "whoami":
           line(`${info.name} · Python backend engineer, Dhaka (UTC+6)`);
@@ -140,7 +142,7 @@ const id = `term-${mode}`;
           if (f) {
             line(`Going to ${f.code} · ${f.name}…`);
             go(f.href);
-          } else line("Floors: L0 to B8, FN (field notes), SR (site radio).");
+          } else line("Floors: L0 to B8, FN (field notes), SR (site radio), BR (break room).");
           break;
         }
         case "stack": {
@@ -178,6 +180,27 @@ const id = `term-${mode}`;
             const want = arg === "off" ? false : arg === "on" ? true : !on;
             if (want !== on) toggle.click();
             line(want ? "Hiss. The python is out: move your mouse." : "The python is curled up in its basket.");
+          }
+          break;
+        }
+        case "games":
+        case "game":
+          line(`Break room · ${info.games.length} machines`, "pencil");
+          info.games.forEach((g) =>
+            g.playable
+              ? line([`${g.no}  `, { text: g.id, href: `/games/?play=${g.id}` }, "  ▶ play now"], "out-teal")
+              : line(`${g.no}  ${g.id}  · being built`, "pencil"),
+          );
+          line("Click a name to play it in the Break room, or type 'play brick-breaker'.", "pencil");
+          break;
+        case "play": {
+          const g = info.games.find((x) => x.id === arg || x.title.toLowerCase() === arg || x.no === arg.padStart(2, "0"));
+          if (!arg) line("Usage: play brick-breaker · 'games' lists every machine.");
+          else if (!g) line(`No machine called ${arg}. Try 'games'.`);
+          else if (!g.playable) line(`${g.title} is still being built. Hard hats only.`);
+          else {
+            line(`Walking to the Break room · ${g.title}…`);
+            go(`/games/?play=${g.id}`);
           }
           break;
         }

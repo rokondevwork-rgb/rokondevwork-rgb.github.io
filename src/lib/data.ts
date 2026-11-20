@@ -30,7 +30,36 @@ export const FLOORS: Floor[] = [
 export const SHEETS = [
   { code: "FN", href: "/blog/", name: "Field notes" },
   { code: "SR", href: "/news/", name: "Site radio" },
+  { code: "BR", href: "/games/", name: "Break room" },
 ];
+
+/** The Break room's machines. Only `playable` ones open; the rest show as being built. */
+export const GAMES = [
+  {
+    id: "brick-breaker",
+    no: "01",
+    title: "Brick breaker",
+    status: "playable",
+    blurb: "Knock down the wall one brick at a time. Three lives, and the ball gets faster every wall.",
+    controls: "← → · mouse · drag",
+  },
+  {
+    id: "pipeline-puzzle",
+    no: "02",
+    title: "Pipeline puzzle",
+    status: "building",
+    blurb: "Turn the pipes so the raw supplier feed reaches one clean record.",
+    controls: "Click or tap a pipe",
+  },
+  {
+    id: "bug-hunt",
+    no: "03",
+    title: "Bug hunt",
+    status: "building",
+    blurb: "Bugs hide in the building's windows. Catch as many as you can in 30 seconds.",
+    controls: "Click or tap",
+  },
+] as const;
 
 /** Which floor a page belongs to, so the panel can light it up. */
 export function floorForPath(path: string): string | undefined {
@@ -40,6 +69,7 @@ export function floorForPath(path: string): string | undefined {
   if (path.startsWith("/contact")) return "B8";
   if (path.startsWith("/blog")) return "FN";
   if (path.startsWith("/news")) return "SR";
+  if (path.startsWith("/games")) return "BR";
   return undefined;
 }
 

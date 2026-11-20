@@ -1,0 +1,221 @@
+---
+/**
+ * The Break room: small games. Each machine is a card; a playable one opens in a window
+ * (a <dialog>) and its code loads only then. /games/?play=<id> opens that game straight away,
+ * which is where the intercom's `games` command links to.
+ */
+import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
+import { GAMES } from "../lib/data";
+
+const playable = GAMES.filter((g) => g.status === "playable").length;
+const building = GAMES.length - playable;
+const tones = ["#5bbfb5", "#d98bb8", "#ff6a3d", "#9daae8"];
+// The little wall on the Brick breaker card: four rows of eight, a few already knocked out.
+const mini = Array.from({ length: 32 }, (_, i) => ([3, 12, 21, 26].includes(i) ? "transparent" : tones[Math.floor(i / 8)]));
+---
+
+<Base
+  title="Games"
+  sheet="Sheet BR · Break room · Games"
+  description="The Break room: small browser games on Rokon's portfolio, starting with Brick breaker."
+>
+  <div class="sheet" style="--tone: var(--h-mulberry)">
+    <div class="sheet-title">
+      <h1 class="sign">Break room</h1>
+      <p class="serif"><span class="reveal">Small games for a short break between floors.</span> <em class="reveal" style="--fill: var(--h-mulberry)">Pick a machine and it opens in a window.</em></p>
+      <p class="mono status">
+        {playable} {playable === 1 ? "machine" : "machines"} running · {building} being built · scores stay in this browser
+      </p>
+    </div>
+
+    <ul class="cabinets" role="list">
+      {
+        GAMES.map((game) =>
+          game.status === "playable" ? (
+            <li class="cabinet">
+              <div class="cabinet-screen" aria-hidden="true">
+                <span class="cabinet-no mono">Cabinet {game.no}</span>
+                <span class="mini-wall">
+                  {mini.map((c) => (
+                    <span style={`background: ${c}`} />
+                  ))}
+                </span>
+                <span class="mini-ball" />
+                <span class="mini-paddle" />
+              </div>
+              <div class="cabinet-head">
+                <h2 class="sign">{game.title}</h2>
+                <span class="cabinet-tag mono">Playable</span>
+              </div>
+              <p>{game.blurb}</p>
+              <dl class="mono">
+                <dt>Controls</dt>
+                <dd>{game.controls}</dd>
+                <dt>Your best</dt>
+                <dd data-best={game.id}>—</dd>
+              </dl>
+              <button type="button" class="cabinet-play mono" data-play={game.id} aria-haspopup="dialog">
+                Play <Icon name="right" size={12} />
+              </button>
+              <noscript><p class="mono pencil">The games need JavaScript.</p></noscript>
+            </li>
+          ) : (
+            <li class="cabinet cabinet--building">
+              <div class="cabinet-screen" aria-hidden="true">
+                <span class="cabinet-no mono">Cabinet {game.no}</span>
+                {game.id === "pipeline-puzzle" ? (
+                  <svg width="150" height="90" viewBox="0 0 150 90" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="square">
+                    <path d="M5 45h40v-30h30v60h30v-30h40" />
+                  </svg>
+                ) : (
+                  <svg width="110" height="96" viewBox="0 0 110 96" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="15" y="6" width="80" height="88" />
+                    <rect x="27" y="18" width="16" height="12" />
+                    <rect x="67" y="18" width="16" height="12" />
+                    <rect x="27" y="42" width="16" height="12" fill="var(--signal)" />
+                    <rect x="67" y="42" width="16" height="12" />
+                    <rect x="27" y="66" width="16" height="12" />
+                    <rect x="67" y="66" width="16" height="12" />
+                  </svg>
+                )}
+              </div>
+              <div class="cabinet-head">
+                <h2 class="sign">{game.title}</h2>
+                <span class="cabinet-tag mono">Being built</span>
+              </div>
+              <p>{game.blurb}</p>
+              <span class="mono pencil cabinet-foot">Under construction · hard hats only</span>
+            </li>
+          ),
+        )
+      }
+    </ul>
+
+    <p class="games-note">
+      Open the intercom (<kbd class="mono">⌘K</kbd>) and type <code class="mono">games</code> to jump straight to a machine.
+    </p>
+  </div>
+
+  <dialog class="arcade" data-arcade aria-labelledby="arcade-title">
+    <div class="arcade-bar">
+      <span class="mono" id="arcade-title">Cabinet 01 · Brick breaker</span>
+      <span class="arcade-spacer"></span>
+      <button type="button" class="arcade-btn mono" data-arcade-pause aria-label="Pause">
+        <span class="arcade-btn-text" data-pause-label>Pause</span>
+        <svg class="arcade-btn-icon" aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><rect x="3" y="2" width="3.5" height="12"></rect><rect x="9.5" y="2" width="3.5" height="12"></rect></svg>
+      </button>
+      <button type="button" class="arcade-btn mono" data-arcade-restart aria-label="Restart">
+        <span class="arcade-btn-text">Restart</span>
+        <svg class="arcade-btn-icon" aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 8a5 5 0 1 1-1.5-3.6M13 2v3h-3"></path></svg>
+      </button>
+      <button type="button" class="arcade-btn arcade-btn--icon" data-arcade-close aria-label="Close game">
+        <Icon name="close" size={14} />
+      </button>
+    </div>
+    <div class="arcade-hud mono" aria-live="polite">
+      <span>Score <b data-hud="score">0</b></span>
+      <span>Wall <b data-hud="level">1</b></span>
+      <span class="arcade-lives">Lives <span data-hud="lives" aria-label="3 lives left"></span></span>
+      <span class="arcade-best">Best <span data-hud="best">0</span></span>
+    </div>
+    <div class="arcade-field">
+      <canvas data-arcade-canvas tabindex="0" aria-label="Brick breaker. Move with the arrow keys or the mouse, launch with Space."></canvas>
+    </div>
+    <div class="arcade-foot mono">
+      <span class="hint-mouse">← → or mouse to move · Space launches · P pauses · Esc closes</span>
+      <span class="hint-touch">Drag anywhere to move · tap to launch</span>
+      <span class="pencil">Scores are saved in this browser only</span>
+    </div>
+  </dialog>
+</Base>
+
+<script>
+  import type { BrickBreaker, Hud } from "../scripts/brick-breaker";
+
+  const BEST_KEY = "brick-breaker:best";
+  const dialog = document.querySelector<HTMLDialogElement>("[data-arcade]");
+  const canvas = document.querySelector<HTMLCanvasElement>("[data-arcade-canvas]");
+
+  const showBest = () => {
+    let best = 0;
+    try {
+      best = Number(localStorage.getItem(BEST_KEY)) || 0;
+    } catch {}
+    document.querySelectorAll<HTMLElement>('[data-best="brick-breaker"]').forEach((el) => (el.textContent = best ? best.toLocaleString() : "—"));
+  };
+  showBest();
+
+  if (dialog && canvas) {
+    const hudEl = (k: string) => dialog.querySelector<HTMLElement>(`[data-hud="${k}"]`)!;
+    const pauseBtn = dialog.querySelector<HTMLButtonElement>("[data-arcade-pause]")!;
+    const pauseLabel = dialog.querySelector<HTMLElement>("[data-pause-label]")!;
+    let game: BrickBreaker | null = null;
+    let opener: HTMLElement | null = null;
+
+    const renderHud = (h: Hud) => {
+      hudEl("score").textContent = h.score.toLocaleString();
+      hudEl("level").textContent = String(h.level);
+      hudEl("best").textContent = h.best.toLocaleString();
+      const lives = hudEl("lives");
+      lives.setAttribute("aria-label", `${h.lives} ${h.lives === 1 ? "life" : "lives"} left`);
+      lives.replaceChildren(...Array.from({ length: 3 }, (_, i) => {
+        const dot = document.createElement("i");
+        if (i >= h.lives) dot.className = "is-lost";
+        return dot;
+      }));
+      const paused = h.phase === "paused";
+      pauseLabel.textContent = paused ? "Resume" : "Pause";
+      pauseBtn.setAttribute("aria-label", paused ? "Resume" : "Pause");
+      pauseBtn.disabled = h.phase === "over";
+    };
+
+    const setUrl = (id: string | null) => {
+      const url = new URL(location.href);
+      if (id) url.searchParams.set("play", id);
+      else url.searchParams.delete("play");
+      history.replaceState(history.state, "", url);
+    };
+
+    const open = async (id: string, from?: HTMLElement) => {
+      if (id !== "brick-breaker" || dialog.open) return;
+      opener = from ?? null;
+      dialog.showModal();
+      setUrl(id);
+      // The game's code is only fetched when someone wants to play.
+      const { createBrickBreaker } = await import("../scripts/brick-breaker");
+      if (!dialog.open) return;
+      game?.destroy();
+      game = createBrickBreaker(canvas, renderHud);
+      canvas.focus({ preventScroll: true });
+    };
+
+    document.querySelectorAll<HTMLButtonElement>("[data-play]").forEach((btn) =>
+      btn.addEventListener("click", () => open(btn.dataset.play ?? "", btn)),
+    );
+    pauseBtn.addEventListener("click", () => {
+      game?.togglePause();
+      canvas.focus({ preventScroll: true });
+    });
+    dialog.querySelector("[data-arcade-restart]")?.addEventListener("click", () => {
+      game?.restart();
+      canvas.focus({ preventScroll: true });
+    });
+    dialog.querySelector("[data-arcade-close]")?.addEventListener("click", () => dialog.close());
+    // A click on the dark backdrop closes the window.
+    dialog.addEventListener("click", (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+    dialog.addEventListener("close", () => {
+      game?.destroy();
+      game = null;
+      setUrl(null);
+      showBest();
+      opener?.focus();
+    });
+
+    // /games/?play=brick-breaker opens the game at once (the intercom links here).
+    const wanted = new URLSearchParams(location.search).get("play");
+    if (wanted) open(wanted, document.querySelector<HTMLElement>(`[data-play="${wanted}"]`) ?? undefined);
+  }
+</script>
