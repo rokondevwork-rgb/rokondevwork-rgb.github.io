@@ -35,7 +35,7 @@ const hrefFor = (code: string, href: string) => (!home && code === current && pa
       <span class="sign" data-floor-code>{shown.code}</span>
       <span class="mono" data-floor-label>{shown.name}</span>
     </div>
-    <ul>
+    <ul class="panel-grid">
       {
         all.slice(0, FLOORS.length).map(({ code, name, href }) => (
           <li>
@@ -48,7 +48,7 @@ const hrefFor = (code: string, href: string) => (!home && code === current && pa
       }
     </ul>
     <span class="panel-sep" aria-hidden="true"></span>
-    <ul>
+    <ul class="panel-grid">
       {
         SHEETS.map(({ code, name, href }) => (
           <li>
@@ -61,6 +61,7 @@ const hrefFor = (code: string, href: string) => (!home && code === current && pa
       }
     </ul>
     <span class="panel-sep" aria-hidden="true"></span>
+    <div class="panel-tools">
     <button type="button" class="panel-tool" data-open-intercom aria-label="Open the intercom terminal (⌘ K)" title="Intercom · ⌘ K">
       <Icon name="terminal" size={16} />
     </button>
@@ -77,6 +78,7 @@ const hrefFor = (code: string, href: string) => (!home && code === current && pa
       </svg>
       <span class="visually-hidden">Python snake that follows the mouse</span>
     </button>
+    </div>
   </div>
 </nav>
 

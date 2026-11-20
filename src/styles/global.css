@@ -2619,6 +2619,532 @@ button {
 /* ==========================================================================
    Small screens: the borehole
    ========================================================================== */
+/* ==========================================================================
+   One floor per screen
+   Every floor is at least one viewport tall and its content is sized to fit
+   in it, so scrolling snaps from floor to floor. The slab line sits 76px
+   inside each floor, so the half-buried numeral stays whole after a snap.
+   ========================================================================== */
+:root {
+  --slab-y: 76px;
+  /* Paper that is not remapped inside the bedrock band. */
+  --sheet: light-dark(#efebe3, #141311);
+}
+
+@media (min-width: 1200px) and (min-height: 640px) {
+  html.snap {
+    scroll-snap-type: y mandatory;
+    scroll-padding-top: 0;
+  }
+}
+
+@media (max-width: 1199px), (max-height: 639px) {
+  html.snap {
+    scroll-snap-type: y proximity;
+    scroll-padding-top: 0;
+  }
+}
+
+.snap .lvl,
+.snap .street,
+.snap .sheet {
+  scroll-snap-align: start;
+}
+
+.snap .sheet-nav {
+  scroll-snap-align: end;
+}
+
+.lvl {
+  min-height: 100svh;
+  padding: 96px calc(var(--panel) + 32px) 48px var(--lane);
+}
+
+.slab {
+  top: var(--slab-y);
+}
+
+.slab-band {
+  top: calc(var(--slab-y) + 2px);
+}
+
+.req-dot {
+  top: calc(var(--slab-y) - 5px);
+}
+
+.depth-mark {
+  top: calc(var(--slab-y) + 10px);
+}
+
+.lvl-num {
+  font-size: 150px;
+  top: calc(var(--slab-y) - 0.44em);
+}
+
+.lvl-head {
+  gap: 6px;
+  margin-bottom: 32px;
+  padding-left: 200px;
+}
+
+.lvl-head h2 {
+  font-size: clamp(2.75rem, 1.6rem + 3vw, 4.5rem);
+}
+
+.lvl-head p {
+  font-size: clamp(1.25rem, 1.05rem + 0.6vw, 1.5rem);
+  max-width: 44ch;
+}
+
+.out-link {
+  margin-top: 20px;
+}
+
+/* The bedrock band starts at its slab; above it is still the floor above. */
+.on-bedrock {
+  background: linear-gradient(var(--sheet) 0 var(--slab-y), var(--bedrock) var(--slab-y));
+}
+
+.below-bedrock {
+  background: linear-gradient(var(--bedrock) 0 var(--slab-y), transparent var(--slab-y));
+}
+
+.street {
+  height: 100svh;
+  min-height: 680px;
+}
+
+/* B1 */
+.site-photo {
+  flex-basis: 340px;
+}
+
+.site-photo-frame img {
+  height: 330px;
+}
+
+.about-text {
+  gap: 18px;
+}
+
+.about-text blockquote {
+  font-size: clamp(1.5rem, 1.1rem + 1.1vw, 2.125rem);
+}
+
+.about-text p {
+  font-size: 1.0625rem;
+}
+
+.about-text .title-block dl {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.about-text .title-block dl > div {
+  border-right: 1px solid var(--hatch);
+  border-bottom: 1px solid var(--hatch);
+}
+
+.about-text .title-block dl > div:nth-child(3n) {
+  border-right: 0;
+}
+
+.about-text .title-block dl > div:nth-last-child(-n + 3) {
+  border-bottom: 0;
+}
+
+/* B2 */
+.scene {
+  margin-bottom: 36px;
+}
+
+.scene-raw {
+  height: 190px;
+}
+
+.scene-machine {
+  flex-basis: 160px;
+  height: 160px;
+}
+
+.scene-machine svg {
+  width: 52px;
+  height: 52px;
+}
+
+.machine {
+  gap: 10px;
+  padding-top: 28px;
+}
+
+.machine::before {
+  height: 22px;
+}
+
+.machine-plate {
+  height: 64px;
+  font-size: 2.5rem;
+}
+
+.machine h3 {
+  font-size: 1.75rem;
+}
+
+.machine p {
+  font-size: 1rem;
+}
+
+.calls {
+  gap: 4px;
+}
+
+/* B3 */
+.trench-layer {
+  padding: 10px 16px;
+}
+
+.pipe {
+  width: 78px;
+  gap: 6px;
+}
+
+.pipe-ring {
+  width: 40px;
+  height: 40px;
+}
+
+.pipe-ring::after {
+  width: 14px;
+  height: 14px;
+}
+
+.pipe-panel {
+  gap: 14px;
+  padding: 20px;
+}
+
+.pipe-panel .sign {
+  font-size: 3rem;
+}
+
+/* B4: the homepage shows its rooms in one row. */
+.plan--row {
+  padding: 34px 18px 18px;
+}
+
+.plan--row .rooms {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 1199px) {
+  .plan--row .rooms {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .plan--row .rooms {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .plan--row .room-shot img,
+  .plan--row .room:not(.room--large):not(.room--mid) .room-shot img {
+    height: 170px;
+  }
+}
+
+.plan--row .room,
+.plan--row .room--large {
+  grid-column: auto;
+  padding: 14px;
+  gap: 8px;
+}
+
+.plan--row .room-shot img,
+.plan--row .room:not(.room--large):not(.room--mid) .room-shot img {
+  height: 140px;
+}
+
+.plan--row .room-title,
+.plan--row .room:not(.room--large):not(.room--mid) .room-title {
+  font-size: 1.625rem;
+}
+
+.plan--row .room p.serif {
+  font-size: 1.125rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* B5 */
+.dig-label {
+  padding: 12px 18px;
+}
+
+.dig-body {
+  padding: 12px 20px;
+}
+
+.dig-body .serif,
+.dig-body.serif {
+  font-size: 1.5rem;
+}
+
+/* B6 */
+.roles {
+  margin-top: 24px;
+  padding-top: 20px;
+}
+
+.role-head .sign {
+  font-size: 2.5rem;
+}
+
+.role ul {
+  gap: 6px;
+}
+
+/* B7 */
+.piles {
+  gap: 32px;
+}
+
+.pile {
+  min-height: 280px;
+  gap: 14px;
+  padding: 24px 22px;
+}
+
+.bedrock {
+  height: 56px;
+}
+
+/* B8 */
+.lvl--last {
+  padding-bottom: 120px;
+}
+
+.contact-main {
+  gap: 18px;
+}
+
+.contact-main > p.serif {
+  font-size: clamp(1.875rem, 1.2rem + 1.8vw, 2.75rem);
+}
+
+.big-email {
+  font-size: clamp(2rem, 0.8rem + 2.6vw, 3.25rem);
+}
+
+.links-grid--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.links-grid--3 li:nth-child(odd) {
+  border-right: 0;
+}
+
+.links-grid--3 li:not(:nth-child(3n)) {
+  border-right: 1px solid var(--hatch);
+}
+
+.links-grid--3 a {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  padding: 10px 12px;
+}
+
+.terminal-log {
+  max-height: 230px;
+}
+
+.response-line {
+  bottom: 92px;
+}
+
+.response-shaft {
+  bottom: 92px;
+}
+
+.response-label {
+  bottom: 102px;
+}
+
+.shaft-foot {
+  bottom: 24px;
+}
+
+/* Shorter laptop screens (e.g. 1366×768): tighten each floor so it still fits. */
+@media (min-width: 1200px) and (max-height: 860px) {
+  :root {
+    --slab-y: 64px;
+  }
+
+  .lvl {
+    padding-top: 78px;
+    padding-bottom: 32px;
+  }
+
+  .lvl-num {
+    font-size: 128px;
+  }
+
+  .lvl-head {
+    margin-bottom: 22px;
+    padding-left: 170px;
+  }
+
+  .lvl-head h2 {
+    font-size: 3.5rem;
+  }
+
+  .lvl-head p {
+    font-size: 1.25rem;
+  }
+
+  .site-photo-frame img {
+    height: 270px;
+  }
+
+  .about-text blockquote {
+    font-size: 1.625rem;
+  }
+
+  .about-text p {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .scene {
+    margin-bottom: 24px;
+  }
+
+  .scene-raw {
+    height: 160px;
+  }
+
+  .scene-machine {
+    flex-basis: 140px;
+    height: 140px;
+  }
+
+  .machine-plate {
+    height: 48px;
+    font-size: 2rem;
+  }
+
+  .trench-layer {
+    padding: 6px 14px;
+  }
+
+  .pipe-ring {
+    width: 34px;
+    height: 34px;
+  }
+
+  .plan--row .room-shot img,
+  .plan--row .room:not(.room--large):not(.room--mid) .room-shot img {
+    height: 110px;
+  }
+
+  .plan--row .room p.serif {
+    -webkit-line-clamp: 2;
+  }
+
+  .core {
+    height: 112px;
+  }
+
+  .role ul {
+    font-size: 1rem;
+  }
+
+  .contact-main > p.serif {
+    font-size: 2.25rem;
+  }
+
+  .big-email {
+    font-size: 2.5rem;
+  }
+
+  .terminal-log {
+    max-height: 190px;
+  }
+}
+
+/* ==========================================================================
+   Elevator panel, compact: two columns of floor buttons, so the whole panel
+   fits on one screen.
+   ========================================================================== */
+.panel {
+  width: 96px;
+}
+
+.panel-box {
+  gap: 8px;
+  padding: 10px 0 12px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.panel-brand {
+  width: 80px;
+  height: 30px;
+}
+
+.panel-brand svg {
+  width: 24px;
+  height: 24px;
+}
+
+.panel-display {
+  width: 80px;
+  padding: 6px 2px;
+}
+
+.panel-display .sign {
+  font-size: 1.75rem;
+}
+
+.panel .panel-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 36px);
+  gap: 6px;
+  justify-content: center;
+}
+
+.panel .panel-grid > li:first-child:nth-last-child(odd) {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+
+.floor-btn {
+  width: 36px;
+  height: 36px;
+  font-size: 0.6875rem;
+}
+
+.panel-tool {
+  width: 36px;
+  height: 32px;
+}
+
+.panel-tools {
+  display: grid;
+  grid-template-columns: repeat(2, 36px);
+  gap: 6px;
+  justify-content: center;
+}
+
+.panel-tools > :last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+
 @media (max-width: 1199px) {
   :root {
     --lane: 56px;
@@ -2642,17 +3168,17 @@ button {
   }
 
   .lvl {
-    padding: 120px 28px 88px var(--lane);
+    padding: 132px 28px 72px var(--lane);
   }
 
   .lvl-num {
     font-size: 120px;
-    top: -52px;
+    top: calc(var(--slab-y) - 0.44em);
   }
 
   .lvl-head {
     padding-left: 0;
-    padding-top: 40px;
+    padding-top: 8px;
   }
 
   .depth-mark {
@@ -2900,7 +3426,7 @@ button {
   }
 
   .lvl {
-    padding: 104px 20px 72px 30px;
+    padding: 132px 20px 64px 30px;
   }
 
   :root {
@@ -2914,7 +3440,7 @@ button {
 
   .lvl-num {
     font-size: 104px;
-    top: -46px;
+    top: calc(var(--slab-y) - 0.44em);
     left: 22px;
   }
 

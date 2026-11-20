@@ -13,9 +13,11 @@ interface Props {
   filters?: string[];
   /** h2 on the Projects page, h3 under a homepage floor heading. */
   headingLevel?: 2 | 3;
+  /** All rooms in one row, sized to fit a single screen (the homepage floor). */
+  row?: boolean;
 }
 
-const { projects, filters, headingLevel = 3 } = Astro.props;
+const { projects, filters, headingLevel = 3, row = false } = Astro.props;
 const Heading = `h${headingLevel}` as const;
 const tones = ["var(--h-teal)", "var(--h-mulberry)", "var(--h-clay)", "var(--h-indigo)", "var(--h-olive)"];
 const large = projects.filter((p) => p.data.featured);
@@ -27,11 +29,12 @@ const counts = (filters ?? []).map((name) => ({
 }));
 // A corridor runs between each pair of large rooms and before the small ones.
 const rows: (CollectionEntry<"projects">[] | "corridor")[] = [];
-for (let i = 0; i < large.length; i += 2) {
+if (row) rows.push(projects);
+else for (let i = 0; i < large.length; i += 2) {
   if (rows.length) rows.push("corridor");
   rows.push(large.slice(i, i + 2));
 }
-if (small.length) {
+if (!row && small.length) {
   if (rows.length) rows.push("corridor");
   rows.push(small);
 }
@@ -54,7 +57,7 @@ if (small.length) {
   )
 }
 
-<div class="plan">
+<div class:list={["plan", { "plan--row": row }]}>
   <div class="plan-tag mono" aria-hidden="true">
     <span>Plan view</span><span>Not to scale</span><span class="ico">N <Icon name="up" size={12} /></span>
   </div>

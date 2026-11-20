@@ -28,7 +28,7 @@ const whatsapp = `https://wa.me/${CONTACT.whatsapp.number}`;
 const year = new Date().getFullYear();
 ---
 
-<Base home>
+<Base home snap>
   <!-- L0 · Street level -->
   <section class="street" id={L0.id} aria-labelledby="name" data-floor={L0.code} data-floor-name={L0.name} data-depth={L0.depth}>
     <div class="street-strip mono">
@@ -90,13 +90,13 @@ const year = new Date().getFullYear();
     <div class="scene" aria-label="Normalisation, with sample data: raw supplier fragments in, one clean record out" role="img">
       <div class="scene-raw" aria-hidden="true">
         <span class="scene-label mono">Raw supplier feeds · sample</span>
-        <pre class="data" style="left: 16px; top: 18px; rotate: -4deg">&lt;Hotel Code="DAC0412"&gt;
+        <pre class="data" style="left: 16px; top: 12px; rotate: -4deg">&lt;Hotel Code="DAC0412"&gt;
   &lt;HotelName&gt;Example Grand Dhaka&lt;/HotelName&gt;</pre>
-        <pre class="data" style="left: 120px; top: 84px; rotate: 3deg">&lt;Amenity&gt;Free WiFi&lt;/Amenity&gt;
+        <pre class="data" style="left: 120px; top: 58px; rotate: 3deg">&lt;Amenity&gt;Free WiFi&lt;/Amenity&gt;
 &lt;amenity&gt;wifi_free&lt;/amenity&gt;</pre>
-        <pre class="data" style="left: 30px; top: 146px; rotate: -2deg">"star_rating": "4*",
+        <pre class="data" style="left: 30px; top: 102px; rotate: -2deg">"star_rating": "4*",
 "rooms": "  120 "</pre>
-        <pre class="data" style="left: 150px; top: 212px; rotate: 5deg">&lt;Lat&gt;23.79&lt;/Lat&gt;&lt;Lng&gt;90.40</pre>
+        <pre class="data" style="left: 150px; top: 150px; rotate: 5deg">&lt;Lat&gt;23.79&lt;/Lat&gt;&lt;Lng&gt;90.40</pre>
       </div>
       <span class="scene-pipe" aria-hidden="true"></span>
       <div class="scene-machine" aria-hidden="true">
@@ -144,7 +144,7 @@ const year = new Date().getFullYear();
 
   <!-- B4 · Featured projects -->
   <Level floor={B4} title="Vaults" sub={`Featured projects: ${featured.length} rooms, seen from above.`} band="rock" tone="var(--h-mulberry)">
-    <VaultPlan projects={featured} />
+    <VaultPlan projects={featured} row />
     <a class="out-link" href="/projects/">All {projects.length} Projects <Icon name="right" /></a>
   </Level>
 
@@ -215,7 +215,7 @@ const year = new Date().getFullYear();
   </Level>
 
   <!-- B8 · Contact -->
-  <Level floor={B8} title="Service elevator" sub="Contact: the way back up." band="rock" tone="var(--graphite)" numTone="var(--chalk)" class="lvl--last">
+  <Level floor={B8} title="Service elevator" sub="Contact: the way back up." band="rock" tone="var(--graphite)" numTone="var(--chalk)" class="lvl--last below-bedrock">
     <span class="response-line" aria-hidden="true"></span>
     <span class="response-shaft" aria-hidden="true"></span>
     <span class="response-label mono ico" aria-hidden="true">Response <Icon name="up" /></span>
@@ -228,13 +228,14 @@ const year = new Date().getFullYear();
           <a class="big-email" href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
           <div><CopyButton text={CONTACT.email} label="email address" /></div>
         </div>
-        <ul class="links-grid" role="list">
+        <ul class="links-grid links-grid--3" role="list">
           <li><a href={whatsapp} rel="noopener"><span class="mono">WhatsApp</span><span class="ico">{CONTACT.whatsapp.display} <Icon name="external" size={12} /></span></a></li>
           <li><a href={CONTACT.github} rel="me noopener"><span class="mono">GitHub</span><span class="ico" translate="no">{CONTACT.github.split("/").pop()} <Icon name="external" size={12} /></span></a></li>
           <li><a href={CONTACT.linkedin} rel="me noopener"><span class="mono">LinkedIn</span><span class="ico" translate="no">rokon-raz <Icon name="external" size={12} /></span></a></li>
           <li><a href={CONTACT.cv} download><span class="mono">CV</span><span class="ico">Download PDF <Icon name="download" size={12} /></span></a></li>
+          <li><a href="/contact/"><span class="mono">More ways</span><span class="ico">Contact page <Icon name="right" size={12} /></span></a></li>
+          <li><a href={`mailto:${CONTACT.email}?subject=${encodeURIComponent("Freelance project")}`}><span class="mono">Freelance</span><span class="ico">Start a project <Icon name="mail" size={12} /></span></a></li>
         </ul>
-        <div><a class="out-link" href="/contact/">Contact Page <Icon name="right" /></a></div>
       </div>
       <Terminal />
     </div>

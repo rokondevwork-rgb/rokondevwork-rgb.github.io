@@ -21,9 +21,11 @@ interface Props {
   home?: boolean;
   /** Sheet label in the strip, e.g. "Sheet V-01 · Excavation". */
   sheet?: string;
+  /** Snap the scroll from floor to floor (pages built from floors: home, about). */
+  snap?: boolean;
 }
 
-const { title, description = SITE.description, type = "website", publishedDate, noindex = false, home = false, sheet } = Astro.props;
+const { title, description = SITE.description, type = "website", publishedDate, noindex = false, home = false, sheet, snap = false } = Astro.props;
 
 const pageTitle = title ? `${title} | ${SITE.name}` : SITE.title;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -32,7 +34,7 @@ const year = new Date().getFullYear();
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class:list={{ snap }}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
