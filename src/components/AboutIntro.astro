@@ -1,0 +1,62 @@
+---
+/** The engineer: taped site photo, the quote, a short story and the title block of facts. */
+import { Picture } from "astro:assets";
+import Icon from "./Icon.astro";
+import { SITE } from "../consts";
+import { EDUCATION, QUOTE } from "../lib/data";
+import photo from "../assets/rokon_photo.png";
+
+interface Props {
+  /** Link on to the full About page (the homepage shows it; the About page does not). */
+  more?: boolean;
+  /** The photo is the first thing on the About page, so load it straight away there. */
+  eager?: boolean;
+}
+
+const { more = false, eager = false } = Astro.props;
+---
+
+<div class="split">
+  <figure class="site-photo">
+    <div class="site-photo-frame">
+      <Picture
+        src={photo}
+        formats={["avif", "webp"]}
+        fallbackFormat="jpg"
+        widths={[480, 840, 1200]}
+        sizes="(min-width: 1200px) 420px, 92vw"
+        alt="Rokon in a dark suit, pointing toward his quote"
+        loading={eager ? "eager" : "lazy"}
+        fetchpriority={eager ? "high" : undefined}
+      />
+      <span class="tape tape--l" aria-hidden="true"></span>
+      <span class="tape tape--r" aria-hidden="true"></span>
+    </div>
+    <figcaption class="callout mono">Site photo / engineer on site</figcaption>
+  </figure>
+
+  <div class="about-text">
+    <blockquote class="serif"><em class="reveal" style="--fill: var(--h-indigo)">“{QUOTE}”</em></blockquote>
+    <p>
+      I’m a Python backend engineer in Dhaka. For four years I’ve built the parts of products
+      nobody sees: the APIs, the data pipelines and the databases underneath them.
+    </p>
+    <p>
+      Most of my recent work is hotel and travel tech: ingesting supplier XML and JSON,
+      integrating third-party hotel APIs, and serving clean, normalised content through FastAPI
+      services on MySQL and PostgreSQL.
+    </p>
+    <div class="title-block">
+      <div class="title-block-head mono"><span>Title block</span><span class="pencil">Sheet B1</span></div>
+      <dl>
+        <div><dt class="mono">Name</dt><dd>MD. Rokonuzzaman Rokon</dd></div>
+        <div><dt class="mono">Role</dt><dd>Software engineer, Python backend</dd></div>
+        <div><dt class="mono">Based in</dt><dd>Dhaka, Bangladesh · UTC+6</dd></div>
+        <div><dt class="mono">Experience</dt><dd>{SITE.experience}</dd></div>
+        <div><dt class="mono">Education</dt><dd>{EDUCATION}</dd></div>
+        <div><dt class="mono">Status</dt><dd class="status">Open to roles + freelance</dd></div>
+      </dl>
+    </div>
+    {more && <div><a class="out-link" href="/about/">More About Me <Icon name="right" /></a></div>}
+  </div>
+</div>

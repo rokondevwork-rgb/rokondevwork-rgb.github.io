@@ -1,0 +1,52 @@
+---
+/**
+ * One floor of the cross-section: the slab line with its material band, the request line
+ * passing through, the depth mark, the half-buried level numeral, and the floor's heading.
+ */
+import type { Floor } from "../lib/data";
+
+interface Props {
+  floor: Floor;
+  title: string;
+  /** The line under the title: what this floor holds, in a human voice. */
+  sub?: string;
+  /** Heading colour for this floor, e.g. "var(--h-teal)". */
+  tone?: string;
+  band?: "earth" | "gravel" | "rock" | "ochre" | "none";
+  /** Colour of the numeral's top half, which sits on the floor above. Defaults to `tone`. */
+  numTone?: string;
+  /** The deep, always-dark band. */
+  bedrock?: boolean;
+  class?: string;
+}
+
+const { floor, title, sub, tone = "var(--ink)", numTone, band = "earth", bedrock = false, class: extra } = Astro.props;
+const headingId = `${floor.id}-title`;
+---
+
+<section
+  id={floor.id}
+  class:list={["lvl", { "on-bedrock": bedrock }, extra]}
+  aria-labelledby={headingId}
+  data-floor={floor.code}
+  data-floor-name={floor.name}
+  data-depth={floor.depth}
+  style={`--tone: ${tone}` + (numTone ? `; --num-tone: ${numTone}` : "")}
+>
+  <div class="slab" aria-hidden="true"></div>
+  {band !== "none" && <div class={`slab-band hatch-${band}`} aria-hidden="true"></div>}
+  <div class="req" aria-hidden="true"></div>
+  <span class="req-dot" aria-hidden="true"></span>
+  <span class="depth-mark mono" aria-hidden="true">−{String(floor.depth).padStart(2, "0")}</span>
+  <div class="lvl-num sign" aria-hidden="true">
+    <span class="top">{floor.code}</span>
+    <span class={bedrock ? "bottom chalk-cut" : "bottom buried"}>{floor.code}</span>
+  </div>
+  <div class="lvl-inner">
+    <header class="lvl-head">
+      <h2 id={headingId} class="sign">{title}</h2>
+      {sub && <p class="serif" set:html={sub} />}
+    </header>
+    <slot />
+  </div>
+</section>

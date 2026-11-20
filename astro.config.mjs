@@ -2,36 +2,83 @@
 import { defineConfig, fontProviders } from "astro/config";
 import sitemap from "@astrojs/sitemap";
 
+// Font files come from the @fontsource packages in node_modules (latin subset only), so the build
+// never depends on reaching Google Fonts and the site self-hosts every face it uses.
+/** @param {string} pkg @param {string} file */
+const font = (pkg, file) => `${pkg}/files/${file}`;
+
 // https://astro.build/config
 export default defineConfig({
   integrations: [sitemap()],
-  // Downloaded from Google Fonts at build time and self-hosted with the site (latin subset only).
   fonts: [
     {
-      provider: fontProviders.google(),
-      name: "Bricolage Grotesque",
-      cssVariable: "--font-display",
-      weights: [500, 700],
-      styles: ["normal"],
+      // Signage: level numerals, the name, section titles. Condensed, built for wayfinding.
+      provider: fontProviders.local(),
+      name: "Big Shoulders Display",
+      cssVariable: "--font-sign",
       fallbacks: ["sans-serif"],
-      // Optical size axis: the browser picks tighter letterforms at large sizes.
-      options: { experimental: { variableAxis: { opsz: [["12", "96"]] } } },
+      options: {
+        variants: [
+          {
+            src: [font("@fontsource-variable/big-shoulders-display", "big-shoulders-display-latin-wght-normal.woff2")],
+            weight: "100 900",
+            style: "normal",
+          },
+        ],
+      },
     },
     {
-      provider: fontProviders.google(),
-      name: "Geist",
+      // Voice: statements, quotes, the first-person lines.
+      provider: fontProviders.local(),
+      name: "Instrument Serif",
+      cssVariable: "--font-serif",
+      fallbacks: ["serif"],
+      options: {
+        variants: [
+          { src: [font("@fontsource/instrument-serif", "instrument-serif-latin-400-normal.woff2")], weight: 400, style: "normal" },
+          { src: [font("@fontsource/instrument-serif", "instrument-serif-latin-400-italic.woff2")], weight: 400, style: "italic" },
+        ],
+      },
+    },
+    {
+      // Reading: body copy and controls.
+      provider: fontProviders.local(),
+      name: "Instrument Sans",
       cssVariable: "--font-body",
-      weights: [400, 500, 600],
-      styles: ["normal"],
       fallbacks: ["sans-serif"],
+      options: {
+        variants: [
+          {
+            src: [font("@fontsource-variable/instrument-sans", "instrument-sans-latin-standard-normal.woff2")],
+            weight: "400 700",
+            stretch: "75% 100%",
+            style: "normal",
+          },
+          {
+            src: [font("@fontsource-variable/instrument-sans", "instrument-sans-latin-standard-italic.woff2")],
+            weight: "400 700",
+            stretch: "75% 100%",
+            style: "italic",
+          },
+        ],
+      },
     },
     {
-      provider: fontProviders.google(),
-      name: "Geist Mono",
+      // Annotation: callouts, the depth gauge, the terminal, stack labels, dates.
+      provider: fontProviders.local(),
+      name: "Martian Mono",
       cssVariable: "--font-mono",
-      weights: [400],
-      styles: ["normal"],
       fallbacks: ["monospace"],
+      options: {
+        variants: [
+          {
+            src: [font("@fontsource-variable/martian-mono", "martian-mono-latin-standard-normal.woff2")],
+            weight: "100 800",
+            stretch: "75% 112.5%",
+            style: "normal",
+          },
+        ],
+      },
     },
   ],
   // Used for canonical URLs, social tags and the sitemap.

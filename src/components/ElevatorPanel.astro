@@ -1,0 +1,228 @@
+---
+/**
+ * The site's navigation, drawn as a service elevator.
+ * - Wide screens: a panel fixed to the right edge with one button per floor of the homepage,
+ *   the two extra sheets (field notes, site radio), and the intercom, theme and snake switches.
+ * - Narrow screens: one round call button showing the current floor, which opens a full-screen
+ *   keypad. Without JS the keypad is simply listed at the end of the page.
+ * On the homepage the panel follows the scroll and lights the floor in view.
+ */
+import Icon from "./Icon.astro";
+import Logo from "./Logo.astro";
+import { FLOORS, SHEETS } from "../lib/data";
+
+interface Props {
+  /** The floor or sheet code to light up, e.g. "B4" or "FN". */
+  current?: string;
+  /** On the homepage the floors are in-page anchors and the panel tracks the scroll. */
+  home?: boolean;
+}
+
+const { current, home = false } = Astro.props;
+const all = [...FLOORS.map((f) => ({ code: f.code, name: f.name, href: home ? `#${f.id}` : `/#${f.id}` })), ...SHEETS];
+const shown = all.find((f) => f.code === current) ?? { code: current ?? "L0", name: "Street level" };
+const pageLinks: Record<string, string> = { B1: "/about/", B4: "/projects/", B8: "/contact/" };
+// On a sheet, the floor that owns this page links to the page itself.
+const hrefFor = (code: string, href: string) => (!home && code === current && pageLinks[code]) || href;
+---
+
+<nav class="panel" aria-label="Floors" data-home={home ? "" : undefined}>
+  <div class="panel-box">
+    <a class="panel-brand" href="/" aria-label="Rokon, home">
+      <Logo />
+    </a>
+    <div class="panel-display" aria-hidden="true">
+      <span class="sign" data-floor-code>{shown.code}</span>
+      <span class="mono" data-floor-label>{shown.name}</span>
+    </div>
+    <ul>
+      {
+        all.slice(0, FLOORS.length).map(({ code, name, href }) => (
+          <li>
+            <a class="floor-btn" href={hrefFor(code, href)} data-floor-link={code} aria-current={code === current ? "location" : undefined}>
+              {code}
+              <span class="floor-name mono">{name}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <span class="panel-sep" aria-hidden="true"></span>
+    <ul>
+      {
+        SHEETS.map(({ code, name, href }) => (
+          <li>
+            <a class="floor-btn" href={href} data-floor-link={code} aria-current={code === current ? "page" : undefined}>
+              {code}
+              <span class="floor-name mono">{name}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <span class="panel-sep" aria-hidden="true"></span>
+    <button type="button" class="panel-tool" data-open-intercom aria-label="Open the intercom terminal (⌘ K)" title="Intercom · ⌘ K">
+      <Icon name="terminal" size={16} />
+    </button>
+    <button type="button" class="panel-tool" data-theme-toggle aria-pressed="true" hidden title="Night shift">
+      <Icon name="theme" size={16} />
+      <span class="visually-hidden">Night shift (dark theme)</span>
+    </button>
+    <!-- Revealed by Snake.astro on mouse devices only. -->
+    <button type="button" class="panel-tool snake-toggle" id="snake-toggle" aria-pressed="true" hidden title="Python snake">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <path d="M1.75 8.5c1.6-3 3.4-3 5 0s3.4 3 5 0"></path>
+        <circle cx="12.75" cy="6.5" r="1.75" fill="currentColor" stroke="none"></circle>
+        <path class="snake-toggle-off" d="M2.5 2.5l11 11"></path>
+      </svg>
+      <span class="visually-hidden">Python snake that follows the mouse</span>
+    </button>
+  </div>
+</nav>
+
+<button type="button" class="call-button" aria-controls="keypad" aria-expanded="false" hidden>
+  <span class="sign" data-floor-code>{shown.code}</span>
+  <span class="mono">Floors</span>
+  <span class="visually-hidden">Open the floor menu</span>
+</button>
+
+<nav class="keypad" id="keypad" aria-label="Floors (menu)">
+  <div class="keypad-head">
+    <span class="mono">Service elevator</span>
+    <button type="button" class="keypad-close" aria-label="Close the floor menu">
+      <Icon name="close" size={16} />
+    </button>
+  </div>
+  <div class="keypad-display" aria-hidden="true">
+    <span class="sign" data-floor-code>{shown.code}</span>
+    <span class="mono" data-floor-label>{shown.name}</span>
+  </div>
+  <ul>
+    {
+      all.map(({ code, name, href }) => (
+        <li>
+          <a class="key" href={hrefFor(code, href)} data-floor-link={code} aria-current={code === current ? "location" : undefined}>
+            <span class="key-code">{code}</span>
+            <span class="mono">{name}</span>
+          </a>
+        </li>
+      ))
+    }
+    <li>
+      <button type="button" class="key key--tool" data-open-intercom>
+        <span class="key-code"><Icon name="terminal" size={16} /></span>
+        <span class="mono">Intercom</span>
+      </button>
+    </li>
+    <li>
+      <button type="button" class="key key--tool" data-theme-toggle aria-pressed="true" hidden>
+        <span class="key-code"><Icon name="theme" size={16} /></span>
+        <span class="mono">Night shift</span>
+      </button>
+    </li>
+  </ul>
+</nav>
+
+<script>
+  const root = document.documentElement;
+
+  // Theme: applied in <head> before paint (saved choice, else the OS setting).
+  const themeButtons = [...document.querySelectorAll<HTMLButtonElement>("[data-theme-toggle]")];
+  const isDark = () => root.dataset.theme !== "light";
+  const syncTheme = () => themeButtons.forEach((b) => b.setAttribute("aria-pressed", String(isDark())));
+  for (const button of themeButtons) {
+    button.hidden = false;
+    button.addEventListener("click", () => {
+      const next = isDark() ? "light" : "dark";
+      root.dataset.theme = next;
+      try {
+        localStorage.setItem("theme", next);
+      } catch {
+        // Storage blocked: the choice lasts for this page only.
+      }
+      syncTheme();
+    });
+  }
+  syncTheme();
+
+  // Keypad: the call button opens it full screen; Escape, the close button or a floor closes it.
+  const call = document.querySelector<HTMLButtonElement>(".call-button");
+  const keypad = document.querySelector<HTMLElement>("#keypad");
+  const close = keypad?.querySelector<HTMLButtonElement>(".keypad-close");
+  if (call && keypad) {
+    call.hidden = false;
+    const setOpen = (open: boolean) => {
+      keypad.classList.toggle("is-open", open);
+      call.setAttribute("aria-expanded", String(open));
+      document.body.style.overflow = open ? "hidden" : "";
+      if (open) keypad.querySelector<HTMLElement>("[aria-current], .key")?.focus();
+      else call.focus();
+    };
+    call.addEventListener("click", () => setOpen(true));
+    close?.addEventListener("click", () => setOpen(false));
+    keypad.addEventListener("click", (event) => {
+      if ((event.target as Element).closest("a.key, [data-open-intercom]")) {
+        keypad.classList.remove("is-open");
+        call.setAttribute("aria-expanded", "false");
+        document.body.style.overflow = "";
+      }
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && keypad.classList.contains("is-open")) setOpen(false);
+    });
+  }
+
+  // Homepage: light the floor in view and run the depth gauge.
+  const panel = document.querySelector<HTMLElement>(".panel[data-home]");
+  const levels = [...document.querySelectorAll<HTMLElement>("[data-floor]")];
+  if (panel && levels.length) {
+    const codes = document.querySelectorAll<HTMLElement>("[data-floor-code]");
+    const names = document.querySelectorAll<HTMLElement>("[data-floor-label]");
+    const links = document.querySelectorAll<HTMLElement>("[data-floor-link]");
+    const gauge = document.querySelector<HTMLElement>("[data-depth]");
+    let shown = "";
+    let queued = false;
+
+    const update = () => {
+      queued = false;
+      const mid = innerHeight * 0.45;
+      let index = 0;
+      for (let i = 0; i < levels.length; i++) if (levels[i].getBoundingClientRect().top <= mid) index = i;
+      const level = levels[index];
+      const box = level.getBoundingClientRect();
+      const frac = Math.min(1, Math.max(0, (mid - box.top) / Math.max(1, box.height)));
+      const depth = Number(level.dataset.depth ?? 0) + (index < levels.length - 1 ? frac * 6 : 0);
+      if (gauge) gauge.textContent = `−${depth.toFixed(1).padStart(4, "0")}`;
+
+      const code = level.dataset.floor ?? "L0";
+      if (code === shown) return;
+      shown = code;
+      codes.forEach((el) => (el.textContent = code));
+      names.forEach((el) => (el.textContent = level.dataset.floorName ?? ""));
+      links.forEach((el) => {
+        if (el.dataset.floorLink === code) el.setAttribute("aria-current", "location");
+        else el.removeAttribute("aria-current");
+      });
+    };
+    const queue = () => {
+      if (!queued) {
+        queued = true;
+        requestAnimationFrame(update);
+      }
+    };
+    addEventListener("scroll", queue, { passive: true });
+    addEventListener("resize", queue);
+    update();
+
+    // Keyboard: 0–8 calls a floor (when not typing).
+    addEventListener("keydown", (event) => {
+      const target = event.target as HTMLElement;
+      if (event.metaKey || event.ctrlKey || event.altKey || target.closest("input, textarea, [contenteditable]")) return;
+      const n = Number(event.key);
+      if (Number.isInteger(n) && n >= 0 && n < levels.length) {
+        levels[n].scrollIntoView({ block: "start" });
+        history.replaceState(null, "", `#${levels[n].id}`);
+      }
+    });
+  }
+</script>

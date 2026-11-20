@@ -1,249 +1,50 @@
 ---
-import { Picture } from "astro:assets";
 import Base from "../layouts/Base.astro";
-import SectionHeading from "../components/SectionHeading.astro";
-import { CONTACT } from "../consts";
-import photo from "../assets/rokon_photo.png";
+import AboutIntro from "../components/AboutIntro.astro";
+import CoreSample from "../components/CoreSample.astro";
+import Icon from "../components/Icon.astro";
+import Level from "../components/Level.astro";
+import Trench from "../components/Trench.astro";
+import { FLOORS, PRINCIPLES } from "../lib/data";
 
-// Shown on the wall beside the photo, where the hand points. Demo text: replace with your own.
-const quote = {
-  text: "I am a Software Developer by profession, a problem solver by practice and a philosopher by curiosity.",
-  by: "Rokunuzzaman Rokon",
-};
-
-const experience = [
-  {
-    company: "Innovate Solution",
-    role: "Python Developer",
-    dates: "Oct 2024 – Present",
-    current: true,
-    points: [
-      "Collect and process supplier XML/JSON static data for hotel content platforms.",
-      "Develop FastAPI-based APIs for data collection and business operations.",
-      "Integrate third-party hotel APIs and build business APIs on top of them.",
-      "Extract, process, and analyze data from web APIs.",
-      "Maintain database integrity, consistency, and performance.",
-    ],
-  },
-  {
-    company: "Artixcore Inc",
-    role: "Python Developer",
-    dates: "Oct 2023 – Sep 2024",
-    points: [
-      "Designed and developed Python-based software applications.",
-      "Deployed applications using AWS Lambda, DynamoDB, API Gateway, and EC2.",
-    ],
-  },
-  {
-    company: "GorillaMove",
-    role: "Junior Software Engineer",
-    dates: "Nov 2022 – Sep 2023",
-    points: [
-      "Developed and maintained frontend components and features using React.",
-      "Optimized web applications for performance and scalability.",
-    ],
-  },
-];
-
-const skills = [
-  { group: "Languages", items: ["Python", "JavaScript", "PHP", "C"] },
-  { group: "Backend", items: ["FastAPI", "Django", "Flask", "REST APIs", "JWT authentication"] },
-  { group: "Frontend", items: ["React.js", "Next.js", "Astro"] },
-  { group: "Database & ORM", items: ["MySQL", "PostgreSQL", "SQLite", "DynamoDB", "SQLAlchemy"] },
-  {
-    group: "Cloud & DevOps",
-    items: ["AWS (EC2, Lambda, API Gateway)", "Docker", "Linux", "Redis", "Git", "GitHub", "CI/CD"],
-  },
-  { group: "Data & formats", items: ["XML", "JSON"] },
-  { group: "AI-assisted dev", items: ["Claude", "Cursor", "Codex", "Ollama", "Mistral"] },
-];
-
-// Demo text: replace with how you actually approach projects.
-const principles = [
-  {
-    title: "Trust the data",
-    text: "Supplier data is messy. I validate and normalize it on the way in, so everything downstream can rely on it.",
-  },
-  {
-    title: "Measure, then optimize",
-    text: "I profile slow queries and endpoints before changing them, and keep the numbers to show what improved.",
-  },
-  {
-    title: "Keep people in the loop",
-    text: "Short updates, readable pull requests and docs that the next developer can follow without asking.",
-  },
-];
+const floor = (code: string) => FLOORS.find((f) => f.code === code)!;
+const pileTones = ["#ece6da", "#f2b48f", "#9fd3cb"];
 ---
 
 <Base
   title="About"
+  sheet="Sheet B1 · Service entrance"
   description="About Rokunuzzaman Rokon, a Python backend developer in Dhaka building APIs, hotel content platforms, and data pipelines."
-  width="full"
 >
-  <div class="container">
-    <section class="page-hero">
-      <h1>About</h1>
-      <p class="lead">
-        Python backend developer in Dhaka with nearly 6 years of experience building APIs, hotel
-        content platforms and data pipelines.
-      </p>
-    </section>
-
-    <figure class="about-photo">
-      <Picture
-        src={photo}
-        formats={["avif", "webp"]}
-        fallbackFormat="jpg"
-        widths={[640, 960, 1280, 1600, photo.width]}
-        sizes="(min-width: 70rem) 1040px, 100vw"
-        alt="Rokunuzzaman Rokon in a dark suit, pointing to the quote beside him"
-        loading="eager"
-        fetchpriority="high"
-      />
-      <!-- On wide screens the quote sits on the empty wall in the photo; on phones, below it. -->
-      <figcaption class="about-quote">
-        <blockquote>
-          <p>{quote.text}</p>
-        </blockquote>
-        <p class="about-quote-by">— {quote.by}</p>
-      </figcaption>
-    </figure>
+  <div class="sheet">
+    <div class="sheet-title">
+      <h1 class="sign">About</h1>
+      <p class="serif"><span class="reveal">A Python backend engineer in Dhaka,</span> <em class="reveal" style="--fill: var(--h-indigo)">building the parts nobody sees.</em></p>
+    </div>
+    <AboutIntro eager />
   </div>
 
-  <section class="section" aria-labelledby="intro-heading">
-    <div class="container about-intro">
-      <div>
-        <SectionHeading id="intro-heading" index="01" kicker="Who I am" title="Hi, I'm Rokon." />
-        <div class="about-intro-text">
-          <p>
-            I'm Rokunuzzaman Rokon, a Python backend developer based in Dhaka, Bangladesh, with
-            nearly 6 years of professional experience.
-          </p>
-          <p>
-            I build scalable APIs, hotel content platforms, data processing pipelines, and
-            database-driven applications. Most of my recent work is in hotel and travel tech:
-            ingesting supplier XML/JSON data, integrating third-party hotel APIs, and serving clean,
-            normalized content through FastAPI services backed by MySQL and PostgreSQL.
-          </p>
-        </div>
-      </div>
+  <Level floor={{ ...floor("B6"), id: "journey" }} title="Core sample" sub="Experience: four years of strata, newest at the drill head." band="ochre" tone="var(--h-olive)">
+    <CoreSample />
+  </Level>
 
-      <aside class="spec-card" aria-label="At a glance" data-reveal>
-        <p class="spec-card-title">At a glance</p>
-        <dl>
-          <div>
-            <dt>Role</dt>
-            <dd>Python backend developer</dd>
-          </div>
-          <div>
-            <dt>Experience</dt>
-            <dd>Nearly 6 years</dd>
-          </div>
-          <div>
-            <dt>Domain</dt>
-            <dd>Hotel &amp; travel tech</dd>
-          </div>
-          <div>
-            <dt>Based in</dt>
-            <dd>Dhaka, Bangladesh · UTC+6</dd>
-          </div>
-          <div>
-            <dt>Education</dt>
-            <dd>B.Sc. in CSE, European University of Bangladesh</dd>
-          </div>
-        </dl>
-      </aside>
-    </div>
-  </section>
+  <Level floor={{ ...floor("B3"), id: "stack" }} title="Utility trench" sub="Skills, as pipes. Tap one to see what it connects to and where I used it." band="earth" tone="var(--h-clay)">
+    <Trench />
+  </Level>
 
-  <section class="section" aria-labelledby="experience-heading">
-    <div class="container">
-      <SectionHeading id="experience-heading" index="02" kicker="Career" title="Experience" />
-      <ol class="timeline">
-        {
-          experience.map(({ company, role, dates, current, points }) => (
-            <li class="timeline-item" data-reveal>
-              <p class="timeline-dates">
-                {dates}
-                {current && (
-                  <span class="timeline-current">
-                    <span class="status-dot" aria-hidden="true" />
-                    Current
-                  </span>
-                )}
-              </p>
-              <div>
-                <h3>{company}</h3>
-                <p class="timeline-role">{role}</p>
-                <ul>
-                  {points.map((point) => (
-                    <li>{point}</li>
-                  ))}
-                </ul>
-              </div>
-            </li>
-          ))
-        }
-      </ol>
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="skills-heading">
-    <div class="container">
-      <SectionHeading id="skills-heading" index="03" kicker="Toolbox" title="Skills" />
-      <ul class="skill-list">
-        {
-          skills.map(({ group, items }) => (
-            <li class="skill-row" data-reveal>
-              <h3 class="eyebrow">{group}</h3>
-              <ul class="chips">
-                {items.map((item) => (
-                  <li>{item}</li>
-                ))}
-              </ul>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="work-style-heading">
-    <div class="container">
-      <SectionHeading id="work-style-heading" index="04" kicker="Approach" title="How I work" />
-      <ol class="feature-grid">
-        {
-          principles.map(({ title, text }, i) => (
-            <li class="feature" data-reveal>
-              <span class="feature-index" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
-              <h3>{title}</h3>
-              <p>{text}</p>
-            </li>
-          ))
-        }
-      </ol>
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="hire-heading">
-    <div class="container">
-      <div class="contact-band" data-reveal>
-        <div>
-          <p class="eyebrow"><span class="eyebrow-index">05</span> / Work with me</p>
-          <h2 id="hire-heading">Have a backend problem to solve?</h2>
-          <p class="contact-band-text">
-            I'm open to backend roles and freelance or contract work on APIs and data pipelines.
-          </p>
-        </div>
-        <div class="contact-band-actions">
-          <a class="contact-email" href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
-          <ul class="contact-band-links">
-            <li><a href={CONTACT.cv} download>Download CV</a></li>
-            <li><a href={CONTACT.linkedin} rel="me noopener">LinkedIn</a></li>
-            <li><a href="/contact/">Contact page</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
+  <Level floor={{ ...floor("B7"), id: "principles" }} title="Foundations" sub="How I work. <em>Three things I don’t compromise on.</em>" band="none" bedrock tone="var(--chalk)" numTone="var(--h-clay)">
+    <ol class="piles" role="list">
+      {
+        PRINCIPLES.map((p, i) => (
+          <li class="pile">
+            <span class="mono pencil">Pile {String(i + 1).padStart(2, "0")}</span>
+            <h3 class="serif"><span class="reveal" style={`--fill: ${pileTones[i]}`}>{p.title}</span></h3>
+            <p>{p.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+    <div class="bedrock mono" aria-hidden="true"><span>Load-bearing · bedrock</span></div>
+    <a class="out-link" href="/contact/" style="border-color: var(--chalk); color: var(--chalk)">Have a Backend Problem? Get in Touch <Icon name="right" /></a>
+  </Level>
 </Base>

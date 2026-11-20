@@ -1,0 +1,105 @@
+---
+/**
+ * The tool stack as a utility trench: every tool is a pipe in cross-section, grouped by layer.
+ * No skill levels; picking a pipe traces what it works with and where it was used.
+ */
+import { TRENCH } from "../lib/data";
+
+interface Props {
+  /** The pipe traced when the page loads. */
+  initial?: string;
+}
+
+const { initial = "FastAPI" } = Astro.props;
+const tools = TRENCH.flatMap((l) => l.tools);
+const first = tools.find((t) => t.name === initial) ?? tools[0];
+---
+
+<div class="trench-wrap" data-trench-wrap>
+  <div class="trench has-pick" data-trench>
+    <div class="trench-wall trench-wall--l hatch-earth" aria-hidden="true"></div>
+    <div class="trench-body">
+      {
+        TRENCH.map(({ layer, tools }) => (
+          <div class="trench-layer">
+            <h3 class="mono">{layer}</h3>
+            <ul class="pipes" role="list">
+              {tools.map((tool) => (
+                <li>
+                  <button
+                    type="button"
+                    class="pipe"
+                    data-name={tool.name}
+                    data-works={tool.works.join("|")}
+                    data-used={tool.usedIn}
+                    data-storage={tool.storage ? "" : undefined}
+                    data-linked={first.works.includes(tool.name) ? "" : undefined}
+                    aria-pressed={tool.name === first.name ? "true" : "false"}
+                  >
+                    <span class="pipe-ring" aria-hidden="true" />
+                    <span class="mono">{tool.name}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+      <div class="trench-grit hatch-gravel" aria-hidden="true"></div>
+    </div>
+    <div class="trench-wall trench-wall--r hatch-earth" aria-hidden="true"></div>
+  </div>
+
+  <aside class="pipe-panel" aria-live="polite" aria-label="Selected tool">
+    <span class="mono pencil">Selected pipe</span>
+    <span class="sign" data-pipe-name>{first.name}</span>
+    <dl>
+      <div>
+        <dt class="mono pencil">Works with</dt>
+        <dd>
+          <ul class="tags mono" role="list" data-pipe-works>
+            {first.works.map((w) => <li>{w}</li>)}
+          </ul>
+        </dd>
+      </div>
+      <div>
+        <dt class="mono pencil">Used in</dt>
+        <dd data-pipe-used>{first.usedIn}</dd>
+      </div>
+    </dl>
+    <p class="legend mono">
+      <span><i></i>Selected</span>
+      <span><i class="teal"></i>Connected or storage</span>
+    </p>
+  </aside>
+</div>
+
+<script>
+  for (const wrap of document.querySelectorAll<HTMLElement>("[data-trench-wrap]")) {
+    const pipes = [...wrap.querySelectorAll<HTMLButtonElement>(".pipe")];
+    const name = wrap.querySelector<HTMLElement>("[data-pipe-name]");
+    const works = wrap.querySelector<HTMLElement>("[data-pipe-works]");
+    const used = wrap.querySelector<HTMLElement>("[data-pipe-used]");
+
+    wrap.addEventListener("click", (event) => {
+      const pipe = (event.target as Element).closest<HTMLButtonElement>(".pipe");
+      if (!pipe) return;
+      const linked = (pipe.dataset.works ?? "").split("|").filter(Boolean);
+      for (const p of pipes) {
+        p.setAttribute("aria-pressed", String(p === pipe));
+        p.toggleAttribute("data-linked", linked.includes(p.dataset.name ?? ""));
+      }
+      if (name) name.textContent = pipe.dataset.name ?? "";
+      if (used) used.textContent = pipe.dataset.used ?? "";
+      if (works) {
+        works.replaceChildren(
+          ...linked.map((w) => {
+            const li = document.createElement("li");
+            li.textContent = w;
+            return li;
+          }),
+        );
+      }
+    });
+  }
+</script>

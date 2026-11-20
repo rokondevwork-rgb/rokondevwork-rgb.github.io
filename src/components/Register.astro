@@ -1,4 +1,5 @@
 ---
+/** Field notes listed like a drawing register: sheet number, date, title and a line about it. */
 import type { CollectionEntry } from "astro:content";
 import { formatDate } from "../lib/format";
 
@@ -12,30 +13,27 @@ const { posts, headingLevel = 2 } = Astro.props;
 const Heading = `h${headingLevel}` as const;
 ---
 
-<ul class="post-list">
+<ol class="register" role="list">
   {
-    posts.map((post) => (
+    posts.map((post, i) => (
       <li>
-        <article class="post-row">
-          <time class="post-row-date" datetime={post.data.pubDate.toISOString()}>
+        <article>
+          <span class="mono pencil">FN-{String(posts.length - i).padStart(2, "0")}</span>
+          <time class="mono" datetime={post.data.pubDate.toISOString()}>
             {formatDate(post.data.pubDate)}
           </time>
-          <div class="post-row-body">
-            <Heading class="post-row-title">
+          <div>
+            <Heading>
               <a href={`/blog/${post.id}/`}>{post.data.title}</a>
               {post.data.draft && " (draft)"}
             </Heading>
-            <p class="post-row-description">{post.data.description}</p>
+            <p>{post.data.description}</p>
             {post.data.tags.length > 0 && (
-              <ul class="tags" aria-label="Tags">
-                {post.data.tags.map((tag) => (
-                  <li>{tag}</li>
-                ))}
-              </ul>
+              <p class="mono" style="color: var(--teal)">{post.data.tags.join(" · ")}</p>
             )}
           </div>
         </article>
       </li>
     ))
   }
-</ul>
+</ol>

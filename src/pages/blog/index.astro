@@ -1,15 +1,18 @@
 ---
 import Base from "../../layouts/Base.astro";
-import PostList from "../../components/PostList.astro";
+import Register from "../../components/Register.astro";
 import { BLOG } from "../../consts";
 import { getPublishedPosts } from "../../lib/content";
 
 const posts = await getPublishedPosts();
 ---
 
-<Base title="Blog" description={BLOG.description}>
-  <h1>Blog</h1>
-  <p class="lead">{BLOG.description}</p>
-
-  {posts.length > 0 ? <PostList posts={posts} /> : <p>No posts yet.</p>}
+<Base title="Field notes" sheet="Sheet FN · Field notes" description={BLOG.description}>
+  <div class="sheet" style="--tone: var(--h-indigo)">
+    <div class="sheet-title">
+      <h1 class="sign">Field notes</h1>
+      <p class="serif"><span class="reveal">{BLOG.description}</span></p>
+    </div>
+    {posts.length > 0 ? <Register posts={posts} /> : <p>No notes yet.</p>}
+  </div>
 </Base>

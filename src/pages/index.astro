@@ -1,135 +1,247 @@
 ---
+/**
+ * The homepage is one continuous cross-section. The visitor starts on the street, follows a
+ * single request line down through eight levels below grade, and rides the elevator back up
+ * from the contact floor.
+ */
 import Base from "../layouts/Base.astro";
-import PostList from "../components/PostList.astro";
-import ProjectCard from "../components/ProjectCard.astro";
-import SectionHeading from "../components/SectionHeading.astro";
-import { CONTACT, SITE, TECH_STACK } from "../consts";
-import { getFeaturedProjects, getPublishedPosts } from "../lib/content";
+import AboutIntro from "../components/AboutIntro.astro";
+import CopyButton from "../components/CopyButton.astro";
+import CoreSample from "../components/CoreSample.astro";
+import Icon from "../components/Icon.astro";
+import Level from "../components/Level.astro";
+import Logo from "../components/Logo.astro";
+import Terminal from "../components/Terminal.astro";
+import Trench from "../components/Trench.astro";
+import VaultPlan from "../components/VaultPlan.astro";
+import { CONTACT, SITE } from "../consts";
+import { FLOORS, MACHINES, PRINCIPLES } from "../lib/data";
+import { getFeaturedProjects, getProjects } from "../lib/content";
 
-const featuredProjects = await getFeaturedProjects();
-const latestPosts = (await getPublishedPosts()).slice(0, 3);
+const [L0, B1, B2, B3, B4, B5, B6, B7, B8] = FLOORS;
+const featured = await getFeaturedProjects();
+const projects = await getProjects();
+const dig = projects.find((p) => p.data.problem) ?? featured[0];
+const machineTones = ["var(--h-teal)", "var(--h-clay)", "var(--h-indigo)", "var(--h-mulberry)"];
+const pileTones = ["#ece6da", "#f2b48f", "#9fd3cb"];
+const whatsapp = `https://wa.me/${CONTACT.whatsapp.number}`;
+const year = new Date().getFullYear();
 ---
 
-<Base width="full">
-  <section class="hero" aria-labelledby="hero-title">
-    <div class="container hero-grid">
-      <div class="hero-main">
-        <p class="hero-status">
-          <span class="status-dot" aria-hidden="true"></span>
-          Open to roles &amp; freelance work
-        </p>
-        <h1 class="hero-title" id="hero-title">
-          <span>Rokunuzzaman</span>{" "}<span>Rokon</span>
-        </h1>
-        <p class="hero-tagline">{SITE.tagline}</p>
-        <div class="hero-actions">
-          <a class="button button--primary" href="/projects/">
-            View projects
-            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
-          </a>
-          <a class="button button--secondary" href="/blog/">Read the blog</a>
-        </div>
+<Base home>
+  <!-- L0 · Street level -->
+  <section class="street" id={L0.id} aria-labelledby="name" data-floor={L0.code} data-floor-name={L0.name} data-depth={L0.depth}>
+    <div class="street-strip mono">
+      <span>Sheet 00 · Section A–A · Below grade</span>
+      <span class="wide">Drawn by MD. Rokonuzzaman Rokon · Dhaka 23.81°N 90.41°E</span>
+    </div>
+
+    <svg class="street-building" viewBox="0 0 104 214" aria-hidden="true">
+      <g fill="none" stroke="currentColor" stroke-width="1">
+        <path d="M8 214V40H96V214M20 40V22H84V40M44 22V8H60V22"></path>
+        <path d="M22 58h12v14H22zM46 58h12v14H46zM70 58h12v14H70zM22 88h12v14H22zM46 88h12v14H46zM70 88h12v14H70zM22 118h12v14H22zM46 118h12v14H46zM70 118h12v14H70zM22 148h12v14H22zM70 148h12v14H70z"></path>
+        <path d="M42 214V182H62V214"></path>
+      </g>
+    </svg>
+    <span class="street-callout mono" aria-hidden="true">What clients see</span>
+
+    <div class="ground" aria-hidden="true"></div>
+    <div class="ground-band hatch-earth" aria-hidden="true"></div>
+    <div class="req" aria-hidden="true"></div>
+
+    <span class="street-md mono" aria-hidden="true">MD. —</span>
+    <h1 class="street-name sign" id="name">
+      <span class="visually-hidden">MD. Rokonuzzaman Rokon</span>
+      <span class="above d-only" aria-hidden="true">Rokonuzzaman</span>
+      <span class="below buried d-only" aria-hidden="true">Rokonuzzaman</span>
+      <span class="under buried d-only" aria-hidden="true">Rokon</span>
+      <span class="above m-only" aria-hidden="true">Rokonuz-</span>
+      <span class="below buried m-only" aria-hidden="true">Rokonuz-</span>
+      <span class="under-1 buried m-only" aria-hidden="true">Zaman</span>
+      <span class="under-2 buried m-only" aria-hidden="true">Rokon</span>
+    </h1>
+
+    <div class="street-voice">
+      <p class="serif"><span class="reveal"><em>Most of what I build,</em> you never see.</span></p>
+      <p class="mono">
+        <span>{SITE.roles}</span>
+        <span class="pencil">Dhaka, Bangladesh · UTC+6 · {SITE.experience}</span>
+      </p>
+    </div>
+
+    <div class="survey">
+      <span class="mono">Open to roles + freelance</span>
+      <span class="survey-post" aria-hidden="true">
+        <svg width="22" height="20" viewBox="0 0 22 20"><path d="M11 1L21 19H1z" fill="var(--signal)"></path></svg>
+        <span></span>
+      </span>
+    </div>
+
+    <a class="street-hint mono ico" href={`#${B1.id}`}>Follow the Request <Icon name="down" /></a>
+  </section>
+
+  <!-- B1 · About -->
+  <Level floor={B1} title="Service entrance" sub="About the engineer: who’s working down here." band="earth" tone="var(--graphite)">
+    <AboutIntro more />
+  </Level>
+
+  <!-- B2 · Expertise -->
+  <Level floor={B2} title="Plant room" sub="Engineering expertise: the machines that keep the building running." band="gravel" tone="var(--h-teal)">
+    <div class="scene" aria-label="Normalisation, with sample data: raw supplier fragments in, one clean record out" role="img">
+      <div class="scene-raw" aria-hidden="true">
+        <span class="scene-label mono">Raw supplier feeds · sample</span>
+        <pre class="data" style="left: 16px; top: 18px; rotate: -4deg">&lt;Hotel Code="DAC0412"&gt;
+  &lt;HotelName&gt;Example Grand Dhaka&lt;/HotelName&gt;</pre>
+        <pre class="data" style="left: 120px; top: 84px; rotate: 3deg">&lt;Amenity&gt;Free WiFi&lt;/Amenity&gt;
+&lt;amenity&gt;wifi_free&lt;/amenity&gt;</pre>
+        <pre class="data" style="left: 30px; top: 146px; rotate: -2deg">"star_rating": "4*",
+"rooms": "  120 "</pre>
+        <pre class="data" style="left: 150px; top: 212px; rotate: 5deg">&lt;Lat&gt;23.79&lt;/Lat&gt;&lt;Lng&gt;90.40</pre>
       </div>
-
-      <aside class="spec-card" aria-label="At a glance">
-        <p class="spec-card-title">Spec sheet</p>
-        <dl>
-          <div>
-            <dt>Role</dt>
-            <dd>Python backend developer</dd>
-          </div>
-          <div>
-            <dt>Focus</dt>
-            <dd>APIs, data pipelines, MySQL &amp; PostgreSQL</dd>
-          </div>
-          <div>
-            <dt>Domain</dt>
-            <dd>Hotel &amp; travel tech</dd>
-          </div>
-          <div>
-            <dt>Experience</dt>
-            <dd>Nearly 6 years</dd>
-          </div>
-          <div>
-            <dt>Based in</dt>
-            <dd>Dhaka, Bangladesh · UTC+6</dd>
-          </div>
-        </dl>
-      </aside>
+      <span class="scene-pipe" aria-hidden="true"></span>
+      <div class="scene-machine" aria-hidden="true">
+        <svg viewBox="0 0 72 72"><g fill="none" stroke="currentColor" stroke-width="1.25"><circle cx="36" cy="36" r="22"></circle><circle cx="36" cy="36" r="8"></circle><path d="M36 6v8M36 58v8M6 36h8M58 36h8M15 15l6 6M51 51l6 6M15 57l6-6M51 21l6-6"></path></g></svg>
+        <span class="sign" style="font-size: 1.875rem; font-weight: 800">Normaliser</span>
+        <span class="mono pencil">Validate · map · dedupe</span>
+      </div>
+      <span class="scene-pipe scene-pipe--stored" aria-hidden="true"></span>
+      <div class="scene-clean" aria-hidden="true">
+        <span class="scene-label mono">One clean record</span>
+        <pre class="data">{`{
+  "hotel_id": "DAC0412",
+  "name": "Example Grand Dhaka",
+  "stars": 4,
+  "geo": { "lat": 23.79, "lng": 90.40 },
+  "rooms": 120,
+  "amenities": ["wifi"]
+}`}</pre>
+      </div>
     </div>
-  </section>
 
-  <section class="stack-strip" aria-labelledby="stack-label">
-    <div class="container stack-strip-inner">
-      <h2 class="eyebrow stack-strip-label" id="stack-label">Core stack</h2>
-      <ul class="stack-strip-list">
-        {TECH_STACK.map((tech) => <li>{tech}</li>)}
-      </ul>
-    </div>
-  </section>
+    <ul class="machines" role="list">
+      {
+        MACHINES.map((m, i) => (
+          <li class="machine" style={`--tone: ${machineTones[i]}`}>
+            <div class="machine-plate sign" aria-hidden="true">{m.code}</div>
+            <h3 class="sign">{m.name}</h3>
+            <p>{m.line}</p>
+            <ul class="calls mono" role="list">
+              {m.calls.map((c) => (
+                <li>{c}</li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ul>
+  </Level>
 
+  <!-- B3 · Technology ecosystem -->
+  <Level floor={B3} title="Utility trench" sub="The technology ecosystem. Every tool is a pipe; what matters is what it connects to." band="earth" tone="var(--h-clay)">
+    <Trench />
+    <p class="mono pencil" style="margin: 20px 0 0 18px">Tap a pipe to trace it · no skill levels, only real connections</p>
+  </Level>
+
+  <!-- B4 · Featured projects -->
+  <Level floor={B4} title="Vaults" sub={`Featured projects: ${featured.length} rooms, seen from above.`} band="rock" tone="var(--h-mulberry)">
+    <VaultPlan projects={featured} />
+    <a class="out-link" href="/projects/">All {projects.length} Projects <Icon name="right" /></a>
+  </Level>
+
+  <!-- B5 · Case study preview -->
   {
-    featuredProjects.length > 0 && (
-      <section class="section" aria-labelledby="work-heading">
-        <div class="container">
-          <SectionHeading
-            id="work-heading"
-            index="01"
-            kicker="Selected work"
-            title="Featured projects"
-            link={{ href: "/projects/", label: "All projects" }}
-          />
-          <ul class="project-grid">
-            {featuredProjects.map((project, i) => (
-              <li data-reveal style={`--reveal-delay: ${i * 80}ms`}>
-                <ProjectCard project={project} index={i + 1} headingLevel={3} />
-              </li>
-            ))}
-          </ul>
+    dig && (
+      <Level floor={B5} title="Excavation sheet" sub={`Case studies are dug in five layers. Here’s ${dig.data.title}.`} band="earth" tone="var(--h-indigo)">
+        <div class="dig">
+          {dig.data.problem && (
+            <div class="dig-row">
+              <div class="dig-label mono">01 · Surface<span class="pencil">The problem</span></div>
+              <p class="dig-body serif"><span class="reveal" style="--fill: var(--h-indigo)">{dig.data.problem}</span></p>
+            </div>
+          )}
+          {dig.data.constraints && (
+            <div class="dig-row hatch-gravel">
+              <div class="dig-label mono">02 · Topsoil<span class="pencil">Constraints</span></div>
+              <p class="dig-body mono"><span>{dig.data.constraints.map((c) => c.value).join(" · ")}</span></p>
+            </div>
+          )}
+          {dig.data.architecture && (
+            <div class="dig-row">
+              <div class="dig-label mono">03 · Structure<span class="pencil">Architecture</span></div>
+              <div class="dig-body">
+                <ol class="chain mono">
+                  {dig.data.architecture.map((n) => (
+                    <li class={`is-${n.kind}`}><span>{n.name}</span></li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+          )}
+          {dig.data.dataModel && (
+            <div class="dig-row hatch-earth">
+              <div class="dig-label mono">04 · Foundations<span class="pencil">Data model</span></div>
+              <p class="dig-body mono"><span style="color: var(--teal)">{dig.data.dataModel.join(" → ")}</span></p>
+            </div>
+          )}
+          <div class="dig-row hatch-rock">
+            <div class="dig-label mono">05 · Bedrock<span class="pencil">Outcomes</span></div>
+            <p class="dig-body mono"><span>{dig.data.results ? dig.data.results[0] : "On the full sheet"}</span></p>
+          </div>
         </div>
-      </section>
+        <a class="out-link" href={`/projects/${dig.id}/`}>Open the Full Sheet <Icon name="right" /></a>
+      </Level>
     )
   }
 
-  {
-    latestPosts.length > 0 && (
-      <section class="section" aria-labelledby="writing-heading">
-        <div class="container">
-          <SectionHeading
-            id="writing-heading"
-            index="02"
-            kicker="Writing"
-            title="Latest posts"
-            link={{ href: "/blog/", label: "All posts" }}
-          />
-          <div data-reveal>
-            <PostList posts={latestPosts} headingLevel={3} />
-          </div>
-        </div>
-      </section>
-    )
-  }
+  <!-- B6 · Professional journey -->
+  <Level floor={B6} title="Core sample" sub="The professional journey: four years of strata, newest at the drill head." band="ochre" tone="var(--h-olive)">
+    <CoreSample />
+  </Level>
 
-  <section class="section" aria-labelledby="contact-heading">
-    <div class="container">
-      <div class="contact-band" data-reveal>
-        <div>
-          <p class="eyebrow"><span class="eyebrow-index">03</span> / Contact</p>
-          <h2 id="contact-heading">Let's build something reliable.</h2>
-          <p class="contact-band-text">
-            I'm open to backend roles and freelance work on APIs, data pipelines and database
-            performance. Email is the fastest way to reach me.
-          </p>
+  <!-- B7 · Philosophy -->
+  <Level floor={B7} title="Foundations" sub="Engineering philosophy. <em>Three things I don’t compromise on.</em>" band="none" bedrock tone="var(--chalk)" numTone="var(--graphite)">
+    <ol class="piles" role="list">
+      {
+        PRINCIPLES.map((p, i) => (
+          <li class="pile">
+            <span class="mono pencil">Pile {String(i + 1).padStart(2, "0")}</span>
+            <h3 class="serif"><span class="reveal" style={`--fill: ${pileTones[i]}`}>{p.title}</span></h3>
+            <p>{p.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+    <div class="bedrock mono" aria-hidden="true"><span>Load-bearing · bedrock</span></div>
+  </Level>
+
+  <!-- B8 · Contact -->
+  <Level floor={B8} title="Service elevator" sub="Contact: the way back up." band="rock" tone="var(--graphite)" numTone="var(--chalk)" class="lvl--last">
+    <span class="response-line" aria-hidden="true"></span>
+    <span class="response-shaft" aria-hidden="true"></span>
+    <span class="response-label mono ico" aria-hidden="true">Response <Icon name="up" /></span>
+
+    <div class="contact-wrap">
+      <div class="contact-main">
+        <p class="serif"><span class="reveal">You’ve seen what’s underneath.</span> <em class="reveal" style="--fill: var(--signal-text)">Let’s build something on top of it.</em></p>
+        <div style="display: grid; gap: 12px">
+          <span class="mono pencil">Fastest way to reach me</span>
+          <a class="big-email" href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
+          <div><CopyButton text={CONTACT.email} label="email address" /></div>
         </div>
-        <div class="contact-band-actions">
-          <a class="contact-email" href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
-          <ul class="contact-band-links">
-            <li><a href={CONTACT.github} rel="me noopener">GitHub</a></li>
-            <li><a href={CONTACT.linkedin} rel="me noopener">LinkedIn</a></li>
-            <li><a href="/contact/">Contact page</a></li>
-          </ul>
-        </div>
+        <ul class="links-grid" role="list">
+          <li><a href={whatsapp} rel="noopener"><span class="mono">WhatsApp</span><span class="ico">{CONTACT.whatsapp.display} <Icon name="external" size={12} /></span></a></li>
+          <li><a href={CONTACT.github} rel="me noopener"><span class="mono">GitHub</span><span class="ico" translate="no">{CONTACT.github.split("/").pop()} <Icon name="external" size={12} /></span></a></li>
+          <li><a href={CONTACT.linkedin} rel="me noopener"><span class="mono">LinkedIn</span><span class="ico" translate="no">rokon-raz <Icon name="external" size={12} /></span></a></li>
+          <li><a href={CONTACT.cv} download><span class="mono">CV</span><span class="ico">Download PDF <Icon name="download" size={12} /></span></a></li>
+        </ul>
+        <div><a class="out-link" href="/contact/">Contact Page <Icon name="right" /></a></div>
       </div>
+      <Terminal />
     </div>
-  </section>
+
+    <div class="shaft-foot mono">
+      <a class="out-link out-link--solid" href={`#${L0.id}`} style="margin: 0">Return to Street Level <Icon name="up" /></a>
+      <span class="ico"><Logo /> © {year} MD. Rokonuzzaman Rokon · Drawn in Dhaka</span>
+    </div>
+  </Level>
 </Base>

@@ -5,28 +5,16 @@ export const SITE = {
   title: "Rokunuzzaman Rokon | Python Backend Developer",
   description:
     "Python backend developer in Dhaka building scalable APIs, hotel content platforms, data processing pipelines, and database-driven applications.",
-  /** One-line positioning statement, used in the home page hero. */
-  tagline:
-    "I build the backend that keeps hotel data moving: the APIs, pipelines and databases behind it.",
+  /** One-line positioning statement, used at street level on the homepage. */
+  tagline: "Most of what I build, you never see.",
+  /** The roles under the tagline. */
+  roles: "Software engineer · Python backend · Databases",
+  /** Experience, counted from the first professional role in Nov 2022. */
+  experience: "4 years, since Nov 2022",
 };
 
 /** Technology filters on the projects page ("All" is added automatically). */
 export const PROJECT_FILTERS = ["FastAPI", "Django", "MySQL", "PostgreSQL", "React.js"];
-
-/** Core stack shown on the home page (from the CV's core skills). */
-export const TECH_STACK = [
-  "Python",
-  "FastAPI",
-  "Django",
-  "Flask",
-  "MySQL",
-  "PostgreSQL",
-  "SQLAlchemy",
-  "Redis",
-  "Docker",
-  "AWS",
-  "Linux",
-];
 
 // Blog index page details.
 export const BLOG = {

@@ -36,42 +36,37 @@ const iso = (seconds: number) => new Date(seconds * 1000).toISOString();
 
 <Base
   title="News"
+  sheet="Sheet SR · Site radio · AI news"
   description="AI news from Hacker News: the last 24 hours of upvoted AI stories, newest first, updated every 6 hours."
-  width="full"
 >
-  <div class="container">
-    <section class="page-hero">
-      <h1>World AI News</h1>
-      <div>
-        <p class="lead">AI stories from Hacker News in the last 24 hours, newest first. Updated every 6 hours.</p>
-        {
-          news && (
-            <p class="hero-status">
-              <span class="status-dot" aria-hidden="true" />
-              Updated <time datetime={iso(fetchedAt)} data-time={fetchedAt}>{timeAgo(fetchedAt, fetchedAt)}</time>
-              · {stories.length} {stories.length === 1 ? "story" : "stories"}
-            </p>
-          )
-        }
-      </div>
-    </section>
+  <div class="sheet" style="--tone: var(--h-teal)">
+    <div class="sheet-title">
+      <h1 class="sign">Site radio</h1>
+      <p class="serif"><span class="reveal">AI stories from Hacker News in the last 24 hours, newest first.</span> <em class="reveal" style="--fill: var(--h-teal)">Updated every 6 hours.</em></p>
+      {
+        news && (
+          <p class="mono status">
+            Updated&nbsp;<time datetime={iso(fetchedAt)} data-time={fetchedAt}>{timeAgo(fetchedAt, fetchedAt)}</time>&nbsp;·&nbsp;{stories.length} {stories.length === 1 ? "story" : "stories"}
+          </p>
+        )
+      }
+    </div>
 
     {
       stories.length > 0 ? (
-        <ol class="news-list">
+        <ol class="radio" role="list">
           {stories.map((story) => (
-            <li class="news-item">
-              <time class="news-time" datetime={iso(story.time)} data-time={story.time}>
+            <li>
+              <time class="mono" datetime={iso(story.time)} data-time={story.time}>
                 {timeAgo(story.time, fetchedAt)}
               </time>
               <div>
-                <h2 class="news-title">
+                <h2>
                   <a href={story.url} target="_blank" rel="noopener noreferrer" aria-describedby="news-new-tab">
                     {story.title}
-                    <span class="news-go" aria-hidden="true">↗</span>
                   </a>
                 </h2>
-                <p class="news-meta">
+                <p class="radio-meta mono">
                   <span>{story.domain}</span>
                   <span>{story.points} points</span>
                   <span>
@@ -85,7 +80,7 @@ const iso = (seconds: number) => new Date(seconds * 1000).toISOString();
           ))}
         </ol>
       ) : (
-        <p class="news-empty">
+        <p class="radio-note">
           {news
             ? `No AI stories with ${news.minPoints}+ points in the last 24 hours yet. Check back in a few hours.`
             : "News isn't available right now. Check back in a few hours."}
@@ -93,10 +88,10 @@ const iso = (seconds: number) => new Date(seconds * 1000).toISOString();
       )
     }
 
-    <p class="news-source">
-      Stories and points from <a href="https://news.ycombinator.com/">Hacker News</a>, via the
-      <a href="https://hn.algolia.com/api">HN Search API</a>. Titles open the original article in a
-      new tab; comment counts open the discussion on Hacker News.
+    <p class="radio-note">
+      Stories and points from <a href="https://news.ycombinator.com/">Hacker News</a>, via the{" "}
+      <a href="https://hn.algolia.com/api">HN Search API</a>. Titles open the original article in a new tab;
+      comment counts open the discussion on Hacker News.
     </p>
     <!-- Read out with every story link (aria-describedby), so screen reader users know too. -->
     <span id="news-new-tab" hidden>Opens in a new tab</span>

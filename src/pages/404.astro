@@ -1,9 +1,16 @@
 ---
 import Base from "../layouts/Base.astro";
+import Icon from "../components/Icon.astro";
 ---
 
-<Base title="Page not found" noindex>
-  <h1>Page not found</h1>
-  <p>That page doesn't exist or has moved.</p>
-  <p>Try the <a href="/">home page</a>, <a href="/projects/">projects</a>, or <a href="/blog/">blog</a>.</p>
+<Base title="Unmapped ground" sheet="Sheet 404 · Unmapped ground" noindex>
+  <div class="sheet">
+    <div class="sheet-title">
+      <h1 class="sign">Unmapped ground</h1>
+      <p class="serif"><span class="reveal">Nothing has been built here yet.</span> <em class="reveal" style="--fill: var(--signal-text)">The page doesn’t exist or has moved.</em></p>
+    </div>
+    <div class="hatch-rock" style="height: 160px; border: 1px solid var(--ink); margin-bottom: 40px" aria-hidden="true"></div>
+    <a class="out-link out-link--solid" href="/">Return to Street Level <Icon name="up" /></a>
+    <a class="out-link" href="/projects/" style="margin-left: 8px">The Vaults <Icon name="right" /></a>
+  </div>
 </Base>

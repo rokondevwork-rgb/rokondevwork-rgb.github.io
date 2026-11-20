@@ -5,6 +5,9 @@ stack: ["Python", "FastAPI", "MySQL", "React.js", "Linux"]
 featured: true
 order: 3
 domain: "Hotel and travel tech"
+image: "../../assets/projects/innhosel.jpg"
+imageAlt: "Concept screen of InnHoSel matching supplier hotel names to the master hotel list"
+imageIsConcept: true
 ---
 
 ## What I built

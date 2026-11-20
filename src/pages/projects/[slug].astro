@@ -1,108 +1,181 @@
 ---
+/**
+ * A case study as an excavation sheet: the project is dug in layers, from the problem at the
+ * surface down to the outcomes at bedrock. Each layer appears only when its frontmatter is set;
+ * the Markdown body is the field record in the middle.
+ */
 import { render, type CollectionEntry } from "astro:content";
+import { Image } from "astro:assets";
 import Base from "../../layouts/Base.astro";
+import Icon from "../../components/Icon.astro";
 import { getProjects } from "../../lib/content";
 
 export async function getStaticPaths() {
   const projects = await getProjects();
   return projects.map((project, i) => ({
     params: { slug: project.id },
-    // The last project links back round to the first.
-    props: { project, next: projects[(i + 1) % projects.length] },
+    // The first and last projects link round to each other.
+    props: {
+      project,
+      prev: projects[(i - 1 + projects.length) % projects.length],
+      next: projects[(i + 1) % projects.length],
+    },
   }));
 }
 
 interface Props {
   project: CollectionEntry<"projects">;
+  prev: CollectionEntry<"projects">;
   next: CollectionEntry<"projects">;
 }
 
-const { project, next } = Astro.props;
-const { title, summary, stack, role, domain, link, results } = project.data;
+const { project, prev, next } = Astro.props;
+const { title, summary, stack, role, domain, link, results, image, imageAlt, imageIsConcept, problem, constraints, architecture, dataModel } = project.data;
 const { Content } = await render(project);
 const hasBody = Boolean(project.body?.trim());
+const vault = (p: CollectionEntry<"projects">) => `V-${String(p.data.order).padStart(2, "0")}`;
+const tones = ["var(--h-teal)", "var(--h-mulberry)", "var(--h-clay)", "var(--h-indigo)", "var(--h-olive)"];
+const tone = tones[(project.data.order - 1) % tones.length];
+
+// Layers in digging order; each is numbered only if it is present.
+const layers = [
+  problem && "surface",
+  constraints?.length && "topsoil",
+  architecture?.length && "structure",
+  dataModel?.length && "foundations",
+  hasBody && "record",
+  results?.length && "bedrock",
+].filter(Boolean) as string[];
+const num = (name: string) => String(layers.indexOf(name) + 1).padStart(2, "0");
+const layerTones = ["var(--h-teal)", "var(--h-clay)", "var(--signal-text)", "var(--h-olive)", "var(--h-indigo)", "var(--h-mulberry)"];
+const layerTone = (name: string) => layerTones[layers.indexOf(name) % layerTones.length];
 ---
 
-<Base title={title} description={summary} width="full">
-  <div class="container">
-    <article class="case">
-      <a class="back" href="/projects/"><span aria-hidden="true">←</span> All projects</a>
-      <h1>{title}</h1>
-      <p class="case-lead">{summary}</p>
+<Base title={title} description={summary} sheet={`Excavation sheet · ${vault(project)}`}>
+  <div class="sheet" style={`--tone: ${tone}`}>
+    <a class="mono ico" href="/projects/" style="color: var(--ink); text-decoration: none; min-height: 44px; margin-bottom: 24px"><Icon name="left" /> Back to the Vaults</a>
 
-      <div class="case-cols">
-        <dl class="case-meta">
-          <div>
-            <dt>Stack</dt>
-            <dd>
-              <ul class="chips">
-                {stack.map((tech) => <li>{tech}</li>)}
-              </ul>
-            </dd>
-          </div>
-          {
-            role && (
-              <div>
-                <dt>Role</dt>
-                <dd>{role}</dd>
-              </div>
-            )
-          }
-          {
-            domain && (
-              <div>
-                <dt>Domain</dt>
-                <dd>{domain}</dd>
-              </div>
-            )
-          }
-          {
-            link && (
-              <div>
-                <dt>Link</dt>
-                <dd>
-                  <a href={link} rel="noopener">{new URL(link).hostname}</a>
-                </dd>
-              </div>
-            )
-          }
-        </dl>
-
-        <div class="case-body">
-          {hasBody ? <Content /> : import.meta.env.DEV && <p class="placeholder-box">Case study coming soon. Add it in <code>src/content/projects/{project.id}.md</code>. (Only shown in dev.)</p>}
-
-          {
-            results ? (
-              <>
-                <h2>Results</h2>
-                <ul>
-                  {results.map((result) => (
-                    <li>{result}</li>
-                  ))}
-                </ul>
-              </>
-            ) : (
-              import.meta.env.DEV && (
-                <>
-                  <h2>Results</h2>
-                  <p class="placeholder-box">
-                    Placeholder (only shown in dev): add a <code>results</code> list to this project's
-                    frontmatter, such as records processed, response time, or cost saved. Only what you can
-                    share.
-                  </p>
-                </>
-              )
-            )
-          }
-        </div>
+    <div class="sheet-hero">
+      <div class="sheet-title" style="margin: 0">
+        <h1 class="sign">{title}</h1>
+        <span class="mono pencil">{vault(project)}{domain && ` · ${domain}`}</span>
+        <p class="serif"><span class="reveal">{summary}</span></p>
       </div>
+      <div class="title-block">
+        <div class="title-block-head mono"><span>Title block</span><span class="pencil">Sheet {vault(project)}</span></div>
+        <dl>
+          {role && <div><dt class="mono">Role</dt><dd>{role}</dd></div>}
+          {domain && <div><dt class="mono">Domain</dt><dd>{domain}</dd></div>}
+          {link && <div><dt class="mono">Link</dt><dd><a href={link} rel="noopener">{new URL(link).hostname}</a></dd></div>}
+          <div style="grid-column: 1 / -1"><dt class="mono">Stack</dt><dd class="mono" style="color: var(--teal); font-size: 0.75rem">{stack.join(" · ")}</dd></div>
+        </dl>
+      </div>
+    </div>
 
-      <a class="next-project" href={`/projects/${next.id}/`}>
-        <span>
-          <small>Next project</small>{" "}<strong>{next.data.title}</strong>
-        </span>
-        <span class="next-project-arrow" aria-hidden="true">→</span>
-      </a>
-    </article>
+    {
+      image && (
+        <figure class="exhibit">
+          <div class="exhibit-frame">
+            <Image src={image} alt={imageAlt ?? ""} widths={[640, 1000, 1400, 1800]} sizes="(min-width: 1200px) 1180px, 100vw" loading="eager" fetchpriority="high" />
+          </div>
+          <figcaption class="mono">
+            <span>Exhibit 01 · {title}</span>
+            {imageIsConcept && <span class="pencil">Concept screen with sample data</span>}
+          </figcaption>
+        </figure>
+      )
+    }
+
+    {
+      problem && (
+        <section class="layer" aria-labelledby="layer-surface" style={`--tone: ${layerTone("surface")}`}>
+          <div class="layer-label"><span class="sign" aria-hidden="true">{num("surface")}</span><h2 id="layer-surface" class="mono">Surface</h2><span class="mono pencil">The problem</span></div>
+          <div class="layer-body"><p class="serif"><span class="reveal">{problem}</span></p></div>
+        </section>
+      )
+    }
+
+    {
+      constraints && constraints.length > 0 && (
+        <section class="layer" aria-labelledby="layer-topsoil" style={`--tone: ${layerTone("topsoil")}`}>
+          <div class="layer-label"><span class="sign" aria-hidden="true">{num("topsoil")}</span><h2 id="layer-topsoil" class="mono">Topsoil</h2><span class="mono pencil">Constraints</span></div>
+          <div class="layer-body">
+            <ul class="constraint-grid" role="list">
+              {constraints.map((c) => (
+                <li>
+                  <span class="mono pencil">{c.label}</span>
+                  <span class="sign">{c.value}</span>
+                  <span>{c.note}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )
+    }
+
+    {
+      architecture && architecture.length > 0 && (
+        <section class="layer" aria-labelledby="layer-structure" style={`--tone: ${layerTone("structure")}`}>
+          <div class="layer-label"><span class="sign" aria-hidden="true">{num("structure")}</span><h2 id="layer-structure" class="mono">Structure</h2><span class="mono pencil">Request path</span></div>
+          <div class="layer-body">
+            <ol class="chain mono">
+              {architecture.map((n) => (
+                <li class={`is-${n.kind}`}><span>{n.name}</span></li>
+              ))}
+            </ol>
+            <p class="mono pencil">Vermilion: the request moving · teal: data at rest</p>
+          </div>
+        </section>
+      )
+    }
+
+    {
+      dataModel && dataModel.length > 0 && (
+        <section class="layer" aria-labelledby="layer-foundations" style={`--tone: ${layerTone("foundations")}`}>
+          <div class="layer-label"><span class="sign" aria-hidden="true">{num("foundations")}</span><h2 id="layer-foundations" class="mono">Foundations</h2><span class="mono pencil">Data model</span></div>
+          <div class="layer-body">
+            <ul class="tables mono" role="list">
+              {dataModel.map((t) => <li>{t}</li>)}
+            </ul>
+          </div>
+        </section>
+      )
+    }
+
+    {
+      hasBody && (
+        <section class="layer" aria-labelledby="layer-record" style={`--tone: ${layerTone("record")}`}>
+          <div class="layer-label"><span class="sign" aria-hidden="true">{num("record")}</span><h2 id="layer-record" class="mono">Field record</h2><span class="mono pencil">What I built</span></div>
+          <div class="layer-body prose">
+            <Content />
+          </div>
+        </section>
+      )
+    }
+
+    {
+      results && results.length > 0 && (
+        <section class="layer" aria-labelledby="layer-bedrock" style={`--tone: ${layerTone("bedrock")}`}>
+          <div class="layer-label"><span class="sign" aria-hidden="true">{num("bedrock")}</span><h2 id="layer-bedrock" class="mono">Bedrock</h2><span class="mono pencil">Outcomes</span></div>
+          <div class="layer-body">
+            <ul class="results" role="list">
+              {results.map((r) => <li>{r}</li>)}
+            </ul>
+          </div>
+        </section>
+      )
+    }
+
+    {
+      !hasBody && import.meta.env.DEV && (
+        <p class="results">Case study coming soon. Add it in <code>src/content/projects/{project.id}.md</code>. (Only shown in dev.)</p>
+      )
+    }
   </div>
+
+  <nav class="sheet-nav mono" aria-label="Other vaults" style="border-bottom: 1px solid var(--pencil)">
+    <a href={`/projects/${prev.id}/`}><Icon name="left" /> {vault(prev)} {prev.data.title}</a>
+    <a href={`/projects/${next.id}/`}>{vault(next)} {next.data.title} <Icon name="right" /></a>
+  </nav>
 </Base>

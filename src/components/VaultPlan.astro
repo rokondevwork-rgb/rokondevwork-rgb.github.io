@@ -1,0 +1,133 @@
+---
+/**
+ * Projects drawn as vault rooms on a floor plan, seen from above. Featured projects get the
+ * large rooms. With `filters`, a row of stack chips lights up the rooms that use a tool and
+ * dims the rest (JS only; without it every room stays lit and the chips stay hidden).
+ */
+import type { CollectionEntry } from "astro:content";
+import { Image } from "astro:assets";
+import Icon from "./Icon.astro";
+
+interface Props {
+  projects: CollectionEntry<"projects">[];
+  filters?: string[];
+  /** h2 on the Projects page, h3 under a homepage floor heading. */
+  headingLevel?: 2 | 3;
+}
+
+const { projects, filters, headingLevel = 3 } = Astro.props;
+const Heading = `h${headingLevel}` as const;
+const tones = ["var(--h-teal)", "var(--h-mulberry)", "var(--h-clay)", "var(--h-indigo)", "var(--h-olive)"];
+const large = projects.filter((p) => p.data.featured);
+const small = projects.filter((p) => !p.data.featured);
+const vault = (p: CollectionEntry<"projects">) => `V-${String(p.data.order).padStart(2, "0")}`;
+const counts = (filters ?? []).map((name) => ({
+  name,
+  count: name === "All" ? projects.length : projects.filter((p) => p.data.stack.includes(name)).length,
+}));
+// A corridor runs between each pair of large rooms and before the small ones.
+const rows: (CollectionEntry<"projects">[] | "corridor")[] = [];
+for (let i = 0; i < large.length; i += 2) {
+  if (rows.length) rows.push("corridor");
+  rows.push(large.slice(i, i + 2));
+}
+if (small.length) {
+  if (rows.length) rows.push("corridor");
+  rows.push(small);
+}
+---
+
+{
+  filters && (
+    <>
+      <div class="filters" role="group" aria-label="Filter projects by technology" data-filters hidden>
+        <span class="mono pencil">Filter by pipe</span>
+        {counts.map(({ name, count }, i) => (
+          <button type="button" class="chip mono" data-filter={name} aria-pressed={i === 0 ? "true" : "false"} aria-label={`${name} (${count} ${count === 1 ? "project" : "projects"})`}>
+            {name}
+            <sup>{count}</sup>
+          </button>
+        ))}
+      </div>
+      <p class="visually-hidden" aria-live="polite" data-filter-status />
+    </>
+  )
+}
+
+<div class="plan">
+  <div class="plan-tag mono" aria-hidden="true">
+    <span>Plan view</span><span>Not to scale</span><span class="ico">N <Icon name="up" size={12} /></span>
+  </div>
+  <ul class="rooms" role="list">
+    {
+      rows.map((row) =>
+        row === "corridor" ? (
+          <li class="corridor mono" aria-hidden="true">
+            <span>Service corridor</span>
+          </li>
+        ) : (
+          row.map((project) => {
+            const { title, summary, stack, featured, image, imageAlt, imageIsConcept, domain } = project.data;
+            const tone = tones[(project.data.order - 1) % tones.length];
+            return (
+              <li class:list={["room", { "room--large": featured }]} data-stack={stack.join("|")} style={`--tone: ${tone}`}>
+                {image && (
+                  <div class="room-shot">
+                    <Image src={image} alt={imageAlt ?? ""} widths={[480, 800, 1200]} sizes="(min-width: 1200px) 560px, 100vw" loading="lazy" />
+                    {imageIsConcept && <span class="concept-tag mono">Concept screen</span>}
+                  </div>
+                )}
+                <span class="mono pencil">
+                  {vault(project)}
+                  {domain && ` · ${domain}`}
+                </span>
+                <Heading class="sign room-title">
+                  <a href={`/projects/${project.id}/`}>{title}</a>
+                </Heading>
+                <p class="serif">{summary}</p>
+                <p class="stack-line mono" aria-label="Tech stack">
+                  {stack.map((s) => <span>{s}</span>)}
+                </p>
+              </li>
+            );
+          })
+        ),
+      )
+    }
+  </ul>
+</div>
+
+<script>
+  for (const group of document.querySelectorAll<HTMLElement>("[data-filters]")) {
+    const buttons = [...group.querySelectorAll<HTMLButtonElement>("button")];
+    const rooms = [...document.querySelectorAll<HTMLElement>(".room[data-stack]")];
+    const status = document.querySelector<HTMLElement>("[data-filter-status]");
+    group.hidden = false;
+
+    const apply = (filter: string) => {
+      let lit = 0;
+      buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.filter === filter)));
+      for (const room of rooms) {
+        const match = filter === "All" || (room.dataset.stack ?? "").split("|").includes(filter);
+        room.classList.toggle("is-dim", !match);
+        if (match) lit++;
+      }
+      if (status) {
+        const noun = lit === 1 ? "project" : "projects";
+        status.textContent = filter === "All" ? `Showing all ${lit} ${noun}.` : `${lit} ${noun} use ${filter}.`;
+      }
+      const url = new URL(location.href);
+      if (filter === "All") url.searchParams.delete("stack");
+      else url.searchParams.set("stack", filter);
+      history.replaceState(null, "", url);
+    };
+
+    group.addEventListener("click", (event) => {
+      const button = (event.target as Element).closest<HTMLButtonElement>("button[data-filter]");
+      if (button) apply(button.dataset.filter ?? "All");
+    });
+    // The filter lives in the URL (?stack=FastAPI), so a filtered view can be shared.
+    const fromUrl = new URL(location.href).searchParams.get("stack");
+    if (fromUrl && buttons.some((b) => b.dataset.filter === fromUrl)) apply(fromUrl);
+  }
+</script>

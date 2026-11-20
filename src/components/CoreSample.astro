@@ -1,0 +1,80 @@
+---
+/**
+ * The career as a drill core lying on its side: one band per role, its width proportional to
+ * time, the newest at the drill head. Tapping a band lifts it and shows the role below.
+ * Without JS every role is listed below the core.
+ */
+import { EDUCATION, ROLES } from "../lib/data";
+
+const total = ROLES.reduce((sum, r) => sum + r.months, 0);
+const hatches = ["hatch-earth", "hatch-gravel", "hatch-ochre"];
+const current = ROLES.find((r) => r.current) ?? ROLES[ROLES.length - 1];
+// Year ticks along the scale, from Nov 2022: January of each later year.
+const ticks = [2024, 2025, 2026].map((year) => ({ year, at: ((year - 2023) * 12 + 2) / total }));
+---
+
+<div data-core>
+  <div class="core" role="group" aria-label="Career, oldest to newest">
+    <div class="core-edu hatch-rock" title={EDUCATION}>
+      <span class="mono">Edu</span>
+    </div>
+    {
+      ROLES.map((role, i) => (
+        <button
+          type="button"
+          class:list={["band", hatches[i % hatches.length]]}
+          style={`--months: ${role.months}`}
+          data-role={role.id}
+          aria-pressed={role === current ? "true" : "false"}
+          aria-controls={`role-${role.id}`}
+        >
+          <span class="sign">{role.company}</span>
+          <span class="mono">{role.dates}</span>
+        </button>
+      ))
+    }
+    <div class="core-drill mono" aria-hidden="true"><span>Drilling</span></div>
+  </div>
+  <div class="core-scale mono" aria-hidden="true">
+    <span style="left: 0">Nov 2022</span>
+    {ticks.map(({ year, at }) => <span style={`left: ${(at * 100).toFixed(2)}%`}>{year}</span>)}
+    <span style="right: 0; border-left: 0; border-right: 1px solid var(--ink); padding: 0 4px 0 0">Now</span>
+    <span class="span-label">4 years</span>
+  </div>
+
+  <div class="roles" aria-live="polite">
+    {
+      ROLES.slice()
+        .reverse()
+        .map((role) => (
+          <article class:list={["role", { "is-shown": role === current }]} id={`role-${role.id}`}>
+            <div class="role-head">
+              <span class="mono pencil">{role.current ? "Current role" : "Earlier role"}</span>
+              <h3 class="sign">{role.company}</h3>
+              <span>{role.role}</span>
+              <span class="mono pencil">{role.dates}</span>
+            </div>
+            <ul>
+              {role.points.map((point) => (
+                <li>{point}</li>
+              ))}
+            </ul>
+          </article>
+        ))
+    }
+    <p class="mono pencil" style="margin-top: 32px">Education · {EDUCATION}</p>
+  </div>
+</div>
+
+<script>
+  for (const core of document.querySelectorAll<HTMLElement>("[data-core]")) {
+    const bands = [...core.querySelectorAll<HTMLButtonElement>(".band")];
+    const roles = [...core.querySelectorAll<HTMLElement>(".role")];
+    core.addEventListener("click", (event) => {
+      const band = (event.target as Element).closest<HTMLButtonElement>(".band");
+      if (!band) return;
+      bands.forEach((b) => b.setAttribute("aria-pressed", String(b === band)));
+      roles.forEach((r) => r.classList.toggle("is-shown", r.id === `role-${band.dataset.role}`));
+    });
+  }
+</script>
