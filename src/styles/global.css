@@ -672,13 +672,23 @@ button {
   font-size: 1rem;
   text-decoration: none;
   transition:
-    background-color var(--tick) var(--ease),
-    color var(--tick) var(--ease);
+    translate var(--settle) var(--ease),
+    box-shadow var(--settle) var(--ease);
 }
 
-.out-link:hover {
-  background: var(--ink);
-  color: var(--paper);
+/* Hover lifts the button and draws a vermilion edge to its right and below.
+   The inside never changes colour, so the text stays readable on any background. */
+.out-link:hover,
+.out-link:focus-visible {
+  translate: calc(-3px * var(--s)) calc(-3px * var(--s));
+  box-shadow: calc(5px * var(--s)) calc(5px * var(--s)) 0 var(--signal);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .out-link,
+  .out-link svg {
+    transition: none;
+  }
 }
 
 .out-link svg {
@@ -695,9 +705,7 @@ button {
 }
 
 .out-link--solid:hover {
-  background: var(--signal);
-  border-color: var(--signal);
-  color: var(--on-signal);
+  color: var(--paper);
 }
 
 /* ==========================================================================
@@ -1744,9 +1752,27 @@ button {
   flex: 0 0 calc(64px * var(--s));
   display: grid;
   place-items: center;
+  padding: 0;
   border: 1.5px solid var(--ink);
   border-right: 0;
   border-radius: calc(66px * var(--s)) 0 0 calc(66px * var(--s));
+  background-color: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    translate var(--settle) var(--ease),
+    border-color var(--settle) var(--ease);
+}
+
+.core-edu:hover {
+  border-color: var(--signal);
+}
+
+/* Lifted like a role band, and outlined in vermilion. */
+.core-edu[aria-pressed="true"] {
+  translate: 0 calc(-14px * var(--s));
+  border: 2px solid var(--signal);
+  border-right: 0;
 }
 
 .core-edu span,
@@ -3572,6 +3598,12 @@ button {
     border: 1.5px solid var(--ink);
     border-top: 0;
     border-radius: 0 0 calc(60px * var(--s)) calc(60px * var(--s));
+  }
+
+  .core-edu[aria-pressed="true"] {
+    translate: calc(10px * var(--s)) 0;
+    border: 2px solid var(--signal);
+    border-top: 0;
   }
 
   .band {

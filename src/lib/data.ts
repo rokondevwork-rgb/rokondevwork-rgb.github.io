@@ -169,6 +169,13 @@ export const ROLES = [
 
 export const EDUCATION = "B.Sc. in CSE, European University of Bangladesh";
 
+/** The deepest strata of the core sample, from the CV. Newest first. */
+export const EDUCATION_LIST = [
+  { degree: "B.Sc. in Computer Science and Engineering (CSE)", school: "European University of Bangladesh", grade: "CGPA 3.26 / 4.00" },
+  { degree: "HSC (Science)", school: "Birampur Government College", grade: "GPA 3.33 / 5.00" },
+  { degree: "SSC (Science)", school: "Adarsha High School, Dinajpur", grade: "GPA 4.06 / 5.00" },
+];
+
 /** B7: the load-bearing principles. Rewrite these in your own words. */
 export const PRINCIPLES = [
   {

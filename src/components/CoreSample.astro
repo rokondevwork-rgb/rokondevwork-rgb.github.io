@@ -1,10 +1,11 @@
 ---
 /**
  * The career as a drill core lying on its side: one band per role, its width proportional to
- * time, the newest at the drill head. Tapping a band lifts it and shows the role below.
- * Without JS every role is listed below the core.
+ * time, the newest at the drill head, and education as the rounded end at the bottom of the
+ * hole. Tapping a band lifts it and shows that role (or the education) below.
+ * Without JS everything is listed below the core.
  */
-import { EDUCATION, ROLES } from "../lib/data";
+import { EDUCATION_LIST, ROLES } from "../lib/data";
 
 const total = ROLES.reduce((sum, r) => sum + r.months, 0);
 const hatches = ["hatch-earth", "hatch-gravel", "hatch-ochre"];
@@ -15,9 +16,9 @@ const ticks = [2024, 2025, 2026].map((year) => ({ year, at: ((year - 2023) * 12 
 
 <div data-core>
   <div class="core" role="group" aria-label="Career, oldest to newest">
-    <div class="core-edu hatch-rock" title={EDUCATION}>
-      <span class="mono">Edu</span>
-    </div>
+    <button type="button" class="core-edu hatch-rock" data-role="education" aria-pressed="false" aria-controls="role-education" aria-label="Education">
+      <span class="mono" aria-hidden="true">Edu</span>
+    </button>
     {
       ROLES.map((role, i) => (
         <button
@@ -62,16 +63,34 @@ const ticks = [2024, 2025, 2026].map((year) => ({ year, at: ((year - 2023) * 12 
           </article>
         ))
     }
-    <p class="mono pencil" style="margin-top: 32px">Education · {EDUCATION}</p>
+    <article class="role" id="role-education">
+      <div class="role-head">
+        <span class="mono pencil">Before the strata</span>
+        <h3 class="sign">Education</h3>
+        <span>Computer Science and Engineering</span>
+      </div>
+      <ul>
+        {
+          EDUCATION_LIST.map((e) => (
+            <li>
+              <span>
+                <strong>{e.degree}</strong> · {e.school}
+                <span class="mono pencil" style="display: block">{e.grade}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </article>
   </div>
 </div>
 
 <script>
   for (const core of document.querySelectorAll<HTMLElement>("[data-core]")) {
-    const bands = [...core.querySelectorAll<HTMLButtonElement>(".band")];
+    const bands = [...core.querySelectorAll<HTMLButtonElement>("button[data-role]")];
     const roles = [...core.querySelectorAll<HTMLElement>(".role")];
     core.addEventListener("click", (event) => {
-      const band = (event.target as Element).closest<HTMLButtonElement>(".band");
+      const band = (event.target as Element).closest<HTMLButtonElement>("button[data-role]");
       if (!band) return;
       bands.forEach((b) => b.setAttribute("aria-pressed", String(b === band)));
       roles.forEach((r) => r.classList.toggle("is-shown", r.id === `role-${band.dataset.role}`));
