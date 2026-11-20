@@ -2859,7 +2859,7 @@ button {
   max-width: 22ch;
 }
 
-/* Site radio: news */
+/* News radio: news */
 .radio {
   margin: 0;
   padding: 0;
@@ -3433,7 +3433,7 @@ button {
   justify-self: center;
 }
 
-/* Sheets: pairs first, an odd one out centred on the last row (FN SR, then GR). */
+/* Sheets: pairs first, an odd one out centred on the last row (FN NR, then GR). */
 .panel .panel-grid--sheets > li:first-child:nth-last-child(odd) {
   grid-column: auto;
   justify-self: auto;

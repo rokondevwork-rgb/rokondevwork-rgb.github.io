@@ -36,12 +36,12 @@ const iso = (seconds: number) => new Date(seconds * 1000).toISOString();
 
 <Base
   title="News"
-  sheet="Sheet SR · Site radio · AI news"
+  sheet="Sheet NR · News radio · AI news"
   description="AI news from Hacker News: the last 24 hours of upvoted AI stories, newest first, updated every 6 hours."
 >
   <div class="sheet" style="--tone: var(--h-teal)">
     <div class="sheet-title">
-      <h1 class="sign">Site radio</h1>
+      <h1 class="sign">News radio</h1>
       <p class="serif"><span class="reveal">AI stories from Hacker News in the last 24 hours, newest first.</span> <em class="reveal" style="--fill: var(--h-teal)">Updated every 6 hours.</em></p>
       {
         news && (

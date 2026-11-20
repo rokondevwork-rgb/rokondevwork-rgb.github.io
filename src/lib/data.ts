@@ -29,7 +29,7 @@ export const FLOORS: Floor[] = [
 /** Pages outside the homepage, reached from the bottom of the elevator panel. */
 export const SHEETS = [
   { code: "FN", href: "/blog/", name: "Field notes" },
-  { code: "SR", href: "/news/", name: "Site radio" },
+  { code: "NR", href: "/news/", name: "News radio" },
   { code: "GR", href: "/games/", name: "Gaming room" },
 ];
 
@@ -68,7 +68,7 @@ export function floorForPath(path: string): string | undefined {
   if (path.startsWith("/projects")) return "B4";
   if (path.startsWith("/contact")) return "B8";
   if (path.startsWith("/blog")) return "FN";
-  if (path.startsWith("/news")) return "SR";
+  if (path.startsWith("/news")) return "NR";
   if (path.startsWith("/games")) return "GR";
   return undefined;
 }
