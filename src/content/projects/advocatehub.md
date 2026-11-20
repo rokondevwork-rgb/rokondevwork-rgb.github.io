@@ -4,9 +4,12 @@ summary: "Legal practice management SaaS for law firms and advocates: clients, c
 stack: ["Next.js", "React.js", "TypeScript", "FastAPI", "Python", "MySQL", "Redis", "Celery", "Docker"]
 order: 7
 featured: true
-image: "../../assets/projects/advocatehub.jpg"
 imageAlt: "Concept screen of the AdvocateHub dashboard with today's hearings, a court calendar and outstanding fees"
 imageIsConcept: true
+galleryCaptions:
+  - "Case file and hearing timeline"
+  - "Client portal"
+  - "Billing and invoices"
 ---
 
 ## What I built

@@ -3,9 +3,12 @@ title: "ConvaterPro"
 summary: "Document management system to upload, convert, organize, and retrieve documents."
 stack: ["Python", "Django", "PostgreSQL"]
 order: 4
-image: "../../assets/projects/convaterpro.jpg"
 imageAlt: "Concept screen of ConvaterPro's document library and conversion queue"
 imageIsConcept: true
+galleryCaptions:
+  - "Upload and convert"
+  - "Document viewer with versions"
+  - "Full-text search"
 ---
 
 ## What I built

@@ -33,6 +33,8 @@ const projects = defineCollection({
       imageAlt: z.string().optional(),
       /** Marks the picture as a concept screen with sample data rather than a real screenshot. */
       imageIsConcept: z.boolean().default(false),
+      /** Optional captions for the gallery pictures 1.png, 2.png, … in the project's image folder, in order. */
+      galleryCaptions: z.array(z.string()).optional(),
       /** Case-study layers. Each one appears only when it is set. */
       problem: z.string().optional(),
       constraints: z.array(z.object({ label: z.string(), value: z.string(), note: z.string() })).optional(),

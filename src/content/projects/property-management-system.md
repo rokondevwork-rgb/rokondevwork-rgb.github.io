@@ -5,9 +5,12 @@ stack: ["FastAPI", "PostgreSQL", "SQLAlchemy"]
 featured: true
 order: 2
 domain: "Hotel and travel tech"
-image: "../../assets/projects/pms.jpg"
 imageAlt: "Concept screen of the PMS availability calendar, with bookings laid out per room and day"
 imageIsConcept: true
+galleryCaptions:
+  - "New reservation form"
+  - "Front-desk reservations list"
+  - "Reservation API with conflict handling"
 ---
 
 ## What I built

@@ -5,7 +5,6 @@ stack: ["FastAPI", "MySQL", "SQLAlchemy", "JWT", "Redis", "Docker"]
 featured: true
 order: 1
 domain: "Hotel and travel tech"
-image: "../../assets/projects/hotel-content-api.jpg"
 imageAlt: "Concept screen of the Hotel Content API docs: a property endpoint with its parameters and a JSON response"
 imageIsConcept: true
 problem: "Every supplier describes the same hotel differently. Clients wanted one answer."
@@ -30,6 +29,10 @@ dataModel:
   - "rooms"
   - "images"
   - "amenities"
+galleryCaptions:
+  - "API usage dashboard"
+  - "B2B clients and their scopes"
+  - "Try-it request and response"
 ---
 
 ## What I built

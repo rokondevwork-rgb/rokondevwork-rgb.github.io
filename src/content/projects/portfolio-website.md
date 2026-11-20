@@ -9,6 +9,12 @@ results:
   - "Pages ship as static HTML with no front-end framework; the only JavaScript is small, optional enhancements."
   - "The About page photo is served as AVIF or WebP at 6 to 44 KB, depending on screen size, instead of the original 1.7 MB."
   - "The News page refreshes four times a day without a server, through a scheduled GitHub Actions build."
+imageAlt: "Concept screen of the portfolio project in a code editor: a project Markdown file and the dev server"
+imageIsConcept: true
+galleryCaptions:
+  - "Type check and build"
+  - "Scheduled AI news workflow"
+  - "The project image folder loader"
 ---
 
 ## What I built
