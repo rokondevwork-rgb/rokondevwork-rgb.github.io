@@ -1,5 +1,5 @@
 /**
- * Brick breaker for the Break room (/games/). Plain canvas, no libraries.
+ * Brick breaker for the Gaming room (/games/). Plain canvas, no libraries.
  *
  * The game runs in its own coordinates: 800 wide on a wide screen, 400 wide on a phone, and as
  * tall as the box it sits in. The canvas is scaled to fit its box, so resizing never moves a brick.

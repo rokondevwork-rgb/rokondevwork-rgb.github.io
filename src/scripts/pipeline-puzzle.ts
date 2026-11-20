@@ -1,5 +1,5 @@
 /**
- * Pipeline puzzle for the Break room (/games/). Plain DOM: every pipe is a real <button>.
+ * Pipeline puzzle for the Gaming room (/games/). Plain DOM: every pipe is a real <button>.
  *
  * A raw supplier feed comes in on the left, a clean record waits on the right. Every pipe can be
  * turned a quarter turn; join the two and the data flows. Each puzzle is generated: a random

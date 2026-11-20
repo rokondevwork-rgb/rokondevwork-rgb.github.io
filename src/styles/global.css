@@ -480,27 +480,14 @@ button {
   color: var(--on-signal);
 }
 
-/* The floor's name slides out to the left on hover or focus. */
+/* The floor's name is for screen readers only: the code on the button is all that shows. */
 .floor-btn .floor-name {
   position: absolute;
-  right: calc(100% + calc(18px * var(--s)));
-  top: 50%;
-  translate: calc(6px * var(--s)) -50%;
-  padding: calc(4px * var(--s)) calc(8px * var(--s));
-  background: var(--ink);
-  color: var(--paper);
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
   white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition:
-    opacity var(--settle) var(--ease),
-    translate var(--settle) var(--ease);
-}
-
-.floor-btn:hover .floor-name,
-.floor-btn:focus-visible .floor-name {
-  opacity: 1;
-  translate: 0 -50%;
 }
 
 .panel-sep {
@@ -2197,6 +2184,23 @@ button {
   color: var(--paper);
 }
 
+/* hake: the Matrix chip, always green on black. */
+.terminal-chips .chip-hake {
+  border-color: #0b7a2c;
+  background: #0d1a10;
+  color: #00ff41;
+}
+
+.terminal-chips .chip-hake:hover,
+.terminal-chips .chip-hake:focus-visible {
+  background: #00ff41;
+  color: #0d1a10;
+}
+
+.terminal-log .out-matrix {
+  color: light-dark(#0b7a2c, #00ff41);
+}
+
 .lvl--last {
   padding-bottom: calc(300px * var(--s));
 }
@@ -3429,7 +3433,7 @@ button {
   justify-self: center;
 }
 
-/* Sheets: pairs first, an odd one out centred on the last row (FN SR, then BR). */
+/* Sheets: pairs first, an odd one out centred on the last row (FN SR, then GR). */
 .panel .panel-grid--sheets > li:first-child:nth-last-child(odd) {
   grid-column: auto;
   justify-self: auto;
@@ -4067,7 +4071,7 @@ button {
 }
 
 /* ==========================================================================
-   Sheet BR: the Break room (games)
+   Sheet GR: the Gaming room (games)
    ========================================================================== */
 .cabinets {
   display: grid;
@@ -4756,5 +4760,61 @@ button.pipe-tile:hover {
 
   .pipe-tile.is-hint {
     background: var(--signal);
+  }
+}
+
+/* ==========================================================================
+   The intercom's hake easter egg: letter rain over the whole page
+   ========================================================================== */
+.matrix-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgb(0 12 3 / 0.5);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 600ms var(--ease);
+}
+
+.matrix-overlay.is-on {
+  opacity: 1;
+}
+
+.matrix-overlay canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.matrix-note {
+  position: absolute;
+  left: 50%;
+  bottom: calc(28px * var(--s));
+  translate: -50% 0;
+  display: flex;
+  gap: calc(14px * var(--s));
+  margin: 0;
+  padding: calc(10px * var(--s)) calc(16px * var(--s));
+  border: 1px solid #00ff41;
+  background: rgb(0 10 2 / 0.85);
+  color: #00ff41;
+  font-size: 0.625rem;
+  white-space: nowrap;
+}
+
+.matrix-note span + span {
+  color: #7fbf8c;
+}
+
+@media (max-width: 640px) {
+  .matrix-note {
+    left: calc(16px * var(--s));
+    right: calc(16px * var(--s));
+    translate: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    white-space: normal;
+    text-align: center;
   }
 }

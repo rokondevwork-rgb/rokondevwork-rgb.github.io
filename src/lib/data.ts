@@ -30,10 +30,10 @@ export const FLOORS: Floor[] = [
 export const SHEETS = [
   { code: "FN", href: "/blog/", name: "Field notes" },
   { code: "SR", href: "/news/", name: "Site radio" },
-  { code: "BR", href: "/games/", name: "Break room" },
+  { code: "GR", href: "/games/", name: "Gaming room" },
 ];
 
-/** The Break room's machines. Only `playable` ones open; the rest show as being built. */
+/** The Gaming room's machines. Only `playable` ones open; the rest show as being built. */
 export const GAMES = [
   {
     id: "brick-breaker",
@@ -69,7 +69,7 @@ export function floorForPath(path: string): string | undefined {
   if (path.startsWith("/contact")) return "B8";
   if (path.startsWith("/blog")) return "FN";
   if (path.startsWith("/news")) return "SR";
-  if (path.startsWith("/games")) return "BR";
+  if (path.startsWith("/games")) return "GR";
   return undefined;
 }
 

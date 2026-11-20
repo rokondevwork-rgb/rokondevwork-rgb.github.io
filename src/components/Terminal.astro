@@ -3,7 +3,7 @@
  * The intercom: a small terminal for visitors who like typing. Every command has a clickable
  * chip too, and the log already shows a short session, so nothing here needs a keyboard.
  * Commands: help, whoami, ls projects, open <project>, goto <floor>, stack --uses <tool>,
- * cat cv.pdf, contact --email|--whatsapp, games, play <game>, theme day|night, snake on|off, clear.
+ * cat cv.pdf, contact --email|--whatsapp, games, play <game>, theme day|night, snake on|off, hake, clear.
  * ⌘K / Ctrl+K (or "/") jumps to the terminal on the page, or opens it in a dialog.
  */
 import { CONTACT, SITE } from "../consts";
@@ -53,6 +53,8 @@ const id = `term-${mode}`;
     {["help", "whoami", "ls projects", "games", "cat cv.pdf", "snake on"].map((c) => <button type="button" data-run={c}>{c}</button>)}
     <!-- Always offers the other theme: "theme day" at night, "theme night" by day. -->
     <button type="button" data-run="theme day" data-theme-chip>theme day</button>
+    <!-- The easter egg: letters rain over the page. -->
+    <button type="button" class="chip-hake" data-run="hake">hake</button>
   </div>
 </section>
 
@@ -118,7 +120,7 @@ const id = `term-${mode}`;
         case "help":
           line("whoami · ls projects · open <project> · goto <floor>");
           line("stack --uses <tool> · cat cv.pdf · contact --email · contact --whatsapp");
-          line("games · play <game> · theme day|night · snake on|off · clear");
+          line("games · play <game> · theme day|night · snake on|off · hake · clear");
           break;
         case "whoami":
           line(`${info.name} · Python backend engineer, Dhaka (UTC+6)`);
@@ -142,7 +144,7 @@ const id = `term-${mode}`;
           if (f) {
             line(`Going to ${f.code} · ${f.name}…`);
             go(f.href);
-          } else line("Floors: L0 to B8, FN (field notes), SR (site radio), BR (break room).");
+          } else line("Floors: L0 to B8, FN (field notes), SR (site radio), GR (gaming room).");
           break;
         }
         case "stack": {
@@ -185,13 +187,13 @@ const id = `term-${mode}`;
         }
         case "games":
         case "game":
-          line(`Break room · ${info.games.length} machines`, "pencil");
+          line(`Gaming room · ${info.games.length} machines`, "pencil");
           info.games.forEach((g) =>
             g.playable
               ? line([`${g.no}  `, { text: g.id, href: `/games/?play=${g.id}` }, "  ▶ play now"], "out-teal")
               : line(`${g.no}  ${g.id}  · being built`, "pencil"),
           );
-          line("Click a name to play it in the Break room, or type 'play brick-breaker'.", "pencil");
+          line("Click a name to play it in the Gaming room, or type 'play brick-breaker'.", "pencil");
           break;
         case "play": {
           const g = info.games.find((x) => x.id === arg || x.title.toLowerCase() === arg || x.no === arg.padStart(2, "0"));
@@ -199,9 +201,27 @@ const id = `term-${mode}`;
           else if (!g) line(`No machine called ${arg}. Try 'games'.`);
           else if (!g.playable) line(`${g.title} is still being built. Hard hats only.`);
           else {
-            line(`Walking to the Break room · ${g.title}…`);
+            line(`Walking to the Gaming room · ${g.title}…`);
             go(`/games/?play=${g.id}`);
           }
+          break;
+        }
+        case "hake":
+        case "hack": {
+          line("Breaking into the mainframe…", "out-matrix");
+          if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            line("Access granted. (The letter rain is off because your device asks for less motion.)", "out-matrix");
+            break;
+          }
+          line("Access granted. Follow the white rabbit.", "out-matrix");
+          line("(Esc, a click or a tap brings you back.)", "pencil");
+          // Close the ⌘K dialog so nothing sits between the visitor and the rain.
+          const box = term.closest("dialog");
+          setTimeout(async () => {
+            if (box?.open) box.close();
+            const { startMatrixRain } = await import("../scripts/matrix-rain");
+            startMatrixRain();
+          }, 700);
           break;
         }
         case "clear":

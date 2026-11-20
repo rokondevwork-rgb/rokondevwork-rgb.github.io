@@ -1,6 +1,6 @@
 ---
 /**
- * The Break room: small games. Each machine is a card; a playable one opens in its own window
+ * The Gaming room: small games. Each machine is a card; a playable one opens in its own window
  * (a <dialog>) and its code loads only then. /games/?play=<id> opens that game straight away,
  * which is where the intercom's `games` command links to.
  */
@@ -23,12 +23,12 @@ const icons = {
 
 <Base
   title="Games"
-  sheet="Sheet BR · Break room · Games"
-  description="The Break room: small browser games on Rokon's portfolio: Brick breaker and Pipeline puzzle."
+  sheet="Sheet GR · Gaming room · Games"
+  description="The Gaming room: small browser games on Rokon's portfolio: Brick breaker and Pipeline puzzle."
 >
   <div class="sheet" style="--tone: var(--h-mulberry)">
     <div class="sheet-title">
-      <h1 class="sign">Break room</h1>
+      <h1 class="sign">Gaming room</h1>
       <p class="serif"><span class="reveal">Small games for a short break between floors.</span> <em class="reveal" style="--fill: var(--h-mulberry)">Pick a machine and it opens in a window.</em></p>
       <p class="mono status">
         {playable} {playable === 1 ? "machine" : "machines"} running · {building} being built · scores stay in this browser
