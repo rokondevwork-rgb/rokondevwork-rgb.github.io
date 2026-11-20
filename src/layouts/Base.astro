@@ -6,6 +6,7 @@ import Icon from "../components/Icon.astro";
 import Logo from "../components/Logo.astro";
 import Snake from "../components/Snake.astro";
 import Terminal from "../components/Terminal.astro";
+import VisitCount from "../components/VisitCount.astro";
 import { SITE } from "../consts";
 import { floorForPath } from "../lib/data";
 
@@ -78,6 +79,16 @@ const year = new Date().getFullYear();
         document.documentElement.dataset.theme = theme;
       } catch {}
     </script>
+    {
+      import.meta.env.PROD && (
+        <script
+          is:inline
+          data-goatcounter="https://rokunuzzaman.goatcounter.com/count"
+          async
+          src="https://gc.zgo.at/count.js"
+        />
+      )
+    }
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to Content</a>
@@ -118,6 +129,7 @@ const year = new Date().getFullYear();
             <span>
               © {year} MD. Rokunuzzaman Rokon · Drawn in Dhaka
             </span>
+            <VisitCount />
           </footer>
         )
       }

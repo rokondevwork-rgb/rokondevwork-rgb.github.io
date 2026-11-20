@@ -13,6 +13,7 @@ import Level from "../components/Level.astro";
 import Logo from "../components/Logo.astro";
 import Terminal from "../components/Terminal.astro";
 import Trench from "../components/Trench.astro";
+import VisitCount from "../components/VisitCount.astro";
 import VaultPlan from "../components/VaultPlan.astro";
 import { CONTACT, SITE } from "../consts";
 import { FLOORS, MACHINES, PRINCIPLES } from "../lib/data";
@@ -254,6 +255,7 @@ const year = new Date().getFullYear();
     <div class="shaft-foot mono">
       <a class="out-link out-link--solid" href={`#${L0.id}`} style="margin: 0">Return to Street Level <Icon name="up" /></a>
       <span class="ico"><Logo /> © {year} MD. Rokunuzzaman Rokon · Drawn in Dhaka</span>
+      <VisitCount />
     </div>
   </Level>
 </Base>

@@ -1,0 +1,30 @@
+---
+/**
+ * Live visitor total from GoatCounter (rokunuzzaman.goatcounter.com).
+ * Stays hidden until the public counter answers, so nothing shows if the
+ * counter is off, blocked or offline.
+ */
+---
+
+<span class="visit-count" data-visits hidden>
+  <span class="visit-dot" aria-hidden="true"></span>
+  <span data-visits-value></span>&nbsp;visitors
+</span>
+
+<script>
+  const counters = document.querySelectorAll<HTMLElement>("[data-visits]");
+  if (counters.length) {
+    fetch("https://rokunuzzaman.goatcounter.com/counter/TOTAL.json")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { count?: string } | null) => {
+        const count = data?.count?.trim();
+        if (!count) return;
+        counters.forEach((el) => {
+          const value = el.querySelector("[data-visits-value]");
+          if (value) value.textContent = count;
+          el.hidden = false;
+        });
+      })
+      .catch(() => {});
+  }
+</script>

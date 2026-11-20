@@ -3789,3 +3789,36 @@ button {
 .astro-code {
   color-scheme: inherit;
 }
+
+/* Visitor count (GoatCounter): hidden until the counter answers */
+.visit-count {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(8px * var(--s));
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.visit-count[hidden] {
+  display: none;
+}
+
+.visit-count .visit-dot {
+  width: calc(7px * var(--s));
+  height: calc(7px * var(--s));
+  border-radius: 50%;
+  background: var(--signal);
+  animation: visit-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes visit-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .visit-count .visit-dot {
+    animation: none;
+  }
+}
