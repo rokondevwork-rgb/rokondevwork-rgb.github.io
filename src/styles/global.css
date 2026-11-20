@@ -416,6 +416,24 @@ button {
 .panel-brand svg {
   width: calc(30px * var(--s));
   height: calc(30px * var(--s));
+  /* The coiled snake on top of the elevator keeps turning. */
+  animation: panel-logo-spin 6s linear infinite;
+}
+
+.panel-brand:hover svg {
+  animation-duration: 1.5s;
+}
+
+@keyframes panel-logo-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-brand svg {
+    animation: none;
+  }
 }
 
 .panel-display {
