@@ -47,9 +47,9 @@ export const GAMES = [
     id: "pipeline-puzzle",
     no: "02",
     title: "Pipeline puzzle",
-    status: "building",
-    blurb: "Turn the pipes so the raw supplier feed reaches one clean record.",
-    controls: "Click or tap a pipe",
+    status: "playable",
+    blurb: "Turn the pipes so the raw supplier feed reaches one clean record. Every pipe is a new puzzle.",
+    controls: "Click · tap · arrows + Enter",
   },
   {
     id: "bug-hunt",

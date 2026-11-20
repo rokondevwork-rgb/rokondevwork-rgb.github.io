@@ -1,6 +1,6 @@
 ---
 /**
- * The Break room: small games. Each machine is a card; a playable one opens in a window
+ * The Break room: small games. Each machine is a card; a playable one opens in its own window
  * (a <dialog>) and its code loads only then. /games/?play=<id> opens that game straight away,
  * which is where the intercom's `games` command links to.
  */
@@ -13,12 +13,18 @@ const building = GAMES.length - playable;
 const tones = ["#5bbfb5", "#d98bb8", "#ff6a3d", "#9daae8"];
 // The little wall on the Brick breaker card: four rows of eight, a few already knocked out.
 const mini = Array.from({ length: 32 }, (_, i) => ([3, 12, 21, 26].includes(i) ? "transparent" : tones[Math.floor(i / 8)]));
+const icons = {
+  pause: '<rect x="3" y="2" width="3.5" height="12" fill="currentColor" stroke="none"/><rect x="9.5" y="2" width="3.5" height="12" fill="currentColor" stroke="none"/>',
+  restart: '<path d="M13 8a5 5 0 1 1-1.5-3.6M13 2v3h-3"/>',
+  hint: '<path d="M5.5 10.5a4 4 0 1 1 5 0V12h-5zM6 14.5h4"/>',
+  next: '<path d="M2 8h12M9 3l5 5-5 5"/>',
+};
 ---
 
 <Base
   title="Games"
   sheet="Sheet BR · Break room · Games"
-  description="The Break room: small browser games on Rokon's portfolio, starting with Brick breaker."
+  description="The Break room: small browser games on Rokon's portfolio: Brick breaker and Pipeline puzzle."
 >
   <div class="sheet" style="--tone: var(--h-mulberry)">
     <div class="sheet-title">
@@ -36,13 +42,24 @@ const mini = Array.from({ length: 32 }, (_, i) => ([3, 12, 21, 26].includes(i) ?
             <li class="cabinet">
               <div class="cabinet-screen" aria-hidden="true">
                 <span class="cabinet-no mono">Cabinet {game.no}</span>
-                <span class="mini-wall">
-                  {mini.map((c) => (
-                    <span style={`background: ${c}`} />
-                  ))}
-                </span>
-                <span class="mini-ball" />
-                <span class="mini-paddle" />
+                {game.id === "brick-breaker" ? (
+                  <>
+                    <span class="mini-wall">
+                      {mini.map((c) => (
+                        <span style={`background: ${c}`} />
+                      ))}
+                    </span>
+                    <span class="mini-ball" />
+                    <span class="mini-paddle" />
+                  </>
+                ) : (
+                  <svg class="mini-pipes" width="170" height="102" viewBox="0 0 170 102" fill="none" stroke-width="9">
+                    <path d="M0 51h34" stroke="#5bbfb5" />
+                    <path d="M17 17h34M85 17v34M119 85h34M153 17v34M51 85v-34" stroke="#6e6a62" />
+                    <path class="mini-pipes-flow" d="M0 51h34v-34h34v68h34v-34h34v-17h34" stroke="#5bbfb5" />
+                    <path class="mini-pipes-dash" d="M0 51h34v-34h34v68h34v-34h34v-17h34" stroke="#ff6a3d" stroke-width="2.5" />
+                  </svg>
+                )}
               </div>
               <div class="cabinet-head">
                 <h2 class="sign">{game.title}</h2>
@@ -64,21 +81,15 @@ const mini = Array.from({ length: 32 }, (_, i) => ([3, 12, 21, 26].includes(i) ?
             <li class="cabinet cabinet--building">
               <div class="cabinet-screen" aria-hidden="true">
                 <span class="cabinet-no mono">Cabinet {game.no}</span>
-                {game.id === "pipeline-puzzle" ? (
-                  <svg width="150" height="90" viewBox="0 0 150 90" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="square">
-                    <path d="M5 45h40v-30h30v60h30v-30h40" />
-                  </svg>
-                ) : (
-                  <svg width="110" height="96" viewBox="0 0 110 96" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="15" y="6" width="80" height="88" />
-                    <rect x="27" y="18" width="16" height="12" />
-                    <rect x="67" y="18" width="16" height="12" />
-                    <rect x="27" y="42" width="16" height="12" fill="var(--signal)" />
-                    <rect x="67" y="42" width="16" height="12" />
-                    <rect x="27" y="66" width="16" height="12" />
-                    <rect x="67" y="66" width="16" height="12" />
-                  </svg>
-                )}
+                <svg width="110" height="96" viewBox="0 0 110 96" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="15" y="6" width="80" height="88" />
+                  <rect x="27" y="18" width="16" height="12" />
+                  <rect x="67" y="18" width="16" height="12" />
+                  <rect x="27" y="42" width="16" height="12" fill="var(--signal)" />
+                  <rect x="67" y="42" width="16" height="12" />
+                  <rect x="27" y="66" width="16" height="12" />
+                  <rect x="67" y="66" width="16" height="12" />
+                </svg>
               </div>
               <div class="cabinet-head">
                 <h2 class="sign">{game.title}</h2>
@@ -97,17 +108,18 @@ const mini = Array.from({ length: 32 }, (_, i) => ([3, 12, 21, 26].includes(i) ?
     </p>
   </div>
 
-  <dialog class="arcade" data-arcade aria-labelledby="arcade-title">
+  <!-- Cabinet 01: Brick breaker -->
+  <dialog class="arcade" data-arcade="brick-breaker" aria-labelledby="bb-title">
     <div class="arcade-bar">
-      <span class="mono" id="arcade-title">Cabinet 01 · Brick breaker</span>
+      <span class="mono" id="bb-title">Cabinet 01 · Brick breaker</span>
       <span class="arcade-spacer"></span>
-      <button type="button" class="arcade-btn mono" data-arcade-pause aria-label="Pause">
+      <button type="button" class="arcade-btn mono" data-bb-pause aria-label="Pause">
         <span class="arcade-btn-text" data-pause-label>Pause</span>
-        <svg class="arcade-btn-icon" aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><rect x="3" y="2" width="3.5" height="12"></rect><rect x="9.5" y="2" width="3.5" height="12"></rect></svg>
+        <svg class="arcade-btn-icon" aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" set:html={icons.pause} />
       </button>
-      <button type="button" class="arcade-btn mono" data-arcade-restart aria-label="Restart">
+      <button type="button" class="arcade-btn mono" data-bb-restart aria-label="Restart">
         <span class="arcade-btn-text">Restart</span>
-        <svg class="arcade-btn-icon" aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 8a5 5 0 1 1-1.5-3.6M13 2v3h-3"></path></svg>
+        <svg class="arcade-btn-icon" aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" set:html={icons.restart} />
       </button>
       <button type="button" class="arcade-btn arcade-btn--icon" data-arcade-close aria-label="Close game">
         <Icon name="close" size={14} />
@@ -120,7 +132,7 @@ const mini = Array.from({ length: 32 }, (_, i) => ([3, 12, 21, 26].includes(i) ?
       <span class="arcade-best">Best <span data-hud="best">0</span></span>
     </div>
     <div class="arcade-field">
-      <canvas data-arcade-canvas tabindex="0" aria-label="Brick breaker. Move with the arrow keys or the mouse, launch with Space."></canvas>
+      <canvas data-bb-canvas tabindex="0" aria-label="Brick breaker. Move with the arrow keys or the mouse, launch with Space."></canvas>
     </div>
     <div class="arcade-foot mono">
       <span class="hint-mouse">← → or mouse to move · Space launches · P pauses · Esc closes</span>
@@ -128,94 +140,215 @@ const mini = Array.from({ length: 32 }, (_, i) => ([3, 12, 21, 26].includes(i) ?
       <span class="pencil">Scores are saved in this browser only</span>
     </div>
   </dialog>
+
+  <!-- Cabinet 02: Pipeline puzzle -->
+  <dialog class="arcade" data-arcade="pipeline-puzzle" aria-labelledby="pp-title">
+    <div class="arcade-bar">
+      <span class="mono" id="pp-title">Cabinet 02 · Pipeline puzzle</span>
+      <span class="arcade-spacer"></span>
+      <button type="button" class="arcade-btn mono" data-pp-hint aria-label="Hint (costs a move)">
+        <span class="arcade-btn-text">Hint</span>
+        <svg class="arcade-btn-icon" aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" set:html={icons.hint} />
+      </button>
+      <button type="button" class="arcade-btn mono" data-pp-reset aria-label="Reset this pipe">
+        <span class="arcade-btn-text">Reset</span>
+        <svg class="arcade-btn-icon" aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" set:html={icons.restart} />
+      </button>
+      <button type="button" class="arcade-btn mono" data-pp-new aria-label="New pipe">
+        <span class="arcade-btn-text">New pipe</span>
+        <svg class="arcade-btn-icon" aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" set:html={icons.next} />
+      </button>
+      <button type="button" class="arcade-btn arcade-btn--icon" data-arcade-close aria-label="Close game">
+        <Icon name="close" size={14} />
+      </button>
+    </div>
+    <div class="arcade-hud mono" aria-live="polite">
+      <span>Pipe <b data-pp="level">1</b></span>
+      <span>Moves <b data-pp="moves" class="hud-signal">0</b></span>
+      <span>Par <b data-pp="par">0</b></span>
+      <span class="arcade-best">Stars <span data-pp="stars">0</span></span>
+    </div>
+    <div class="pipe-done" data-pipe-done hidden>
+      <p class="sign">Record clean</p>
+      <p class="mono" data-pipe-done-text></p>
+      <button type="button" class="cabinet-play mono" data-pipe-next>
+        Next pipe <Icon name="right" size={12} />
+      </button>
+    </div>
+    <div class="arcade-field pipe-field">
+      <div class="pipe-stage">
+        <span class="pipe-end pipe-end--feed mono" data-pipe-feed>Raw feed<small>xml</small></span>
+        <div class="pipe-board" data-pipe-board role="group" aria-label="Pipes. Use the arrow keys to move and Enter to turn a pipe."></div>
+        <span class="pipe-end pipe-end--record mono" data-pipe-record>Clean record<small data-record-state>waiting</small></span>
+      </div>
+    </div>
+    <div class="arcade-foot mono">
+      <span class="hint-mouse">Click a pipe to turn it · arrow keys move · Enter turns · Esc closes</span>
+      <span class="hint-touch">Tap a pipe to turn it · join the teal feed (left) to the record (right)</span>
+      <span class="pencil">Progress is saved in this browser only</span>
+    </div>
+  </dialog>
 </Base>
 
 <script>
   import type { BrickBreaker, Hud } from "../scripts/brick-breaker";
+  import type { PipelinePuzzle, PipeHud } from "../scripts/pipeline-puzzle";
 
-  const BEST_KEY = "brick-breaker:best";
-  const dialog = document.querySelector<HTMLDialogElement>("[data-arcade]");
-  const canvas = document.querySelector<HTMLCanvasElement>("[data-arcade-canvas]");
-
-  const showBest = () => {
-    let best = 0;
+  const read = (key: string) => {
     try {
-      best = Number(localStorage.getItem(BEST_KEY)) || 0;
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  };
+
+  /** "Your best" on each card. */
+  const showBest = () => {
+    const bb = Number(read("brick-breaker:best")) || 0;
+    document.querySelectorAll<HTMLElement>('[data-best="brick-breaker"]').forEach((el) => (el.textContent = bb ? bb.toLocaleString() : "—"));
+    let pp = { level: 1, stars: 0 };
+    try {
+      pp = JSON.parse(read("pipeline-puzzle:progress") ?? "") ?? pp;
     } catch {}
-    document.querySelectorAll<HTMLElement>('[data-best="brick-breaker"]').forEach((el) => (el.textContent = best ? best.toLocaleString() : "—"));
+    const cleared = Math.max(0, (pp.level ?? 1) - 1);
+    document.querySelectorAll<HTMLElement>('[data-best="pipeline-puzzle"]').forEach(
+      (el) => (el.textContent = cleared ? `${cleared} ${cleared === 1 ? "pipe" : "pipes"} · ${pp.stars} ★` : "—"),
+    );
   };
   showBest();
 
-  if (dialog && canvas) {
-    const hudEl = (k: string) => dialog.querySelector<HTMLElement>(`[data-hud="${k}"]`)!;
-    const pauseBtn = dialog.querySelector<HTMLButtonElement>("[data-arcade-pause]")!;
-    const pauseLabel = dialog.querySelector<HTMLElement>("[data-pause-label]")!;
-    let game: BrickBreaker | null = null;
-    let opener: HTMLElement | null = null;
+  interface Running {
+    destroy(): void;
+  }
+  type Mount = (dialog: HTMLDialogElement) => Promise<Running>;
 
-    const renderHud = (h: Hud) => {
+  /** Brick breaker: a canvas game. */
+  const mountBrickBreaker: Mount = async (dialog) => {
+    const canvas = dialog.querySelector<HTMLCanvasElement>("[data-bb-canvas]")!;
+    const hudEl = (k: string) => dialog.querySelector<HTMLElement>(`[data-hud="${k}"]`)!;
+    const pauseBtn = dialog.querySelector<HTMLButtonElement>("[data-bb-pause]")!;
+    const pauseLabel = dialog.querySelector<HTMLElement>("[data-pause-label]")!;
+    const restartBtn = dialog.querySelector<HTMLButtonElement>("[data-bb-restart]")!;
+    const render = (h: Hud) => {
       hudEl("score").textContent = h.score.toLocaleString();
       hudEl("level").textContent = String(h.level);
       hudEl("best").textContent = h.best.toLocaleString();
       const lives = hudEl("lives");
       lives.setAttribute("aria-label", `${h.lives} ${h.lives === 1 ? "life" : "lives"} left`);
-      lives.replaceChildren(...Array.from({ length: 3 }, (_, i) => {
-        const dot = document.createElement("i");
-        if (i >= h.lives) dot.className = "is-lost";
-        return dot;
-      }));
+      lives.replaceChildren(
+        ...Array.from({ length: 3 }, (_, i) => {
+          const dot = document.createElement("i");
+          if (i >= h.lives) dot.className = "is-lost";
+          return dot;
+        }),
+      );
       const paused = h.phase === "paused";
       pauseLabel.textContent = paused ? "Resume" : "Pause";
       pauseBtn.setAttribute("aria-label", paused ? "Resume" : "Pause");
       pauseBtn.disabled = h.phase === "over";
     };
-
-    const setUrl = (id: string | null) => {
-      const url = new URL(location.href);
-      if (id) url.searchParams.set("play", id);
-      else url.searchParams.delete("play");
-      history.replaceState(history.state, "", url);
-    };
-
-    const open = async (id: string, from?: HTMLElement) => {
-      if (id !== "brick-breaker" || dialog.open) return;
-      opener = from ?? null;
-      dialog.showModal();
-      setUrl(id);
-      // The game's code is only fetched when someone wants to play.
-      const { createBrickBreaker } = await import("../scripts/brick-breaker");
-      if (!dialog.open) return;
-      game?.destroy();
-      game = createBrickBreaker(canvas, renderHud);
+    const { createBrickBreaker } = await import("../scripts/brick-breaker");
+    const game: BrickBreaker = createBrickBreaker(canvas, render);
+    const onPause = () => {
+      game.togglePause();
       canvas.focus({ preventScroll: true });
     };
+    const onRestart = () => {
+      game.restart();
+      canvas.focus({ preventScroll: true });
+    };
+    pauseBtn.addEventListener("click", onPause);
+    restartBtn.addEventListener("click", onRestart);
+    canvas.focus({ preventScroll: true });
+    return {
+      destroy() {
+        pauseBtn.removeEventListener("click", onPause);
+        restartBtn.removeEventListener("click", onRestart);
+        game.destroy();
+      },
+    };
+  };
 
-    document.querySelectorAll<HTMLButtonElement>("[data-play]").forEach((btn) =>
-      btn.addEventListener("click", () => open(btn.dataset.play ?? "", btn)),
-    );
-    pauseBtn.addEventListener("click", () => {
-      game?.togglePause();
-      canvas.focus({ preventScroll: true });
-    });
-    dialog.querySelector("[data-arcade-restart]")?.addEventListener("click", () => {
-      game?.restart();
-      canvas.focus({ preventScroll: true });
-    });
+  /** Pipeline puzzle: a grid of buttons. */
+  const mountPipeline: Mount = async (dialog) => {
+    const field = dialog.querySelector<HTMLElement>(".pipe-field")!;
+    const el = (k: string) => dialog.querySelector<HTMLElement>(`[data-pp="${k}"]`)!;
+    const recordState = dialog.querySelector<HTMLElement>("[data-record-state]")!;
+    const hintBtn = dialog.querySelector<HTMLButtonElement>("[data-pp-hint]")!;
+    const resetBtn = dialog.querySelector<HTMLButtonElement>("[data-pp-reset]")!;
+    const newBtn = dialog.querySelector<HTMLButtonElement>("[data-pp-new]")!;
+    const render = (h: PipeHud) => {
+      el("level").textContent = String(h.level);
+      el("moves").textContent = String(h.moves);
+      el("par").textContent = String(h.par);
+      el("stars").textContent = `${h.stars} ★`;
+      recordState.textContent = h.solved ? "json ✓" : "waiting";
+      hintBtn.disabled = resetBtn.disabled = h.solved;
+    };
+    const { createPipelinePuzzle } = await import("../scripts/pipeline-puzzle");
+    const game: PipelinePuzzle = createPipelinePuzzle(field, render);
+    const onHint = () => game.hint();
+    const onReset = () => game.reset();
+    const onNew = () => game.next();
+    hintBtn.addEventListener("click", onHint);
+    resetBtn.addEventListener("click", onReset);
+    newBtn.addEventListener("click", onNew);
+    field.querySelector<HTMLElement>(".pipe-tile[tabindex='0']")?.focus({ preventScroll: true });
+    return {
+      destroy() {
+        hintBtn.removeEventListener("click", onHint);
+        resetBtn.removeEventListener("click", onReset);
+        newBtn.removeEventListener("click", onNew);
+        game.destroy();
+      },
+    };
+  };
+
+  const mounts: Record<string, Mount> = { "brick-breaker": mountBrickBreaker, "pipeline-puzzle": mountPipeline };
+
+  const setUrl = (id: string | null) => {
+    const url = new URL(location.href);
+    if (id) url.searchParams.set("play", id);
+    else url.searchParams.delete("play");
+    history.replaceState(history.state, "", url);
+  };
+
+  let running: Running | null = null;
+  let opener: HTMLElement | null = null;
+
+  const open = async (id: string, from?: HTMLElement) => {
+    const dialog = document.querySelector<HTMLDialogElement>(`dialog[data-arcade="${id}"]`);
+    const mount = mounts[id];
+    if (!dialog || !mount || document.querySelector("dialog[data-arcade][open]")) return;
+    opener = from ?? null;
+    dialog.showModal();
+    setUrl(id);
+    // The game's code is only fetched when someone wants to play.
+    const game = await mount(dialog);
+    if (dialog.open) running = game;
+    else game.destroy();
+  };
+
+  document.querySelectorAll<HTMLButtonElement>("[data-play]").forEach((btn) =>
+    btn.addEventListener("click", () => open(btn.dataset.play ?? "", btn)),
+  );
+
+  document.querySelectorAll<HTMLDialogElement>("dialog[data-arcade]").forEach((dialog) => {
     dialog.querySelector("[data-arcade-close]")?.addEventListener("click", () => dialog.close());
     // A click on the dark backdrop closes the window.
     dialog.addEventListener("click", (e) => {
       if (e.target === dialog) dialog.close();
     });
     dialog.addEventListener("close", () => {
-      game?.destroy();
-      game = null;
+      running?.destroy();
+      running = null;
       setUrl(null);
       showBest();
       opener?.focus();
     });
+  });
 
-    // /games/?play=brick-breaker opens the game at once (the intercom links here).
-    const wanted = new URLSearchParams(location.search).get("play");
-    if (wanted) open(wanted, document.querySelector<HTMLElement>(`[data-play="${wanted}"]`) ?? undefined);
-  }
+  // /games/?play=<id> opens that game at once (the intercom links here).
+  const wanted = new URLSearchParams(location.search).get("play");
+  if (wanted) open(wanted, document.querySelector<HTMLElement>(`[data-play="${wanted}"]`) ?? undefined);
 </script>
