@@ -36,10 +36,20 @@ const year = new Date().getFullYear();
       <span class="wide">Drawn by MD. Rokunuzzaman Rokon · Dhaka 23.81°N 90.41°E</span>
     </div>
 
-    <svg class="street-building" viewBox="0 0 104 214" aria-hidden="true">
+    <svg class="street-building" viewBox="0 0 104 214" aria-hidden="true" data-windows>
       <g fill="none" stroke="currentColor" stroke-width="1">
         <path d="M8 214V40H96V214M20 40V22H84V40M44 22V8H60V22"></path>
-        <path d="M22 58h12v14H22zM46 58h12v14H46zM70 58h12v14H70zM22 88h12v14H22zM46 88h12v14H46zM70 88h12v14H70zM22 118h12v14H22zM46 118h12v14H46zM70 118h12v14H70zM22 148h12v14H22zM70 148h12v14H70z"></path>
+        <rect class="win" x="22" y="58" width="12" height="14"></rect>
+        <rect class="win" x="46" y="58" width="12" height="14"></rect>
+        <rect class="win" x="70" y="58" width="12" height="14"></rect>
+        <rect class="win" x="22" y="88" width="12" height="14"></rect>
+        <rect class="win" x="46" y="88" width="12" height="14"></rect>
+        <rect class="win" x="70" y="88" width="12" height="14"></rect>
+        <rect class="win" x="22" y="118" width="12" height="14"></rect>
+        <rect class="win" x="46" y="118" width="12" height="14"></rect>
+        <rect class="win" x="70" y="118" width="12" height="14"></rect>
+        <rect class="win" x="22" y="148" width="12" height="14"></rect>
+        <rect class="win" x="70" y="148" width="12" height="14"></rect>
         <path d="M42 214V182H62V214"></path>
       </g>
     </svg>
@@ -300,6 +310,56 @@ const year = new Date().getFullYear();
       running = false;
       timers.forEach((t) => clearTimeout(t));
       timers.clear();
+    };
+
+    start();
+    document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
+  }
+</script>
+
+<script>
+  /*
+   * L0: the building's windows light up one at a time in a random colour, then go back to the
+   * plain drawing, as if someone were working late on each floor. Rests only while the tab is hidden.
+   */
+  const building = document.querySelector<SVGElement>("[data-windows]");
+
+  if (building) {
+    const windows = [...building.querySelectorAll<SVGRectElement>(".win")];
+    const colours = ["var(--signal)", "var(--teal)", "#ffd43b", "var(--h-mulberry)", "var(--h-indigo)", "var(--h-olive)", "var(--ochre)"];
+    let last: SVGRectElement | undefined;
+    let timer = 0;
+    let running = false;
+
+    const pick = <T,>(list: T[]) => list[Math.floor(Math.random() * list.length)];
+
+    // One window at a time: light a random one (never the same twice in a row), hold it,
+    // let it go dark, pause, then the next.
+    const flash = () => {
+      if (!running) return;
+      const win = pick(windows.filter((w) => w !== last));
+      last = win;
+      win.style.fill = pick(colours);
+      win.classList.add("is-lit");
+      timer = window.setTimeout(() => {
+        win.classList.remove("is-lit");
+        win.style.fill = "";
+        timer = window.setTimeout(flash, 250 + Math.random() * 350);
+      }, 900 + Math.random() * 600);
+    };
+
+    const start = () => {
+      if (running) return;
+      running = true;
+      flash();
+    };
+    const stop = () => {
+      running = false;
+      clearTimeout(timer);
+      windows.forEach((w) => {
+        w.classList.remove("is-lit");
+        w.style.fill = "";
+      });
     };
 
     start();

@@ -742,6 +742,16 @@ button {
   color: var(--ink);
 }
 
+/* Windows: plain outlines that light up one at a time (script in index.astro). */
+.street-building .win {
+  fill: transparent;
+  transition: fill 450ms var(--ease);
+}
+
+.street-building .win.is-lit {
+  stroke: var(--ink);
+}
+
 .street-callout {
   position: absolute;
   left: calc(196px * var(--s));

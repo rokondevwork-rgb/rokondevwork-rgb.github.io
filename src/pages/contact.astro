@@ -13,7 +13,7 @@ const whatsapp = `https://wa.me/${CONTACT.whatsapp.number}?text=${encodeURICompo
   "Hi Rokon, I found your portfolio and would like to talk.",
 )}`;
 
-// Each topic opens the visitor's email app with the subject already filled in.
+// Each topic opens a new Gmail message in a new tab, addressed to me with the subject already filled in.
 const topics = [
   { label: "A backend role", subject: "Backend role" },
   { label: "A freelance project", subject: "Freelance project" },
@@ -59,9 +59,9 @@ const checklist = [
             {
               topics.map(({ label, subject }) => (
                 <li>
-                  <a href={`${mailto}?subject=${encodeURIComponent(subject)}`}>
+                  <a href={`${gmail}&su=${encodeURIComponent(subject)}`} target="_blank" rel="noopener noreferrer">
                     {label}
-                    <Icon name="mail" />
+                    <span class="ico mono">Gmail <Icon name="external" size={12} /></span>
                   </a>
                 </li>
               ))
