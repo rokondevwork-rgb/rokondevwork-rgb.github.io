@@ -85,7 +85,7 @@ export const TRENCH: { layer: string; tools: Tool[] }[] = [
     layer: "Languages",
     tools: [
       { name: "Python", works: ["FastAPI", "Django", "Flask", "SQLAlchemy", "Pandas"], usedIn: "Every project on this site." },
-      { name: "JavaScript", works: ["React.js", "Next.js"], usedIn: "Rentor, AdvocateHub." },
+      { name: "JavaScript", works: ["React.js", "Next.js", "Astro"], usedIn: "Rentor, AdvocateHub, and this portfolio." },
     ],
   },
   {
@@ -94,6 +94,7 @@ export const TRENCH: { layer: string; tools: Tool[] }[] = [
       { name: "FastAPI", works: ["SQLAlchemy", "MySQL", "PostgreSQL", "Redis", "Docker"], usedIn: "Hotel Content API, PMS, InnHoSel, AdvocateHub, Passport Scanner." },
       { name: "Django", works: ["PostgreSQL", "Python"], usedIn: "Rentor, ConvaterPro." },
       { name: "Flask", works: ["Python"], usedIn: "In my toolkit; no public project to show yet." },
+      { name: "Astro", works: ["JavaScript", "TypeScript", "Markdown", "GitHub Actions"], usedIn: "This portfolio: case studies, the blog and the self-updating news page." },
       { name: "Celery", works: ["Redis", "FastAPI", "AI automation"], usedIn: "AdvocateHub: reminders, file scans, reports." },
     ],
   },

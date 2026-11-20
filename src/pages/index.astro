@@ -33,7 +33,7 @@ const year = new Date().getFullYear();
   <section class="street" id={L0.id} aria-labelledby="name" data-floor={L0.code} data-floor-name={L0.name} data-depth={L0.depth}>
     <div class="street-strip mono">
       <span>Sheet 00 · Section A–A · Below grade</span>
-      <span class="wide">Drawn by MD. Rokonuzzaman Rokon · Dhaka 23.81°N 90.41°E</span>
+      <span class="wide">Drawn by MD. Rokunuzzaman Rokon · Dhaka 23.81°N 90.41°E</span>
     </div>
 
     <svg class="street-building" viewBox="0 0 104 214" aria-hidden="true">
@@ -51,12 +51,12 @@ const year = new Date().getFullYear();
 
     <span class="street-md mono" aria-hidden="true">MD. —</span>
     <h1 class="street-name sign" id="name">
-      <span class="visually-hidden">MD. Rokonuzzaman Rokon</span>
-      <span class="above d-only" aria-hidden="true">Rokonuzzaman</span>
-      <span class="below buried d-only" aria-hidden="true">Rokonuzzaman</span>
+      <span class="visually-hidden">MD. Rokunuzzaman Rokon</span>
+      <span class="above d-only" aria-hidden="true">Rokunuzzaman</span>
+      <span class="below buried d-only" aria-hidden="true">Rokunuzzaman</span>
       <span class="under buried d-only" aria-hidden="true">Rokon</span>
-      <span class="above m-only" aria-hidden="true">Rokonuz-</span>
-      <span class="below buried m-only" aria-hidden="true">Rokonuz-</span>
+      <span class="above m-only" aria-hidden="true">Rokunuz-</span>
+      <span class="below buried m-only" aria-hidden="true">Rokunuz-</span>
       <span class="under-1 buried m-only" aria-hidden="true">Zaman</span>
       <span class="under-2 buried m-only" aria-hidden="true">Rokon</span>
     </h1>
@@ -88,15 +88,16 @@ const year = new Date().getFullYear();
   <!-- B2 · Expertise -->
   <Level floor={B2} title="Plant room" sub="Engineering expertise: the machines that keep the building running." band="gravel" tone="var(--h-teal)">
     <div class="scene" aria-label="Normalisation, with sample data: raw supplier fragments in, one clean record out" role="img">
-      <div class="scene-raw" aria-hidden="true">
+      <div class="scene-raw" aria-hidden="true" data-drift>
         <span class="scene-label mono">Raw supplier feeds · sample</span>
-        <pre class="data" style="left: 16px; top: 12px; rotate: -4deg">&lt;Hotel Code="DAC0412"&gt;
-  &lt;HotelName&gt;Example Grand Dhaka&lt;/HotelName&gt;</pre>
-        <pre class="data" style="left: 120px; top: 58px; rotate: 3deg">&lt;Amenity&gt;Free WiFi&lt;/Amenity&gt;
-&lt;amenity&gt;wifi_free&lt;/amenity&gt;</pre>
-        <pre class="data" style="left: 30px; top: 102px; rotate: -2deg">"star_rating": "4*",
-"rooms": "  120 "</pre>
-        <pre class="data" style="left: 150px; top: 150px; rotate: 5deg">&lt;Lat&gt;23.79&lt;/Lat&gt;&lt;Lng&gt;90.40</pre>
+        <span class="raw-line data" style="left: 4%; top: 8%; rotate: -4deg">&lt;Hotel Code="DAC0412"&gt;</span>
+        <span class="raw-line data" style="left: 9%; top: 20%; rotate: -3deg">&lt;HotelName&gt;Example Grand Dhaka&lt;/HotelName&gt;</span>
+        <span class="raw-line data" style="left: 40%; top: 33%; rotate: 2deg">"name": "EXAMPLE GRAND - DHAKA"</span>
+        <span class="raw-line data" style="left: 30%; top: 46%; rotate: 3deg">&lt;Amenity&gt;Free WiFi&lt;/Amenity&gt;</span>
+        <span class="raw-line data" style="left: 12%; top: 58%; rotate: -2deg">&lt;amenity&gt;wifi_free&lt;/amenity&gt;</span>
+        <span class="raw-line data" style="left: 6%; top: 70%; rotate: -1deg">"star_rating": "4*",</span>
+        <span class="raw-line data" style="left: 44%; top: 76%; rotate: 4deg">"rooms": "  120 "</span>
+        <span class="raw-line data" style="left: 26%; top: 88%; rotate: 5deg">&lt;Lat&gt;23.79&lt;/Lat&gt;&lt;Lng&gt;90.40</span>
       </div>
       <span class="scene-pipe" aria-hidden="true"></span>
       <div class="scene-machine" aria-hidden="true">
@@ -242,7 +243,66 @@ const year = new Date().getFullYear();
 
     <div class="shaft-foot mono">
       <a class="out-link out-link--solid" href={`#${L0.id}`} style="margin: 0">Return to Street Level <Icon name="up" /></a>
-      <span class="ico"><Logo /> © {year} MD. Rokonuzzaman Rokon · Drawn in Dhaka</span>
+      <span class="ico"><Logo /> © {year} MD. Rokunuzzaman Rokon · Drawn in Dhaka</span>
     </div>
   </Level>
 </Base>
+
+<script>
+  /*
+   * B2: the raw supplier lines drift around their box at random, all the time, one line at a
+   * time: each picks a new spot and a slight tilt every few seconds, and never leaves the box.
+   * It only rests while the tab is hidden, and picks up again when you come back.
+   */
+  const box = document.querySelector<HTMLElement>("[data-drift]");
+
+  if (box) {
+    const lines = [...box.querySelectorAll<HTMLElement>(".raw-line")];
+    const timers = new Map<HTMLElement, number>();
+    const pad = 10;
+    let running = false;
+
+    // Switch from the static percentage layout to transforms, nudging any line that pokes
+    // out of the box back inside.
+    for (const line of lines) {
+      const x = Math.min(Math.max(pad, line.offsetLeft), Math.max(pad, box.clientWidth - line.offsetWidth - pad));
+      const y = Math.min(Math.max(pad, line.offsetTop), Math.max(pad, box.clientHeight - line.offsetHeight - pad));
+      line.style.left = "0";
+      line.style.top = "0";
+      line.style.translate = `${x}px ${y}px`;
+    }
+    // Only now turn the transitions on, so the lines don't glide in from the corner.
+    void box.offsetWidth;
+    lines.forEach((line) => line.classList.add("is-drifting"));
+
+    const move = (line: HTMLElement) => {
+      const maxX = Math.max(pad, box.clientWidth - line.offsetWidth - pad);
+      const maxY = Math.max(pad, box.clientHeight - line.offsetHeight - pad);
+      const x = pad + Math.random() * (maxX - pad);
+      const y = pad + Math.random() * (maxY - pad);
+      // Long lines tilt less, so their corners stay inside the box too.
+      const maxTilt = Math.min(6, (Math.asin(Math.min(1, 14 / line.offsetWidth)) * 180) / Math.PI);
+      const tilt = ((Math.random() * 2 - 1) * maxTilt).toFixed(1);
+      const seconds = 2.5 + Math.random() * 3;
+      line.style.setProperty("--drift", `${seconds}s`);
+      line.style.translate = `${x.toFixed(1)}px ${y.toFixed(1)}px`;
+      line.style.rotate = `${tilt}deg`;
+      // The next move starts as this one ends, so the lines never stand still.
+      timers.set(line, window.setTimeout(() => running && move(line), seconds * 1000));
+    };
+
+    const start = () => {
+      if (running) return;
+      running = true;
+      lines.forEach((line, i) => timers.set(line, window.setTimeout(() => move(line), i * 120)));
+    };
+    const stop = () => {
+      running = false;
+      timers.forEach((t) => clearTimeout(t));
+      timers.clear();
+    };
+
+    start();
+    document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
+  }
+</script>
