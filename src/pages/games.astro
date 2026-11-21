@@ -8,8 +8,10 @@ import Base from "../layouts/Base.astro";
 import Icon from "../components/Icon.astro";
 import { GAMES } from "../lib/data";
 
-const playable = GAMES.filter((g) => g.status === "playable").length;
-const building = GAMES.length - playable;
+// Widened so a game can be listed as "building" again without a type error.
+const games: readonly { id: string; no: string; title: string; status: string; blurb: string; controls: string }[] = GAMES;
+const playable = games.filter((g) => g.status === "playable").length;
+const building = games.length - playable;
 const tones = ["#5bbfb5", "#d98bb8", "#ff6a3d", "#9daae8"];
 // The little wall on the Brick breaker card: four rows of eight, a few already knocked out.
 const mini = Array.from({ length: 32 }, (_, i) => ([3, 12, 21, 26].includes(i) ? "transparent" : tones[Math.floor(i / 8)]));
@@ -24,20 +26,20 @@ const icons = {
 <Base
   title="Games"
   sheet="Sheet GR · Gaming room · Games"
-  description="The Gaming room: small browser games on Rokon's portfolio: Brick breaker and Pipeline puzzle."
+  description="The Gaming room: small browser games on Rokon's portfolio: Brick breaker, Pipeline puzzle and Snake."
 >
   <div class="sheet" style="--tone: var(--h-mulberry)">
     <div class="sheet-title">
       <h1 class="sign">Gaming room</h1>
       <p class="serif"><span class="reveal">Small games for a short break between floors.</span> <em class="reveal" style="--fill: var(--h-mulberry)">Pick a machine and it opens in a window.</em></p>
       <p class="mono status">
-        {playable} {playable === 1 ? "machine" : "machines"} running · {building} being built · scores stay in this browser
+        {playable} {playable === 1 ? "machine" : "machines"} running{building > 0 && ` · ${building} being built`} · scores stay in this browser
       </p>
     </div>
 
     <ul class="cabinets" role="list">
       {
-        GAMES.map((game) =>
+        games.map((game) =>
           game.status === "playable" ? (
             <li class="cabinet">
               <div class="cabinet-screen" aria-hidden="true">
@@ -52,6 +54,20 @@ const icons = {
                     <span class="mini-ball" />
                     <span class="mini-paddle" />
                   </>
+                ) : game.id === "snake" ? (
+                  <svg class="mini-snake" width="170" height="102" viewBox="0 0 170 102" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 78H66V30h54v30" stroke="#306998" stroke-width="15" />
+                    <path d="M18 78H66V30h54v30" stroke="#4b8bbe" stroke-width="11" />
+                    <path class="mini-snake-stripe" d="M18 78H66V30h54v30" stroke="#ffd43b" stroke-opacity=".45" stroke-width="2" stroke-dasharray="4 6" />
+                    <circle cx="120" cy="62" r="8.5" fill="#4b8bbe" />
+                    <circle cx="116.5" cy="65" r="2.2" fill="#ffd43b" />
+                    <circle cx="123.5" cy="65" r="2.2" fill="#ffd43b" />
+                    <g class="mini-snake-bug" fill="#ff6a3d" stroke="#c9542f" stroke-width="1.4">
+                      <path d="M144 76l-6-3M144 80h-7M144 84l-6 3M152 76l6-3M152 80h7M152 84l6 3" />
+                      <ellipse cx="148" cy="81" rx="5" ry="6.5" stroke="none" />
+                      <circle cx="148" cy="73" r="3" stroke="none" />
+                    </g>
+                  </svg>
                 ) : (
                   <svg class="mini-pipes" width="170" height="102" viewBox="0 0 170 102" fill="none" stroke-width="9">
                     <path d="M0 51h34" stroke="#5bbfb5" />
@@ -188,11 +204,51 @@ const icons = {
       <span class="pencil">Progress is saved in this browser only</span>
     </div>
   </dialog>
+
+  <!-- Cabinet 03: Snake -->
+  <dialog class="arcade" data-arcade="snake" aria-labelledby="sn-title">
+    <div class="arcade-bar">
+      <span class="mono" id="sn-title">Cabinet 03 · Snake</span>
+      <span class="arcade-spacer"></span>
+      <button type="button" class="arcade-btn mono" data-sn-pause aria-label="Pause">
+        <span class="arcade-btn-text" data-sn-pause-label>Pause</span>
+        <svg class="arcade-btn-icon" aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" set:html={icons.pause} />
+      </button>
+      <button type="button" class="arcade-btn mono" data-sn-restart aria-label="Restart">
+        <span class="arcade-btn-text">Restart</span>
+        <svg class="arcade-btn-icon" aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" set:html={icons.restart} />
+      </button>
+      <button type="button" class="arcade-btn arcade-btn--icon" data-arcade-close aria-label="Close game">
+        <Icon name="close" size={14} />
+      </button>
+    </div>
+    <div class="arcade-hud mono" aria-live="polite">
+      <span>Score <b data-sn="score">0</b></span>
+      <span>Length <b data-sn="length">4</b></span>
+      <span>Speed <b data-sn="speed" class="hud-signal">1</b></span>
+      <span class="arcade-best">Best <span data-sn="best">0</span></span>
+    </div>
+    <div class="arcade-field snake-field">
+      <canvas data-sn-canvas tabindex="0" aria-label="Snake. Steer with the arrow keys or WASD, start with Space, pause with P."></canvas>
+    </div>
+    <div class="snake-pad" role="group" aria-label="Steer the snake">
+      <button type="button" class="snake-pad-btn" data-sn-dir="up" aria-label="Up"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10l5-5 5 5" /></svg></button>
+      <button type="button" class="snake-pad-btn" data-sn-dir="left" aria-label="Left"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 3L5 8l5 5" /></svg></button>
+      <button type="button" class="snake-pad-btn" data-sn-dir="down" aria-label="Down"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6l5 5 5-5" /></svg></button>
+      <button type="button" class="snake-pad-btn" data-sn-dir="right" aria-label="Right"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3l5 5-5 5" /></svg></button>
+    </div>
+    <div class="arcade-foot mono">
+      <span class="hint-mouse">Arrows or WASD steer · Space starts · P pauses · Esc closes</span>
+      <span class="hint-touch">Swipe on the board or use the pad · tap to start</span>
+      <span class="pencil">Scores are saved in this browser only</span>
+    </div>
+  </dialog>
 </Base>
 
 <script>
   import type { BrickBreaker, Hud } from "../scripts/brick-breaker";
   import type { PipelinePuzzle, PipeHud } from "../scripts/pipeline-puzzle";
+  import type { Dir, SnakeGame, SnakeHud } from "../scripts/snake-game";
 
   const read = (key: string) => {
     try {
@@ -214,6 +270,8 @@ const icons = {
     document.querySelectorAll<HTMLElement>('[data-best="pipeline-puzzle"]').forEach(
       (el) => (el.textContent = cleared ? `${cleared} ${cleared === 1 ? "pipe" : "pipes"} · ${pp.stars} ★` : "—"),
     );
+    const sn = Number(read("snake:best")) || 0;
+    document.querySelectorAll<HTMLElement>('[data-best="snake"]').forEach((el) => (el.textContent = sn ? sn.toLocaleString() : "—"));
   };
   showBest();
 
@@ -304,7 +362,63 @@ const icons = {
     };
   };
 
-  const mounts: Record<string, Mount> = { "brick-breaker": mountBrickBreaker, "pipeline-puzzle": mountPipeline };
+  /** Snake: a canvas game with an on-screen pad for touch screens. */
+  const mountSnake: Mount = async (dialog) => {
+    const canvas = dialog.querySelector<HTMLCanvasElement>("[data-sn-canvas]")!;
+    const el = (k: string) => dialog.querySelector<HTMLElement>(`[data-sn="${k}"]`)!;
+    const pauseBtn = dialog.querySelector<HTMLButtonElement>("[data-sn-pause]")!;
+    const pauseLabel = dialog.querySelector<HTMLElement>("[data-sn-pause-label]")!;
+    const restartBtn = dialog.querySelector<HTMLButtonElement>("[data-sn-restart]")!;
+    const pad = dialog.querySelector<HTMLElement>(".snake-pad")!;
+    const render = (h: SnakeHud) => {
+      el("score").textContent = h.score.toLocaleString();
+      el("length").textContent = String(h.length);
+      el("speed").textContent = String(h.speed);
+      el("best").textContent = h.best.toLocaleString();
+      const paused = h.phase === "paused";
+      pauseLabel.textContent = paused ? "Resume" : "Pause";
+      pauseBtn.setAttribute("aria-label", paused ? "Resume" : "Pause");
+      pauseBtn.disabled = h.phase !== "playing" && !paused;
+    };
+    const { createSnakeGame } = await import("../scripts/snake-game");
+    const game: SnakeGame = createSnakeGame(canvas, render);
+    const onPause = () => {
+      game.togglePause();
+      canvas.focus({ preventScroll: true });
+    };
+    const onRestart = () => {
+      game.restart();
+      canvas.focus({ preventScroll: true });
+    };
+    // The pad steers on press, not on release, so it feels as quick as a key.
+    const onPad = (e: PointerEvent) => {
+      const btn = (e.target as Element).closest<HTMLButtonElement>("[data-sn-dir]");
+      if (!btn) return;
+      e.preventDefault();
+      game.turn(btn.dataset.snDir as Dir);
+    };
+    const onPadKey = (e: MouseEvent) => {
+      // Keyboard "clicks" on a pad button (Enter or Space) have no pointer.
+      const btn = (e.target as Element).closest<HTMLButtonElement>("[data-sn-dir]");
+      if (btn && e.detail === 0) game.turn(btn.dataset.snDir as Dir);
+    };
+    pauseBtn.addEventListener("click", onPause);
+    restartBtn.addEventListener("click", onRestart);
+    pad.addEventListener("pointerdown", onPad);
+    pad.addEventListener("click", onPadKey);
+    canvas.focus({ preventScroll: true });
+    return {
+      destroy() {
+        pauseBtn.removeEventListener("click", onPause);
+        restartBtn.removeEventListener("click", onRestart);
+        pad.removeEventListener("pointerdown", onPad);
+        pad.removeEventListener("click", onPadKey);
+        game.destroy();
+      },
+    };
+  };
+
+  const mounts: Record<string, Mount> = { "brick-breaker": mountBrickBreaker, "pipeline-puzzle": mountPipeline, snake: mountSnake };
 
   const setUrl = (id: string | null) => {
     const url = new URL(location.href);

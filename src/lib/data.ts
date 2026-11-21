@@ -52,12 +52,12 @@ export const GAMES = [
     controls: "Click · tap · arrows + Enter",
   },
   {
-    id: "bug-hunt",
+    id: "snake",
     no: "03",
-    title: "Bug hunt",
-    status: "building",
-    blurb: "Bugs hide in the building's windows. Catch as many as you can in 30 seconds.",
-    controls: "Click or tap",
+    title: "Snake",
+    status: "playable",
+    blurb: "A Python that eats bugs. Every five bugs it gets faster, and a golden bug is worth more for a few seconds.",
+    controls: "Arrows · WASD · swipe",
   },
 ] as const;
 

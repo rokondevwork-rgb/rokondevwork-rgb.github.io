@@ -6246,3 +6246,88 @@ button.pipe-tile:hover {
     text-align: center;
   }
 }
+
+/* ==========================================================================
+   Gaming room: Cabinet 03, Snake
+   ========================================================================== */
+.mini-snake-stripe {
+  animation: pipe-flow 1.6s linear infinite;
+}
+
+.mini-snake-bug {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: mini-bug 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes mini-bug {
+  from {
+    rotate: -6deg;
+  }
+
+  to {
+    rotate: 6deg;
+  }
+}
+
+.snake-field canvas {
+  cursor: default;
+}
+
+/* The pad shows on touch screens only; keys and swipes cover the rest. */
+.snake-pad {
+  display: none;
+  grid-template-columns: repeat(3, 56px);
+  grid-template-rows: repeat(2, 48px);
+  grid-template-areas:
+    ". up ."
+    "left down right";
+  gap: 6px;
+  justify-content: center;
+  padding: 0 calc(16px * var(--s)) calc(12px * var(--s));
+}
+
+.snake-pad-btn {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.snake-pad-btn:active {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.snake-pad-btn[data-sn-dir="up"] {
+  grid-area: up;
+}
+
+.snake-pad-btn[data-sn-dir="left"] {
+  grid-area: left;
+}
+
+.snake-pad-btn[data-sn-dir="down"] {
+  grid-area: down;
+}
+
+.snake-pad-btn[data-sn-dir="right"] {
+  grid-area: right;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .snake-pad {
+    display: grid;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mini-snake-stripe,
+  .mini-snake-bug {
+    animation: none;
+  }
+}
