@@ -1,9 +1,10 @@
 ---
 /**
- * The tool stack as a utility trench: every tool is a pipe in cross-section, grouped by layer.
- * No skill levels; picking a pipe traces what it works with and where it was used.
+ * The tool stack as a utility trench: every tool is a pipe in cross-section, grouped by layer,
+ * and each layer wears the paint colour of the real utility line it resembles. No skill levels.
+ * Picking a pipe draws lines to what it works with; a flow plays a real path through the stack.
  */
-import { TRENCH } from "../lib/data";
+import { TRENCH, TRENCH_FLOWS } from "../lib/data";
 
 interface Props {
   /** The pipe traced when the page loads. */
@@ -11,18 +12,29 @@ interface Props {
 }
 
 const { initial = "FastAPI" } = Astro.props;
-const tools = TRENCH.flatMap((l) => l.tools);
+const tools = TRENCH.flatMap((l) => l.tools.map((t) => ({ ...t, layer: l.layer, paint: l.paint, tone: l.tone })));
 const first = tools.find((t) => t.name === initial) ?? tools[0];
+const toolData = Object.fromEntries(tools.map((t) => [t.name, { works: t.works, used: t.usedIn, layer: t.layer, paint: t.paint, tone: t.tone }]));
 ---
 
 <div class="trench-wrap" data-trench-wrap>
+  <script is:inline type="application/json" data-trench-data set:html={JSON.stringify({ tools: toolData, flows: TRENCH_FLOWS })} />
   <div class="trench has-pick" data-trench>
     <div class="trench-wall trench-wall--l hatch-earth" aria-hidden="true"></div>
-    <div class="trench-body">
+    <div class="trench-body" data-trench-body>
+      <svg class="trench-lines" aria-hidden="true" data-trench-lines>
+        <g data-lines></g>
+        <circle class="trench-packet" r="6" data-packet style="display: none">
+          <animateMotion dur="3.4s" repeatCount="indefinite" path="M0 0" data-motion></animateMotion>
+        </circle>
+      </svg>
       {
-        TRENCH.map(({ layer, tools }) => (
-          <div class="trench-layer">
-            <h3 class="mono">{layer}</h3>
+        TRENCH.map(({ layer, tone, tools }) => (
+          <div class="trench-layer" style={`--pipe: var(--u-${tone})`}>
+            <h3 class="mono">
+              <i class="trench-swatch" aria-hidden="true" />
+              {layer}
+            </h3>
             <ul class="pipes" role="list">
               {tools.map((tool) => (
                 <li>
@@ -30,9 +42,6 @@ const first = tools.find((t) => t.name === initial) ?? tools[0];
                     type="button"
                     class="pipe"
                     data-name={tool.name}
-                    data-works={tool.works.join("|")}
-                    data-used={tool.usedIn}
-                    data-storage={tool.storage ? "" : undefined}
                     data-linked={first.works.includes(tool.name) ? "" : undefined}
                     aria-pressed={tool.name === first.name ? "true" : "false"}
                   >
@@ -50,56 +59,197 @@ const first = tools.find((t) => t.name === initial) ?? tools[0];
     <div class="trench-wall trench-wall--r hatch-earth" aria-hidden="true"></div>
   </div>
 
-  <aside class="pipe-panel" aria-live="polite" aria-label="Selected tool">
-    <span class="mono pencil">Selected pipe</span>
-    <span class="sign" data-pipe-name>{first.name}</span>
-    <dl>
-      <div>
-        <dt class="mono pencil">Works with</dt>
-        <dd>
-          <ul class="tags mono" role="list" data-pipe-works>
-            {first.works.map((w) => <li>{w}</li>)}
-          </ul>
-        </dd>
+  <aside class="pipe-panel" aria-label="Selected tool">
+    <div class="pipe-panel-live" aria-live="polite">
+      <span class="mono pencil" data-pipe-kicker>Selected pipe</span>
+      <span class="sign" data-pipe-name>{first.name}</span>
+      <span class="mono pipe-paint" data-pipe-paint style={`--pipe: var(--u-${first.tone})`}><i aria-hidden="true"></i><span>{first.layer} · {first.paint.split(" · ")[0]}</span></span>
+      <dl data-pipe-info>
+        <div>
+          <dt class="mono pencil">Works with</dt>
+          <dd>
+            <ul class="tags mono" role="list" data-pipe-works>
+              {first.works.map((w) => <li>{w}</li>)}
+            </ul>
+          </dd>
+        </div>
+        <div>
+          <dt class="mono pencil">Used in</dt>
+          <dd data-pipe-used>{first.usedIn}</dd>
+        </div>
+      </dl>
+      <ol class="flow-steps" role="list" data-flow-steps hidden></ol>
+    </div>
+    <div class="flow-picker">
+      <span class="mono pencil">Trace a flow</span>
+      <div class="flow-btns">
+        {
+          TRENCH_FLOWS.map((f) => (
+            <button type="button" class="flow-btn" data-flow={f.id} aria-pressed="false">
+              <span class="mono">{f.name}</span>
+              <span>{f.hint}</span>
+            </button>
+          ))
+        }
       </div>
-      <div>
-        <dt class="mono pencil">Used in</dt>
-        <dd data-pipe-used>{first.usedIn}</dd>
-      </div>
-    </dl>
-    <p class="legend mono">
-      <span><i></i>Selected</span>
-      <span><i class="teal"></i>Connected or storage</span>
-    </p>
+    </div>
   </aside>
 </div>
 
 <script>
-  for (const wrap of document.querySelectorAll<HTMLElement>("[data-trench-wrap]")) {
-    const pipes = [...wrap.querySelectorAll<HTMLButtonElement>(".pipe")];
-    const name = wrap.querySelector<HTMLElement>("[data-pipe-name]");
-    const works = wrap.querySelector<HTMLElement>("[data-pipe-works]");
-    const used = wrap.querySelector<HTMLElement>("[data-pipe-used]");
+  type ToolInfo = { works: string[]; used: string; layer: string; paint: string; tone: string };
+  type Flow = { id: string; name: string; hint: string; steps: { tool: string; what: string }[] };
+  const SVG = "http://www.w3.org/2000/svg";
 
-    wrap.addEventListener("click", (event) => {
-      const pipe = (event.target as Element).closest<HTMLButtonElement>(".pipe");
-      if (!pipe) return;
-      const linked = (pipe.dataset.works ?? "").split("|").filter(Boolean);
-      for (const p of pipes) {
-        p.setAttribute("aria-pressed", String(p === pipe));
-        p.toggleAttribute("data-linked", linked.includes(p.dataset.name ?? ""));
+  for (const wrap of document.querySelectorAll<HTMLElement>("[data-trench-wrap]")) {
+    const data = JSON.parse(wrap.querySelector("[data-trench-data]")?.textContent ?? "{}") as {
+      tools: Record<string, ToolInfo>;
+      flows: Flow[];
+    };
+    const body = wrap.querySelector<HTMLElement>("[data-trench-body]")!;
+    const svg = wrap.querySelector<SVGSVGElement>("[data-trench-lines]")!;
+    const group = svg.querySelector<SVGGElement>("[data-lines]")!;
+    const packet = svg.querySelector<SVGCircleElement>("[data-packet]")!;
+    const motion = svg.querySelector<SVGAnimateMotionElement>("[data-motion]")!;
+    const pipes = [...wrap.querySelectorAll<HTMLButtonElement>(".pipe")];
+    const flowBtns = [...wrap.querySelectorAll<HTMLButtonElement>("[data-flow]")];
+    const kicker = wrap.querySelector<HTMLElement>("[data-pipe-kicker]")!;
+    const name = wrap.querySelector<HTMLElement>("[data-pipe-name]")!;
+    const paint = wrap.querySelector<HTMLElement>("[data-pipe-paint]")!;
+    const info = wrap.querySelector<HTMLElement>("[data-pipe-info]")!;
+    const works = wrap.querySelector<HTMLElement>("[data-pipe-works]")!;
+    const used = wrap.querySelector<HTMLElement>("[data-pipe-used]")!;
+    const steps = wrap.querySelector<HTMLOListElement>("[data-flow-steps]")!;
+    const still = matchMedia("(prefers-reduced-motion: reduce)");
+
+    let sel = pipes.find((p) => p.getAttribute("aria-pressed") === "true")?.dataset.name ?? "";
+    let flow: Flow | null = null;
+
+    const centre = (tool: string) => {
+      const ring = pipes.find((p) => p.dataset.name === tool)?.querySelector(".pipe-ring");
+      if (!ring) return null;
+      const r = ring.getBoundingClientRect();
+      const b = body.getBoundingClientRect();
+      return { x: r.left - b.left + r.width / 2, y: r.top - b.top + r.height / 2 };
+    };
+    const curve = (a: { x: number; y: number }, b: { x: number; y: number }) => {
+      const my = (a.y + b.y) / 2;
+      return `M${a.x.toFixed(1)} ${a.y.toFixed(1)} C${a.x.toFixed(1)} ${my.toFixed(1)} ${b.x.toFixed(1)} ${my.toFixed(1)} ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
+    };
+
+    // Lines are measured from the rings on screen, so they follow every layout and resize.
+    const draw = () => {
+      svg.setAttribute("width", String(body.clientWidth));
+      svg.setAttribute("height", String(body.clientHeight));
+      const paths: { d: string; cls: string }[] = [];
+      let route = "";
+      if (flow) {
+        const pts = flow.steps.map((s) => centre(s.tool));
+        for (let k = 0; k < pts.length - 1; k++) {
+          const a = pts[k], b = pts[k + 1];
+          if (!a || !b) continue;
+          const d = curve(a, b);
+          paths.push({ d, cls: "trench-line trench-line--flow" });
+          route += k ? d.replace(/^M[^C]+/, "") : d;
+        }
+      } else {
+        const from = centre(sel);
+        for (const w of data.tools[sel]?.works ?? []) {
+          const to = centre(w);
+          if (from && to) paths.push({ d: curve(from, to), cls: "trench-line" });
+        }
       }
-      if (name) name.textContent = pipe.dataset.name ?? "";
-      if (used) used.textContent = pipe.dataset.used ?? "";
-      if (works) {
-        works.replaceChildren(
-          ...linked.map((w) => {
+      group.replaceChildren(
+        ...paths.map(({ d, cls }) => {
+          const p = document.createElementNS(SVG, "path");
+          p.setAttribute("d", d);
+          p.setAttribute("class", cls);
+          return p;
+        }),
+      );
+      const moving = !!route && !still.matches;
+      packet.style.display = moving ? "" : "none";
+      if (moving && motion.getAttribute("path") !== route) {
+        motion.setAttribute("path", route);
+        motion.setAttribute("dur", `${(flow!.steps.length - 1) * 1.1}s`);
+        try {
+          motion.beginElement();
+        } catch {
+          /* SMIL not running yet; it starts on its own. */
+        }
+      }
+    };
+
+    const render = () => {
+      const linked = new Set(flow ? [] : (data.tools[sel]?.works ?? []));
+      const order = flow ? flow.steps.map((s) => s.tool) : [];
+      for (const p of pipes) {
+        const n = p.dataset.name ?? "";
+        const step = order.indexOf(n);
+        p.setAttribute("aria-pressed", String(!flow && n === sel));
+        p.toggleAttribute("data-linked", linked.has(n));
+        if (step >= 0) p.dataset.step = String(step + 1);
+        else delete p.dataset.step;
+        p.style.setProperty("--k", String(Math.max(step, 0)));
+      }
+      for (const b of flowBtns) b.setAttribute("aria-pressed", String(flow?.id === b.dataset.flow));
+      wrap.querySelector("[data-trench]")?.classList.toggle("is-flowing", !!flow);
+
+      info.hidden = !!flow;
+      steps.hidden = !flow;
+      if (flow) {
+        kicker.textContent = "Playing a flow";
+        name.textContent = flow.name;
+        paint.hidden = true;
+        steps.replaceChildren(
+          ...flow.steps.map((s, k) => {
             const li = document.createElement("li");
-            li.textContent = w;
+            li.style.setProperty("--k", String(k));
+            const no = document.createElement("span");
+            no.className = "mono";
+            no.textContent = `${String(k + 1).padStart(2, "0")} · ${s.tool}`;
+            li.append(no, document.createTextNode(s.what));
             return li;
           }),
         );
+      } else {
+        const t = data.tools[sel];
+        kicker.textContent = "Selected pipe";
+        name.textContent = sel;
+        paint.hidden = false;
+        if (t) {
+          paint.style.setProperty("--pipe", `var(--u-${t.tone})`);
+          paint.querySelector("span")!.textContent = `${t.layer} · ${t.paint.split(" · ")[0]}`;
+          used.textContent = t.used;
+          works.replaceChildren(
+            ...t.works.map((w) => {
+              const li = document.createElement("li");
+              li.textContent = w;
+              return li;
+            }),
+          );
+        }
+      }
+      draw();
+    };
+
+    wrap.addEventListener("click", (event) => {
+      const target = event.target as Element;
+      const pipe = target.closest<HTMLButtonElement>(".pipe");
+      const btn = target.closest<HTMLButtonElement>("[data-flow]");
+      if (pipe) {
+        sel = pipe.dataset.name ?? sel;
+        flow = null;
+        render();
+      } else if (btn) {
+        flow = flow?.id === btn.dataset.flow ? null : (data.flows.find((f) => f.id === btn.dataset.flow) ?? null);
+        render();
       }
     });
+
+    new ResizeObserver(draw).observe(body);
+    still.addEventListener("change", draw);
+    document.fonts?.ready.then(draw);
+    render();
   }
 </script>

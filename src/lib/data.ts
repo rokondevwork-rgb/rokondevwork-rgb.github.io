@@ -104,32 +104,58 @@ export const MACHINES = [
 /** B3: every tool is a pipe; what matters is what it connects to and where it was used. */
 export interface Tool {
   name: string;
-  /** Storage is drawn in teal: anything that holds data at rest. */
-  storage?: boolean;
   works: string[];
   usedIn: string;
 }
 
-export const TRENCH: { layer: string; tools: Tool[] }[] = [
+/**
+ * Each layer is painted like the real utility line it resembles (the colour code used to mark
+ * lines under a street). `tone` picks the CSS colour: var(--u-<tone>).
+ */
+export const TRENCH: { layer: string; tone: string; paint: string; tools: Tool[] }[] = [
   {
     layer: "Languages",
+    tone: "white",
+    paint: "White · where the dig starts",
     tools: [
-      { name: "Python", works: ["FastAPI", "Django", "Flask", "SQLAlchemy", "Pandas"], usedIn: "Every project on this site." },
-      { name: "JavaScript", works: ["React.js", "Next.js", "Astro"], usedIn: "Rentor, AdvocateHub, and this portfolio." },
+      { name: "Python", works: ["FastAPI", "Django", "Flask", "Pandas", "Apache Flink"], usedIn: "Every project on this site." },
+      { name: "JavaScript", works: ["React", "Next.js", "Astro"], usedIn: "Rentor, AdvocateHub, and this portfolio." },
     ],
   },
   {
-    layer: "Frameworks",
+    layer: "Frontend",
+    tone: "orange",
+    paint: "Orange · communication",
     tools: [
-      { name: "FastAPI", works: ["SQLAlchemy", "MySQL", "PostgreSQL", "Redis", "Docker"], usedIn: "Hotel Content API, PMS, InnHoSel, AdvocateHub, Passport Scanner." },
-      { name: "Django", works: ["PostgreSQL", "Python"], usedIn: "Rentor, ConvaterPro." },
-      { name: "Flask", works: ["Python"], usedIn: "In my toolkit; no public project to show yet." },
+      { name: "React", works: ["JavaScript", "Next.js"], usedIn: "GorillaMove: frontend components and features." },
+      { name: "Next.js", works: ["React", "FastAPI", "JavaScript"], usedIn: "InnHoSel and ConvaterPro dashboards." },
       { name: "Astro", works: ["JavaScript", "TypeScript", "Markdown", "GitHub Actions"], usedIn: "This portfolio: case studies, the blog and the self-updating news page." },
-      { name: "Celery", works: ["Redis", "FastAPI", "AI automation"], usedIn: "AdvocateHub: reminders, file scans, reports." },
     ],
   },
   {
-    layer: "Data",
+    layer: "Backend",
+    tone: "red",
+    paint: "Red · power",
+    tools: [
+      { name: "FastAPI", works: ["Next.js", "SQLAlchemy", "MySQL", "PostgreSQL", "Redis", "Kafka", "Celery", "Docker"], usedIn: "Hotel Content API, PMS, InnHoSel, AdvocateHub, Passport Scanner, ConvaterPro." },
+      { name: "Django", works: ["PostgreSQL", "Python", "MailHog"], usedIn: "Rentor." },
+      { name: "Flask", works: ["Python"], usedIn: "In my toolkit; no public project to show yet." },
+      { name: "Celery", works: ["Redis", "FastAPI", "MailHog", "AI automation"], usedIn: "AdvocateHub: reminders, file scans, reports." },
+    ],
+  },
+  {
+    layer: "Streaming",
+    tone: "yellow",
+    paint: "Yellow · gas under pressure",
+    tools: [
+      { name: "Kafka", works: ["FastAPI", "Apache Flink", "Docker"], usedIn: "In my toolkit; no public project to show yet." },
+      { name: "Apache Flink", works: ["Kafka", "MinIO", "PostgreSQL", "Python"], usedIn: "In my toolkit; no public project to show yet." },
+    ],
+  },
+  {
+    layer: "Data & AI",
+    tone: "purple",
+    paint: "Purple · reclaimed",
     tools: [
       { name: "SQLAlchemy", works: ["FastAPI", "MySQL", "PostgreSQL"], usedIn: "Hotel Content API, PMS." },
       { name: "Pandas", works: ["Python"], usedIn: "In my toolkit; no public project to show yet." },
@@ -139,19 +165,84 @@ export const TRENCH: { layer: string; tools: Tool[] }[] = [
   },
   {
     layer: "Storage",
+    tone: "blue",
+    paint: "Blue · held water",
     tools: [
-      { name: "MySQL", storage: true, works: ["FastAPI", "SQLAlchemy"], usedIn: "Hotel Content API, InnHoSel, AdvocateHub." },
-      { name: "PostgreSQL", storage: true, works: ["Django", "SQLAlchemy", "FastAPI"], usedIn: "PMS, Rentor, ConvaterPro." },
-      { name: "Redis", storage: true, works: ["FastAPI", "Celery"], usedIn: "Hotel Content API, AdvocateHub." },
-      { name: "DynamoDB", storage: true, works: ["AWS"], usedIn: "Artixcore Inc, 2023–24." },
+      { name: "MySQL", works: ["FastAPI", "SQLAlchemy"], usedIn: "Hotel Content API, InnHoSel, AdvocateHub." },
+      { name: "PostgreSQL", works: ["Django", "SQLAlchemy", "FastAPI", "Apache Flink"], usedIn: "PMS, Rentor, ConvaterPro." },
+      { name: "Redis", works: ["FastAPI", "Celery"], usedIn: "Hotel Content API, AdvocateHub." },
+      { name: "MinIO", works: ["Apache Flink", "Docker", "AWS"], usedIn: "In my toolkit; no public project to show yet." },
+      { name: "DynamoDB", works: ["AWS"], usedIn: "Artixcore Inc, 2023–24." },
     ],
   },
   {
-    layer: "Infra",
+    layer: "DevOps",
+    tone: "green",
+    paint: "Green · drains it all away",
     tools: [
-      { name: "Docker", works: ["FastAPI", "Redis", "MySQL"], usedIn: "Hotel Content API, AdvocateHub." },
-      { name: "AWS", works: ["DynamoDB", "Python"], usedIn: "Artixcore Inc: Lambda, API Gateway, EC2." },
-      { name: "Linux", works: ["Python", "FastAPI"], usedIn: "InnHoSel." },
+      { name: "Docker", works: ["FastAPI", "Redis", "MySQL", "Kafka", "MinIO", "MailHog", "GitHub Actions"], usedIn: "Hotel Content API, AdvocateHub." },
+      { name: "Linux", works: ["Docker", "Python", "FastAPI"], usedIn: "InnHoSel." },
+      { name: "AWS", works: ["DynamoDB", "MinIO", "Docker", "Python"], usedIn: "Artixcore Inc: Lambda, API Gateway, EC2." },
+    ],
+  },
+  {
+    layer: "Tools",
+    tone: "pink",
+    paint: "Pink · survey marks",
+    tools: [
+      { name: "Git", works: ["GitHub"], usedIn: "Every project on this site." },
+      { name: "GitHub", works: ["Git", "GitHub Actions"], usedIn: "Every project on this site." },
+      { name: "GitHub Actions", works: ["GitHub", "Docker", "Astro"], usedIn: "This portfolio: builds the site and refreshes the news page." },
+      { name: "MailHog", works: ["Django", "Celery", "Docker"], usedIn: "In my toolkit; no public project to show yet." },
+    ],
+  },
+];
+
+/** B3: real paths through the stack, played step by step along the trench. */
+export const TRENCH_FLOWS: { id: string; name: string; hint: string; steps: { tool: string; what: string }[] }[] = [
+  {
+    id: "api",
+    name: "API request",
+    hint: "A page asks for a hotel",
+    steps: [
+      { tool: "Next.js", what: "The page asks for a hotel." },
+      { tool: "FastAPI", what: "Checks the key and builds the query." },
+      { tool: "Redis", what: "A cache hit answers at once." },
+      { tool: "MySQL", what: "On a miss, the record is read here." },
+    ],
+  },
+  {
+    id: "stream",
+    name: "Event stream",
+    hint: "Supplier updates, live",
+    steps: [
+      { tool: "FastAPI", what: "Publishes each supplier update." },
+      { tool: "Kafka", what: "Keeps the updates in order on a topic." },
+      { tool: "Apache Flink", what: "Cleans and joins them as they arrive." },
+      { tool: "MinIO", what: "Stores the result as files." },
+    ],
+  },
+  {
+    id: "mail",
+    name: "Mail in dev",
+    hint: "No real inbox gets test mail",
+    steps: [
+      { tool: "FastAPI", what: "A user action needs an email." },
+      { tool: "Celery", what: "Sends it in the background." },
+      { tool: "Redis", what: "Queues the task." },
+      { tool: "MailHog", what: "Catches the email so it can be checked." },
+    ],
+  },
+  {
+    id: "ship",
+    name: "Ship it",
+    hint: "From commit to server",
+    steps: [
+      { tool: "Git", what: "A commit on a branch." },
+      { tool: "GitHub", what: "Pull request and review." },
+      { tool: "GitHub Actions", what: "Tests and builds." },
+      { tool: "Docker", what: "Packs the image." },
+      { tool: "AWS", what: "Runs it." },
     ],
   },
 ];
