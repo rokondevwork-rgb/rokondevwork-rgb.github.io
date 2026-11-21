@@ -755,6 +755,55 @@ button {
   color: var(--ink);
 }
 
+/* The flag on the roof: its pole stands on the top of the building's spire (x 52, y 8). */
+.street-flag {
+  position: absolute;
+  left: calc(84px * var(--s) + calc(51px * var(--s)));
+  top: calc(var(--ground) - calc(214px * var(--s)) + calc(8px * var(--s)) - calc(50px * var(--s)));
+  width: calc(40px * var(--s));
+  height: calc(50px * var(--s));
+  overflow: visible;
+  color: var(--ink);
+}
+
+.street-flag .flag-wave {
+  animation: flag-wave 1.6s ease-in-out infinite alternate;
+  animation-delay: calc(var(--k) * -0.11s);
+}
+
+/* Each strip's light and shade follows its own rise and fall, so the folds read as cloth. */
+.street-flag .flag-shade {
+  fill: #000;
+  opacity: 0;
+  animation: flag-shade 1.6s ease-in-out infinite alternate;
+  animation-delay: calc(var(--k) * -0.11s);
+}
+
+@keyframes flag-wave {
+  from {
+    translate: 0 calc(var(--a) * -1);
+  }
+  to {
+    translate: 0 var(--a);
+  }
+}
+
+@keyframes flag-shade {
+  from {
+    opacity: 0.2;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .street-flag .flag-wave,
+  .street-flag .flag-shade {
+    animation: none;
+  }
+}
+
 /* Windows: plain outlines that light up one at a time (script in index.astro). */
 .street-building .win {
   fill: transparent;
@@ -3909,6 +3958,7 @@ button {
 
   /* No room for the building beside the name on a phone: only the survey label stays above ground. */
   .street-building,
+  .street-flag,
   .street-callout,
   .survey-post {
     display: none;

@@ -27,6 +27,10 @@ const machineTones = ["var(--h-teal)", "var(--h-clay)", "var(--h-indigo)", "var(
 const pileTones = ["#ece6da", "#f2b48f", "#9fd3cb"];
 const whatsapp = `https://wa.me/${CONTACT.whatsapp.number}`;
 const year = new Date().getFullYear();
+
+// The roof flag is cut into this many strips; each one moves a little after the one before it.
+const stripW = 2;
+const flagStrips = Array.from({ length: 15 }, (_, k) => k);
 ---
 
 <Base home snap>
@@ -53,6 +57,35 @@ const year = new Date().getFullYear();
         <rect class="win" x="70" y="148" width="12" height="14"></rect>
         <path d="M42 214V182H62V214"></path>
       </g>
+    </svg>
+    <!-- Bangladesh flag on the roof. Cut into thin vertical strips that rise and fall one after
+         another, so a wave runs from the pole to the free end, like cloth in the wind. -->
+    <svg class="street-flag" viewBox="0 0 40 50" aria-hidden="true">
+      <defs>
+        <g id="bd-flag">
+          <rect x="2" y="4" width="30" height="18" fill="#006a4e"></rect>
+          <circle cx="15.5" cy="13" r="6" fill="#f42a41"></circle>
+        </g>
+        {
+          flagStrips.map((k) => (
+            <clipPath id={`bd-strip-${k}`}>
+              <rect x={2 + k * stripW} y="-4" width={stripW + 0.35} height="34"></rect>
+            </clipPath>
+          ))
+        }
+      </defs>
+      <path class="flag-pole" d="M1 3.5V50" stroke="currentColor" stroke-width="1.2"></path>
+      <circle cx="1" cy="2.2" r="1.4" fill="currentColor"></circle>
+      {
+        flagStrips.map((k) => (
+          <g clip-path={`url(#bd-strip-${k})`}>
+            <g class="flag-wave" style={`--k: ${k}; --a: ${(0.35 + (k / flagStrips.length) * 2.4).toFixed(2)}px`}>
+              <use href="#bd-flag"></use>
+              <rect class="flag-shade" x="2" y="4" width="30" height="18"></rect>
+            </g>
+          </g>
+        ))
+      }
     </svg>
     <span class="street-callout mono" aria-hidden="true">What clients see</span>
 
