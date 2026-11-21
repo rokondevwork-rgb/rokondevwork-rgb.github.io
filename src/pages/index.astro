@@ -8,6 +8,7 @@ import Base from "../layouts/Base.astro";
 import AboutIntro from "../components/AboutIntro.astro";
 import CopyButton from "../components/CopyButton.astro";
 import CoreSample from "../components/CoreSample.astro";
+import Foundations from "../components/Foundations.astro";
 import Icon from "../components/Icon.astro";
 import Level from "../components/Level.astro";
 import Logo from "../components/Logo.astro";
@@ -16,7 +17,7 @@ import Trench from "../components/Trench.astro";
 import VisitCount from "../components/VisitCount.astro";
 import VaultPlan from "../components/VaultPlan.astro";
 import { CONTACT, SITE } from "../consts";
-import { FLOORS, MACHINES, PILE_LOADS, PILE_PROOFS, PRINCIPLES } from "../lib/data";
+import { FLOORS, MACHINES } from "../lib/data";
 import { getFeaturedProjects, getProjects } from "../lib/content";
 
 const [L0, B1, B2, B3, B4, B5, B6, B7, B8] = FLOORS;
@@ -26,7 +27,6 @@ const dig = projects.find((p) => p.data.problem) ?? featured[0];
 // Sample data for B5's animated excavation (only when the project has it).
 const ex = dig?.data.excavation;
 const machineTones = ["var(--h-teal)", "var(--h-clay)", "var(--h-indigo)", "var(--h-mulberry)"];
-const pileTones = ["#ece6da", "#f2b48f", "#9fd3cb"];
 const whatsapp = `https://wa.me/${CONTACT.whatsapp.number}`;
 const year = new Date().getFullYear();
 
@@ -370,81 +370,7 @@ const flagStrips = Array.from({ length: 15 }, (_, k) => k);
   <!-- B7 · Philosophy: the principles are the piles everything stands on. A pile driver drives
        one every 3 s (a 9 s loop while the floor is on screen) and each pile shows its proof. -->
   <Level floor={B7} title="Foundations" sub="Engineering philosophy. <em>Three piles I drive before I build anything on top.</em>" band="none" bedrock tone="var(--chalk)" numTone="var(--graphite)" class="lvl--piles">
-    <div class="pile-stage">
-      <div class="pile-site" data-pile-site>
-        <div class="pile-loads mono" aria-hidden="true">
-          {
-            PILE_LOADS.map((load, k) => (
-              <span style={`--k: ${k}`}>
-                {load}
-                <i>↓</i>
-              </span>
-            ))
-          }
-        </div>
-        <span class="pile-driver mono" aria-hidden="true"><span>Pile driver</span></span>
-        <div class="pile-cap mono" aria-hidden="true"><span>Pile cap · everything I build rests here</span></div>
-        {PRINCIPLES.map((_, i) => <span class="pile-thud" style={`--step: ${i}; left: var(--c${i})`} aria-hidden="true" />)}
-        <ol class="piles piles--live" role="list">
-          {
-            PRINCIPLES.map((p, i) => {
-              const proof = PILE_PROOFS[i];
-              return (
-                <li class="pile" style={`--step: ${i}`}>
-                  <span class="mono pencil pile-no"><i class="pile-led" aria-hidden="true" />Pile {String(i + 1).padStart(2, "0")}</span>
-                  <h3 class="serif"><span class="reveal" style={`--fill: ${pileTones[i]}`}>{p.title}</span></h3>
-                  <p>{p.text}</p>
-                  {proof?.kind === "validator" && (
-                    <div class="pile-proof mono">
-                      <span class="pile-proof-title">{proof.title}</span>
-                      {proof.rows.map((r, k) => (
-                        <span class:list={["proof-row", { "is-bad": !r.ok }]} style={`--k: ${k}`}>
-                          <span class="proof-raw">{r.raw}</span>
-                          <span class="proof-out">{r.ok ? `→ ${r.clean} ✓` : `✕ ${r.clean}`}</span>
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  {proof?.kind === "profile" && (
-                    <div class="pile-proof mono">
-                      <span class="pile-proof-title">{proof.title}</span>
-                      <span class="proof-bar-label">{proof.before}<span class="proof-bar proof-bar--slow" /></span>
-                      <span class="proof-fix">{proof.fix}</span>
-                      <span class="proof-bar-label">{proof.after}<span class="proof-bar proof-bar--fast" /></span>
-                      <span class="proof-note">{proof.note}</span>
-                    </div>
-                  )}
-                  {proof?.kind === "review" && (
-                    <div class="pile-proof mono">
-                      <span class="pile-proof-title">{proof.title}</span>
-                      {proof.ticks.map((t, k) => (
-                        <span class="proof-tick" style={`--k: ${k}`}><b>✓</b> {t}</span>
-                      ))}
-                      <span class="proof-update">{proof.update}</span>
-                    </div>
-                  )}
-                </li>
-              );
-            })
-          }
-        </ol>
-        <div class="bedrock mono" aria-hidden="true"><span>Load-bearing · bedrock</span></div>
-      </div>
-      <aside class="pile-test mono" aria-label="Load test">
-        <p class="pile-test-head">Load test <span aria-hidden="true">●</span></p>
-        <ol>
-          {
-            PRINCIPLES.map((p, i) => (
-              <li style={`--step: ${i}`}>
-                <i class="pile-led" aria-hidden="true" />
-                <span><span class="pencil">Pile {String(i + 1).padStart(2, "0")}</span><br />{p.title}</span>
-              </li>
-            ))
-          }
-        </ol>
-        <p class="pile-test-foot">Load held on all three piles</p>
-      </aside>
-    </div>
+    <Foundations />
   </Level>
 
   <!-- B8 · Contact -->
@@ -482,31 +408,6 @@ const flagStrips = Array.from({ length: 15 }, (_, k) => k);
 </Base>
 
 <script>
-  // B7: tell the pile driver where the piles are, and drive them only while the floor is on screen.
-  {
-    const site = document.querySelector<HTMLElement>("[data-pile-site]");
-    const section = site?.closest<HTMLElement>(".lvl");
-    if (site && section) {
-      const place = () => {
-        const sr = site.getBoundingClientRect();
-        site.querySelectorAll<HTMLElement>(".piles--live > .pile").forEach((pile, k) => {
-          const r = pile.getBoundingClientRect();
-          site.style.setProperty(`--c${k}`, `${r.left - sr.left + r.width / 2}px`);
-        });
-      };
-      place();
-      new ResizeObserver(place).observe(site);
-      const still = matchMedia("(prefers-reduced-motion: reduce)");
-      new IntersectionObserver(
-        ([entry]) => {
-          section.classList.toggle("is-playing", entry.isIntersecting && !still.matches);
-          if (entry.isIntersecting) place();
-        },
-        { threshold: 0.45 },
-      ).observe(section);
-    }
-  }
-
   // B5: play the excavation loop while the floor is on screen, and tell the drill and the
   // request packet where the layers and the architecture boxes are.
   {

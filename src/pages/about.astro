@@ -2,13 +2,13 @@
 import Base from "../layouts/Base.astro";
 import AboutIntro from "../components/AboutIntro.astro";
 import CoreSample from "../components/CoreSample.astro";
+import Foundations from "../components/Foundations.astro";
 import Icon from "../components/Icon.astro";
 import Level from "../components/Level.astro";
 import Trench from "../components/Trench.astro";
-import { FLOORS, PRINCIPLES } from "../lib/data";
+import { FLOORS } from "../lib/data";
 
 const floor = (code: string) => FLOORS.find((f) => f.code === code)!;
-const pileTones = ["#ece6da", "#f2b48f", "#9fd3cb"];
 ---
 
 <Base
@@ -33,19 +33,8 @@ const pileTones = ["#ece6da", "#f2b48f", "#9fd3cb"];
     <Trench />
   </Level>
 
-  <Level floor={{ ...floor("B7"), id: "principles" }} title="Foundations" sub="How I work. <em>Three things I don’t compromise on.</em>" band="none" bedrock tone="var(--chalk)" numTone="var(--h-clay)">
-    <ol class="piles" role="list">
-      {
-        PRINCIPLES.map((p, i) => (
-          <li class="pile">
-            <span class="mono pencil">Pile {String(i + 1).padStart(2, "0")}</span>
-            <h3 class="serif"><span class="reveal" style={`--fill: ${pileTones[i]}`}>{p.title}</span></h3>
-            <p>{p.text}</p>
-          </li>
-        ))
-      }
-    </ol>
-    <div class="bedrock mono" aria-hidden="true"><span>Load-bearing · bedrock</span></div>
+  <Level floor={{ ...floor("B7"), id: "principles" }} title="Foundations" sub="How I work. <em>Three piles I drive before I build anything on top.</em>" band="none" bedrock tone="var(--chalk)" numTone="var(--graphite)" class="lvl--piles">
+    <Foundations />
     <a class="out-link" href="/contact/">Have a Backend Problem? Get in Touch <Icon name="right" /></a>
   </Level>
 </Base>
