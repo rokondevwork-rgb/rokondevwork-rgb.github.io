@@ -16,13 +16,15 @@ import Trench from "../components/Trench.astro";
 import VisitCount from "../components/VisitCount.astro";
 import VaultPlan from "../components/VaultPlan.astro";
 import { CONTACT, SITE } from "../consts";
-import { FLOORS, MACHINES, PRINCIPLES } from "../lib/data";
+import { FLOORS, MACHINES, PILE_LOADS, PILE_PROOFS, PRINCIPLES } from "../lib/data";
 import { getFeaturedProjects, getProjects } from "../lib/content";
 
 const [L0, B1, B2, B3, B4, B5, B6, B7, B8] = FLOORS;
 const featured = await getFeaturedProjects();
 const projects = await getProjects();
 const dig = projects.find((p) => p.data.problem) ?? featured[0];
+// Sample data for B5's animated excavation (only when the project has it).
+const ex = dig?.data.excavation;
 const machineTones = ["var(--h-teal)", "var(--h-clay)", "var(--h-indigo)", "var(--h-mulberry)"];
 const pileTones = ["#ece6da", "#f2b48f", "#9fd3cb"];
 const whatsapp = `https://wa.me/${CONTACT.whatsapp.number}`;
@@ -193,47 +195,169 @@ const flagStrips = Array.from({ length: 15 }, (_, k) => k);
     <a class="out-link" href="/projects/">All {projects.length} Projects <Icon name="right" /></a>
   </Level>
 
-  <!-- B5 · Case study preview -->
+  <!-- B5 · Case study preview. With `excavation` sample data, one request is followed down
+       the five layers in a 10 s loop that plays while the floor is on screen. -->
   {
     dig && (
-      <Level floor={B5} title="Excavation sheet" sub={`Case studies are dug in five layers. Here’s ${dig.data.title}.`} band="earth" tone="var(--h-indigo)">
-        <div class="dig">
-          {dig.data.problem && (
-            <div class="dig-row">
-              <div class="dig-label mono">01 · Surface<span class="pencil">The problem</span></div>
-              <p class="dig-body serif"><span class="reveal" style="--fill: var(--h-indigo)">{dig.data.problem}</span></p>
-            </div>
-          )}
-          {dig.data.constraints && (
-            <div class="dig-row hatch-gravel">
-              <div class="dig-label mono">02 · Topsoil<span class="pencil">Constraints</span></div>
-              <p class="dig-body mono"><span>{dig.data.constraints.map((c) => c.value).join(" · ")}</span></p>
-            </div>
-          )}
-          {dig.data.architecture && (
-            <div class="dig-row">
-              <div class="dig-label mono">03 · Structure<span class="pencil">Architecture</span></div>
-              <div class="dig-body">
-                <ol class="chain mono">
-                  {dig.data.architecture.map((n) => (
-                    <li class={`is-${n.kind}`}><span>{n.name}</span></li>
-                  ))}
-                </ol>
+      <Level
+        floor={B5}
+        title="Excavation sheet"
+        sub={ex ? `Case studies are dug in five layers. Watch one request go through ${dig.data.title}.` : `Case studies are dug in five layers. Here’s ${dig.data.title}.`}
+        band="earth"
+        tone="var(--h-indigo)"
+        class={ex ? "lvl--dig-live" : undefined}
+      >
+        {ex && (
+          <span class="drill" aria-hidden="true" data-drill>
+            <span class="drill-shank" />
+            <svg viewBox="0 0 26 24"><g class="drill-bit"><path d="M2 2h22L13 23z" /><path class="drill-groove" d="M6 6h14M9 12h8" /></g></svg>
+          </span>
+        )}
+        <div class:list={["dig-stage", { "dig-stage--live": ex }]}>
+          <div class:list={["dig", { "dig--live": ex }]} data-dig-live={ex ? "" : undefined}>
+            {dig.data.problem && (
+              <div class="dig-row" style="--step: 0">
+                <div class="dig-label mono">01 · Surface<span class="pencil">The problem</span>{ex && <span class="dig-now">● digging</span>}</div>
+                <div class="dig-body">
+                  <p class="serif"><span class="reveal" style="--fill: var(--h-indigo)">{dig.data.problem}</span></p>
+                  {ex && (
+                    <div class="dig-merge mono" aria-label={`${ex.raw.length} supplier spellings become one record: ${ex.clean}`}>
+                      {ex.raw.map((r, k) => (
+                        <span class="dig-raw" style={`--k: ${k}`} aria-hidden="true">{r.supplier} · {r.text}</span>
+                      ))}
+                      <svg class="dig-arrow" viewBox="0 0 34 12" aria-hidden="true"><path d="M0 6h30M25 1l5 5-5 5" /></svg>
+                      <span class="dig-clean" aria-hidden="true">{ex.clean}</span>
+                    </div>
+                  )}
+                </div>
               </div>
+            )}
+            {dig.data.constraints && (
+              <div class="dig-row hatch-gravel" style="--step: 1">
+                <div class="dig-label mono">02 · Topsoil<span class="pencil">Constraints</span>{ex && <span class="dig-now">● digging</span>}</div>
+                {ex ? (
+                  <div class="dig-body dig-gauges">
+                    <div class="dig-gauge">
+                      <span class="mono">{dig.data.constraints[0]?.value}</span>
+                      {[100, 86, 94, 72].map((w, k) => (
+                        <span class="dig-bar" style={`--w: ${w}%; --k: ${k}`} />
+                      ))}
+                    </div>
+                    <div class="dig-gauge">
+                      <span class="mono">{dig.data.constraints[1]?.value}</span>
+                      <span class="dig-chips">
+                        {ex.feeds.map((f, k) => (
+                          <span class="dig-feed mono" style={`--k: ${k}; --c: var(--feed-${k % 6})`}>{f}</span>
+                        ))}
+                      </span>
+                    </div>
+                    <div class="dig-gauge">
+                      <span class="mono">{dig.data.constraints[2]?.value}</span>
+                      <span class="dig-chips">
+                        {ex.keys.map((key, k) => (
+                          <span class:list={["dig-key mono", key.ok ? "is-ok" : "is-no"]} style={`--k: ${k}`}>
+                            {key.name} {key.ok ? "✓" : "✕ not in scope"}
+                          </span>
+                        ))}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <p class="dig-body mono"><span>{dig.data.constraints.map((c) => c.value).join(" · ")}</span></p>
+                )}
+              </div>
+            )}
+            {dig.data.architecture && (
+              <div class="dig-row" style="--step: 2">
+                <div class="dig-label mono">03 · Structure<span class="pencil">Architecture</span>{ex && <span class="dig-now">● digging</span>}</div>
+                <div class="dig-body dig-structure">
+                  <div class="dig-chain" data-chain>
+                  <ol class="chain mono">
+                    {dig.data.architecture.map((n, k) => {
+                      const firstGate = k === dig.data.architecture!.findIndex((x) => x.kind === "gate");
+                      const firstStore = k === dig.data.architecture!.findIndex((x) => x.kind === "store");
+                      return (
+                        <li class={`is-${n.kind}`}>
+                          <span>
+                            {n.name}
+                            {ex && firstGate && <i class="chain-tag chain-tag--ok" aria-hidden="true">✓ scope ok</i>}
+                            {ex && firstStore && <i class="chain-tag chain-tag--hit" aria-hidden="true">cache hit</i>}
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ol>
+                  {ex && <span class="packet" aria-hidden="true" />}
+                  </div>
+                  {ex && (
+                    <span class="dig-key-note mono" aria-hidden="true">
+                      orange = request<br /><span>teal = answer</span>
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+            {dig.data.dataModel && (
+              <div class="dig-row hatch-earth" style="--step: 3">
+                <div class="dig-label mono">04 · Foundations<span class="pencil">Data model</span>{ex && <span class="dig-now">● digging</span>}</div>
+                {ex ? (
+                  <div class="dig-body">
+                    <ol class="dig-tables mono" aria-label={dig.data.dataModel.join(", ")}>
+                      {dig.data.dataModel.map((t, k) => (
+                        <li style={`--k: ${k}`} aria-hidden="true">
+                          <span class="dig-table-name">{t}</span>
+                          <span class="dig-trow" style="--w: 92%" />
+                          <span class="dig-trow" style={`--w: ${70 + ((k * 7) % 20)}%`} />
+                          <span class="dig-trow" style={`--w: ${54 + ((k * 13) % 30)}%`} />
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                ) : (
+                  <p class="dig-body mono"><span style="color: var(--teal)">{dig.data.dataModel.join(" → ")}</span></p>
+                )}
+              </div>
+            )}
+            <div class="dig-row hatch-rock" style="--step: 4">
+              <div class="dig-label mono">05 · Bedrock<span class="pencil">Outcomes</span>{ex && <span class="dig-now">● digging</span>}</div>
+              {ex ? (
+                <div class="dig-body dig-answer">
+                  <code class="dig-json"><span class="dig-type">{ex.answer}</span><span class="dig-caret" aria-hidden="true">▌</span></code>
+                  <span class="mono dig-outcome">{ex.outcome}</span>
+                </div>
+              ) : (
+                <p class="dig-body mono"><span>{dig.data.results ? dig.data.results[0] : "On the full sheet"}</span></p>
+              )}
             </div>
-          )}
-          {dig.data.dataModel && (
-            <div class="dig-row hatch-earth">
-              <div class="dig-label mono">04 · Foundations<span class="pencil">Data model</span></div>
-              <p class="dig-body mono"><span style="color: var(--teal)">{dig.data.dataModel.join(" → ")}</span></p>
-            </div>
-          )}
-          <div class="dig-row hatch-rock">
-            <div class="dig-label mono">05 · Bedrock<span class="pencil">Outcomes</span></div>
-            <p class="dig-body mono"><span>{dig.data.results ? dig.data.results[0] : "On the full sheet"}</span></p>
           </div>
+
+          {ex && (
+            <aside class="dig-readout mono" aria-label="Live readout">
+              <p class="dig-readout-head">Live readout <span aria-hidden="true">●</span></p>
+              <ol>
+                {ex.readout.map((line, k) => (
+                  <li style={`--step: ${k}`}>
+                    <span class="pencil">{["01 Surface", "02 Topsoil", "03 Structure", "04 Foundations", "05 Bedrock"][k]}</span>
+                    {line}
+                  </li>
+                ))}
+              </ol>
+            </aside>
+          )}
+
+          {ex && (
+            <div class="dig-log mono" aria-hidden="true">
+              <span class="dig-log-tag">Processing log</span>
+              <span class="dig-log-track">
+                {[...ex.log, ...ex.log].map((line) => (
+                  <span class:list={{ "is-warn": /^(dedupe|reject)/.test(line) }}>{line}</span>
+                ))}
+              </span>
+            </div>
+          )}
+          {ex && <a class="out-link" href={`/projects/${dig.id}/`}>Open the Full Sheet <Icon name="right" /></a>}
         </div>
-        <a class="out-link" href={`/projects/${dig.id}/`}>Open the Full Sheet <Icon name="right" /></a>
+        {!ex && <a class="out-link" href={`/projects/${dig.id}/`}>Open the Full Sheet <Icon name="right" /></a>}
       </Level>
     )
   }
@@ -243,20 +367,84 @@ const flagStrips = Array.from({ length: 15 }, (_, k) => k);
     <CoreSample />
   </Level>
 
-  <!-- B7 · Philosophy -->
-  <Level floor={B7} title="Foundations" sub="Engineering philosophy. <em>Three things I don’t compromise on.</em>" band="none" bedrock tone="var(--chalk)" numTone="var(--graphite)">
-    <ol class="piles" role="list">
-      {
-        PRINCIPLES.map((p, i) => (
-          <li class="pile">
-            <span class="mono pencil">Pile {String(i + 1).padStart(2, "0")}</span>
-            <h3 class="serif"><span class="reveal" style={`--fill: ${pileTones[i]}`}>{p.title}</span></h3>
-            <p>{p.text}</p>
-          </li>
-        ))
-      }
-    </ol>
-    <div class="bedrock mono" aria-hidden="true"><span>Load-bearing · bedrock</span></div>
+  <!-- B7 · Philosophy: the principles are the piles everything stands on. A pile driver drives
+       one every 3 s (a 9 s loop while the floor is on screen) and each pile shows its proof. -->
+  <Level floor={B7} title="Foundations" sub="Engineering philosophy. <em>Three piles I drive before I build anything on top.</em>" band="none" bedrock tone="var(--chalk)" numTone="var(--graphite)" class="lvl--piles">
+    <div class="pile-stage">
+      <div class="pile-site" data-pile-site>
+        <div class="pile-loads mono" aria-hidden="true">
+          {
+            PILE_LOADS.map((load, k) => (
+              <span style={`--k: ${k}`}>
+                {load}
+                <i>↓</i>
+              </span>
+            ))
+          }
+        </div>
+        <span class="pile-driver mono" aria-hidden="true"><span>Pile driver</span></span>
+        <div class="pile-cap mono" aria-hidden="true"><span>Pile cap · everything I build rests here</span></div>
+        {PRINCIPLES.map((_, i) => <span class="pile-thud" style={`--step: ${i}; left: var(--c${i})`} aria-hidden="true" />)}
+        <ol class="piles piles--live" role="list">
+          {
+            PRINCIPLES.map((p, i) => {
+              const proof = PILE_PROOFS[i];
+              return (
+                <li class="pile" style={`--step: ${i}`}>
+                  <span class="mono pencil pile-no"><i class="pile-led" aria-hidden="true" />Pile {String(i + 1).padStart(2, "0")}</span>
+                  <h3 class="serif"><span class="reveal" style={`--fill: ${pileTones[i]}`}>{p.title}</span></h3>
+                  <p>{p.text}</p>
+                  {proof?.kind === "validator" && (
+                    <div class="pile-proof mono">
+                      <span class="pile-proof-title">{proof.title}</span>
+                      {proof.rows.map((r, k) => (
+                        <span class:list={["proof-row", { "is-bad": !r.ok }]} style={`--k: ${k}`}>
+                          <span class="proof-raw">{r.raw}</span>
+                          <span class="proof-out">{r.ok ? `→ ${r.clean} ✓` : `✕ ${r.clean}`}</span>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {proof?.kind === "profile" && (
+                    <div class="pile-proof mono">
+                      <span class="pile-proof-title">{proof.title}</span>
+                      <span class="proof-bar-label">{proof.before}<span class="proof-bar proof-bar--slow" /></span>
+                      <span class="proof-fix">{proof.fix}</span>
+                      <span class="proof-bar-label">{proof.after}<span class="proof-bar proof-bar--fast" /></span>
+                      <span class="proof-note">{proof.note}</span>
+                    </div>
+                  )}
+                  {proof?.kind === "review" && (
+                    <div class="pile-proof mono">
+                      <span class="pile-proof-title">{proof.title}</span>
+                      {proof.ticks.map((t, k) => (
+                        <span class="proof-tick" style={`--k: ${k}`}><b>✓</b> {t}</span>
+                      ))}
+                      <span class="proof-update">{proof.update}</span>
+                    </div>
+                  )}
+                </li>
+              );
+            })
+          }
+        </ol>
+        <div class="bedrock mono" aria-hidden="true"><span>Load-bearing · bedrock</span></div>
+      </div>
+      <aside class="pile-test mono" aria-label="Load test">
+        <p class="pile-test-head">Load test <span aria-hidden="true">●</span></p>
+        <ol>
+          {
+            PRINCIPLES.map((p, i) => (
+              <li style={`--step: ${i}`}>
+                <i class="pile-led" aria-hidden="true" />
+                <span><span class="pencil">Pile {String(i + 1).padStart(2, "0")}</span><br />{p.title}</span>
+              </li>
+            ))
+          }
+        </ol>
+        <p class="pile-test-foot">Load held on all three piles</p>
+      </aside>
+    </div>
   </Level>
 
   <!-- B8 · Contact -->
@@ -294,6 +482,69 @@ const flagStrips = Array.from({ length: 15 }, (_, k) => k);
 </Base>
 
 <script>
+  // B7: tell the pile driver where the piles are, and drive them only while the floor is on screen.
+  {
+    const site = document.querySelector<HTMLElement>("[data-pile-site]");
+    const section = site?.closest<HTMLElement>(".lvl");
+    if (site && section) {
+      const place = () => {
+        const sr = site.getBoundingClientRect();
+        site.querySelectorAll<HTMLElement>(".piles--live > .pile").forEach((pile, k) => {
+          const r = pile.getBoundingClientRect();
+          site.style.setProperty(`--c${k}`, `${r.left - sr.left + r.width / 2}px`);
+        });
+      };
+      place();
+      new ResizeObserver(place).observe(site);
+      const still = matchMedia("(prefers-reduced-motion: reduce)");
+      new IntersectionObserver(
+        ([entry]) => {
+          section.classList.toggle("is-playing", entry.isIntersecting && !still.matches);
+          if (entry.isIntersecting) place();
+        },
+        { threshold: 0.45 },
+      ).observe(section);
+    }
+  }
+
+  // B5: play the excavation loop while the floor is on screen, and tell the drill and the
+  // request packet where the layers and the architecture boxes are.
+  {
+    const live = document.querySelector<HTMLElement>("[data-dig-live]");
+    const section = live?.closest<HTMLElement>(".lvl");
+    if (live && section) {
+      const drill = section.querySelector<HTMLElement>("[data-drill]");
+      const chain = live.querySelector<HTMLElement>("[data-chain]");
+      const place = () => {
+        const sr = section.getBoundingClientRect();
+        live.querySelectorAll<HTMLElement>(":scope > .dig-row").forEach((row, k) => {
+          const r = row.getBoundingClientRect();
+          drill?.style.setProperty(`--d${k}`, `${r.top - sr.top + r.height / 2}px`);
+        });
+        if (chain) {
+          const cr = chain.getBoundingClientRect();
+          chain.querySelectorAll<HTMLElement>(".chain > li > span").forEach((box, k) => {
+            if (k > 3) return;
+            const r = box.getBoundingClientRect();
+            chain.style.setProperty(`--x${k}`, `${r.left - cr.left + r.width / 2}px`);
+            chain.style.setProperty(`--y${k}`, `${r.top - cr.top + r.height / 2}px`);
+          });
+        }
+      };
+      place();
+      new ResizeObserver(place).observe(live);
+      const still = matchMedia("(prefers-reduced-motion: reduce)");
+      new IntersectionObserver(
+        ([entry]) => {
+          // Restart from the top layer every time the floor comes back into view.
+          section.classList.toggle("is-playing", entry.isIntersecting && !still.matches);
+          if (entry.isIntersecting) place();
+        },
+        { threshold: 0.45 },
+      ).observe(section);
+    }
+  }
+
   /*
    * B2: the raw supplier lines drift around their box at random, all the time, one line at a
    * time: each picks a new spot and a slight tilt every few seconds, and never leaves the box.

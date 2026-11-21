@@ -222,6 +222,35 @@ export const PRINCIPLES = [
   },
 ];
 
+/** B7 on the homepage: what presses down on the piles, and each pile's small proof. */
+export const PILE_LOADS = ["Messy\nsupplier data", "Traffic", "New\nfeatures", "Deadlines"];
+
+export const PILE_PROOFS = [
+  {
+    kind: "validator",
+    title: "Validator · on the way in",
+    rows: [
+      { raw: '"stars": "4*"', clean: "4", ok: true },
+      { raw: '" EXAMPLE GRAND - DHAKA"', clean: '"Example Grand Dhaka"', ok: true },
+      { raw: '"geo": "23.79,abc"', clean: "sent back", ok: false },
+    ],
+  },
+  {
+    kind: "profile",
+    title: "Profile · GET /v1/properties",
+    before: "Before · full table scan",
+    fix: "+ index on (city, stars)",
+    after: "After · index scan",
+    note: "Measured first, then fixed, numbers kept.",
+  },
+  {
+    kind: "review",
+    title: "Pull request · normalise supplier names",
+    ticks: ["Checks passed", "Reviewed and approved", "docs/normalise.md updated"],
+    update: "Update: dedupe is live for supplier B. C is next.",
+  },
+] as const;
+
 /** The quote on the About floor. */
 export const QUOTE =
   "I am a software developer by profession, a problem solver by practice and a philosopher by curiosity.";

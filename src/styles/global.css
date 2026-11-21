@@ -1802,6 +1802,703 @@ button {
   color: var(--teal);
 }
 
+/* --------------------------------------------------------------------------
+   B5 live: one request followed down the five layers in a 10 s loop.
+   Each layer has 2 s in the spotlight (--step 0–4). Everything rests in its
+   finished state; the loop runs only while the floor is on screen
+   (.is-playing, set in index.astro) and never with reduced motion.
+   -------------------------------------------------------------------------- */
+.lvl--dig-live .lvl-inner {
+  max-width: calc(var(--wrap) + calc(236px * var(--s)));
+}
+
+.dig-stage--live {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) calc(220px * var(--s));
+  column-gap: calc(20px * var(--s));
+  row-gap: calc(10px * var(--s));
+  margin-bottom: calc(16px * var(--s));
+}
+
+.dig--live {
+  --feed-0: var(--h-mulberry);
+  --feed-1: var(--h-clay);
+  --feed-2: var(--h-olive);
+  --feed-3: var(--h-indigo);
+  --feed-4: var(--teal);
+  --feed-5: var(--signal-text);
+}
+
+.dig--live .dig-row {
+  min-height: calc(92px * var(--s));
+}
+
+/* "Open the full sheet" sits under the readout on wide screens. */
+.dig-stage--live .out-link {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: stretch;
+  justify-content: space-between;
+  min-height: 0;
+  margin: 0;
+  padding: 0 calc(12px * var(--s));
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+.dig--live .dig-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dig-now {
+  margin-top: auto;
+  padding-top: calc(6px * var(--s));
+  color: var(--signal-text);
+  opacity: 0;
+}
+
+.dig--live .dig-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: calc(10px * var(--s));
+}
+
+.dig--live .dig-body .serif {
+  margin: 0;
+}
+
+/* 01 Surface */
+.dig-merge {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(8px * var(--s)) calc(10px * var(--s));
+  font-size: 0.625rem;
+}
+
+.dig-raw,
+.dig-clean {
+  padding: calc(5px * var(--s)) calc(8px * var(--s));
+  white-space: nowrap;
+}
+
+.dig-raw {
+  border: 1px dashed var(--c, var(--pencil));
+  background: var(--paper);
+  color: var(--c, var(--pencil));
+}
+
+.dig-raw:nth-child(1) { --c: var(--h-mulberry); }
+.dig-raw:nth-child(2) { --c: var(--h-clay); }
+.dig-raw:nth-child(3) { --c: var(--h-olive); }
+
+.dig-arrow {
+  width: calc(34px * var(--s));
+  height: calc(12px * var(--s));
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.2;
+}
+
+.dig-clean {
+  border: 1px solid var(--teal);
+  background: color-mix(in srgb, var(--teal) 12%, var(--paper));
+  color: var(--teal);
+}
+
+/* 02 Topsoil */
+.dig--live .dig-gauges {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: calc(14px * var(--s));
+}
+
+.dig-gauge {
+  display: flex;
+  flex-direction: column;
+  gap: calc(5px * var(--s));
+  padding: calc(8px * var(--s)) calc(10px * var(--s));
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  font-size: 0.625rem;
+}
+
+.dig-bar {
+  width: var(--w);
+  height: calc(6px * var(--s));
+  background: var(--h-indigo);
+  transform-origin: left;
+}
+
+.dig-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(4px * var(--s));
+}
+
+.dig-feed {
+  padding: calc(3px * var(--s)) calc(5px * var(--s));
+  background: var(--c);
+  color: var(--paper);
+  font-size: 0.53rem;
+}
+
+.dig-key {
+  padding: calc(3px * var(--s)) calc(6px * var(--s));
+  font-size: 0.53rem;
+}
+
+.dig-key.is-ok {
+  border: 1px solid var(--teal);
+  background: var(--teal);
+  color: var(--paper);
+}
+
+.dig-key.is-no {
+  border: 1px solid var(--signal-text);
+  color: var(--signal-text);
+}
+
+/* 03 Structure */
+.dig--live .dig-structure {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dig-chain {
+  position: relative;
+  padding-top: calc(16px * var(--s));
+}
+
+.dig--live .chain span {
+  position: relative;
+}
+
+.chain-tag {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + calc(4px * var(--s)));
+  translate: -50% 0;
+  padding: 1px calc(5px * var(--s));
+  font-size: 0.5rem;
+  font-style: normal;
+  white-space: nowrap;
+  opacity: 0;
+}
+
+.chain-tag--ok {
+  background: var(--teal);
+  color: var(--paper);
+}
+
+.chain-tag--hit {
+  background: var(--signal);
+  color: var(--on-signal);
+}
+
+.packet {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(12px * var(--s));
+  height: calc(12px * var(--s));
+  margin: calc(-6px * var(--s)) 0 0 calc(-6px * var(--s));
+  border-radius: 50%;
+  background: var(--signal);
+  box-shadow: 0 0 0 calc(4px * var(--s)) color-mix(in srgb, var(--signal) 22%, transparent);
+  opacity: 0;
+  translate: var(--x0, 0) var(--y0, 0);
+  pointer-events: none;
+}
+
+.dig-key-note {
+  flex: none;
+  color: var(--pencil);
+  font-size: 0.625rem;
+  text-align: right;
+}
+
+.dig-key-note span {
+  color: var(--teal);
+}
+
+/* 04 Foundations */
+.dig-tables {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(10px * var(--s)) calc(34px * var(--s));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dig-tables li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: calc(4px * var(--s));
+  width: calc(128px * var(--s));
+  padding-bottom: calc(7px * var(--s));
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+
+/* The link from each table to the next */
+.dig-tables li + li::before {
+  content: "";
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  width: calc(34px * var(--s));
+  border-top: 2px dashed var(--hatch);
+}
+
+.dig-table-name {
+  margin-bottom: calc(3px * var(--s));
+  padding: calc(4px * var(--s)) calc(8px * var(--s));
+  background: var(--graphite);
+  color: var(--paper);
+  font-size: 0.5625rem;
+}
+
+.dig-trow {
+  width: var(--w);
+  height: calc(5px * var(--s));
+  margin-left: calc(8px * var(--s));
+  background: var(--teal);
+  transform-origin: left;
+}
+
+/* 05 Bedrock */
+.dig-answer {
+  align-items: flex-start;
+}
+
+.dig-json {
+  max-width: 100%;
+  padding: calc(10px * var(--s)) calc(12px * var(--s));
+  background: var(--bedrock);
+  color: #d7dde8;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  overflow: hidden;
+}
+
+.dig-type {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.dig-caret {
+  color: var(--signal);
+}
+
+.dig-outcome {
+  padding: 2px calc(6px * var(--s));
+  background: var(--paper);
+  font-size: 0.625rem;
+}
+
+/* Live readout and the processing log */
+.dig-readout {
+  align-self: start;
+  border: 1px solid var(--ink);
+  background: var(--vellum);
+  font-size: 0.5625rem;
+}
+
+.dig-readout-head {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: calc(8px * var(--s)) calc(10px * var(--s));
+  border-bottom: 1px solid var(--ink);
+  font-size: 0.625rem;
+}
+
+.dig-readout-head span {
+  color: var(--signal);
+}
+
+.dig-readout ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dig-readout li {
+  display: grid;
+  gap: 2px;
+  padding: calc(9px * var(--s)) calc(10px * var(--s));
+  border-bottom: 1px solid var(--hatch);
+}
+
+.dig-readout li:last-child {
+  border-bottom: 0;
+}
+
+.dig-log {
+  grid-column: 1;
+  display: flex;
+  align-items: stretch;
+  height: calc(34px * var(--s));
+  overflow: hidden;
+  border: 1px solid var(--graphite);
+  background: var(--bedrock);
+  font-size: 0.59rem;
+}
+
+.dig-log-tag {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  display: flex;
+  align-items: center;
+  padding: 0 calc(10px * var(--s));
+  background: var(--signal);
+  color: var(--on-signal);
+}
+
+.dig-log-track {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  color: #9fd6c9;
+}
+
+.dig-log-track span {
+  padding: 0 calc(24px * var(--s));
+}
+
+.dig-log-track .is-warn {
+  color: #e8b8a8;
+}
+
+/* The drill rides the request line down to the layer in the spotlight. */
+.drill {
+  position: absolute;
+  left: calc(var(--line-x) - calc(12px * var(--s)));
+  top: var(--d0, 0);
+  z-index: 3;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  width: calc(26px * var(--s));
+  translate: 0 -50%;
+}
+
+.drill-shank {
+  width: calc(14px * var(--s));
+  height: calc(10px * var(--s));
+  background: var(--graphite);
+}
+
+.drill svg {
+  width: calc(26px * var(--s));
+  height: calc(24px * var(--s));
+  overflow: visible;
+}
+
+.drill-bit {
+  transform-origin: 13px 9px;
+  fill: var(--signal);
+  stroke: var(--graphite);
+  stroke-width: 1.2;
+}
+
+.drill-groove {
+  fill: none;
+}
+
+/* ---- The loop: only while B5 is on screen ---- */
+.lvl--dig-live.is-playing .drill {
+  display: flex;
+  animation: dig-drill 10s infinite both;
+}
+
+.lvl--dig-live.is-playing .drill-bit {
+  animation: dig-spin 0.6s linear infinite;
+}
+
+.lvl--dig-live.is-playing .dig-row,
+.lvl--dig-live.is-playing .dig-readout li {
+  animation: dig-spot 10s infinite both;
+  /* Negative delays: every layer is already in its place in the loop, none waits its turn. */
+  animation-delay: calc(var(--step) * 2s - 10s);
+}
+
+.lvl--dig-live.is-playing .dig-now {
+  animation: dig-now 10s infinite both;
+  animation-delay: calc(var(--step) * 2s - 10s);
+}
+
+.lvl--dig-live.is-playing .dig-raw {
+  animation: dig-raw 10s infinite both;
+  animation-delay: calc(var(--k) * 0.15s);
+}
+
+.lvl--dig-live.is-playing .dig-clean {
+  animation: dig-clean 10s infinite both;
+}
+
+.lvl--dig-live.is-playing .dig-bar {
+  animation: dig-bar 10s infinite both;
+  animation-delay: calc(var(--k) * 0.12s);
+}
+
+.lvl--dig-live.is-playing .dig-feed {
+  animation: dig-feed 10s infinite both;
+  animation-delay: calc(var(--k) * 0.15s);
+}
+
+.lvl--dig-live.is-playing .dig-key.is-ok {
+  animation: dig-key-ok 10s infinite both;
+  animation-delay: calc(var(--k) * 0.2s);
+}
+
+.lvl--dig-live.is-playing .dig-key.is-no {
+  animation: dig-key-no 10s infinite both;
+}
+
+.lvl--dig-live.is-playing .packet {
+  animation: dig-packet 10s infinite both;
+}
+
+.lvl--dig-live.is-playing .chain-tag--ok {
+  animation: dig-stamp 10s infinite both;
+}
+
+.lvl--dig-live.is-playing .chain-tag--hit {
+  animation: dig-hit 10s infinite both;
+}
+
+.lvl--dig-live.is-playing .dig-trow {
+  animation: dig-trow 10s infinite both;
+  animation-delay: calc(var(--k, 0) * 0.35s);
+}
+
+.lvl--dig-live.is-playing .dig-tables li + li::before {
+  animation: dig-fk 10s infinite both;
+}
+
+.lvl--dig-live.is-playing .dig-type {
+  animation: dig-type 10s infinite both;
+}
+
+.lvl--dig-live.is-playing .dig-caret {
+  animation: dig-caret 0.9s steps(1) infinite;
+}
+
+.lvl--dig-live.is-playing .dig-log-track {
+  animation: dig-ticker 40s linear infinite;
+}
+
+@keyframes dig-drill {
+  0%, 18% { top: var(--d0); }
+  20%, 38% { top: var(--d1); }
+  40%, 58% { top: var(--d2); }
+  60%, 78% { top: var(--d3); }
+  80%, 98% { top: var(--d4); }
+  100% { top: var(--d0); }
+}
+
+@keyframes dig-spin {
+  to { rotate: 360deg; }
+}
+
+@keyframes dig-spot {
+  0%, 19% {
+    box-shadow: inset calc(4px * var(--s)) 0 0 var(--signal);
+    background-color: color-mix(in srgb, var(--signal) 5%, transparent);
+  }
+  21%, 100% {
+    box-shadow: inset 0 0 0 transparent;
+  }
+}
+
+@keyframes dig-now {
+  0%, 19% { opacity: 1; }
+  21%, 100% { opacity: 0; }
+}
+
+@keyframes dig-raw {
+  0% { opacity: 0; translate: calc(-24px * var(--s)) 0; }
+  5% { opacity: 1; translate: 0 0; }
+  11% { opacity: 1; }
+  15%, 100% { opacity: 0.35; }
+}
+
+@keyframes dig-clean {
+  0%, 10% { opacity: 0; scale: 0.85; }
+  14% { opacity: 1; scale: 1.06; box-shadow: 0 0 0 calc(6px * var(--s)) color-mix(in srgb, var(--teal) 20%, transparent); }
+  18%, 100% { opacity: 1; scale: 1; box-shadow: 0 0 0 0 transparent; }
+}
+
+/* Each scene empties just before its turn and fills again during it, so the floor
+   never sits half-empty between turns. */
+@keyframes dig-bar {
+  0%, 18% { scale: 1 1; }
+  19%, 20% { scale: 0 1; }
+  30%, 100% { scale: 1 1; }
+}
+
+@keyframes dig-feed {
+  0%, 18% { opacity: 1; }
+  19%, 20% { opacity: 0.25; }
+  28%, 100% { opacity: 1; }
+}
+
+@keyframes dig-key-ok {
+  0%, 18% { background: var(--teal); color: var(--paper); }
+  19%, 26% { background: transparent; color: var(--pencil); }
+  32%, 100% { background: var(--teal); color: var(--paper); }
+}
+
+@keyframes dig-key-no {
+  0%, 33% { translate: 0 0; }
+  34%, 37% { translate: -3px 0; }
+  35%, 38% { translate: 3px 0; }
+  40%, 100% { translate: 0 0; }
+}
+
+@keyframes dig-packet {
+  0%, 40% { opacity: 0; translate: var(--x0) var(--y0); background: var(--signal); }
+  41% { opacity: 1; translate: var(--x0) var(--y0); }
+  46% { translate: var(--x1) var(--y1); }
+  50% { translate: var(--x2) var(--y2); }
+  53% { translate: var(--x3) var(--y3); background: var(--signal); }
+  54% { background: var(--teal); }
+  58% { opacity: 1; translate: var(--x0) var(--y0); background: var(--teal); }
+  60%, 100% { opacity: 0; translate: var(--x0) var(--y0); }
+}
+
+@keyframes dig-stamp {
+  0%, 45% { opacity: 0; scale: 1.6; }
+  47% { opacity: 1; scale: 1; }
+  58% { opacity: 1; }
+  61%, 100% { opacity: 0; }
+}
+
+@keyframes dig-hit {
+  0%, 52% { opacity: 0; }
+  53%, 58% { opacity: 1; }
+  61%, 100% { opacity: 0; }
+}
+
+@keyframes dig-trow {
+  0%, 58% { scale: 1 1; }
+  59%, 60% { scale: 0 1; }
+  66%, 100% { scale: 1 1; }
+}
+
+@keyframes dig-fk {
+  0%, 62% { border-color: var(--hatch); }
+  66%, 78% { border-color: var(--teal); }
+  80%, 100% { border-color: var(--hatch); }
+}
+
+@keyframes dig-type {
+  0%, 78% { max-width: 100%; }
+  79%, 80% { max-width: 0; }
+  95%, 100% { max-width: 100%; }
+}
+
+@keyframes dig-caret {
+  50% { opacity: 0; }
+}
+
+@keyframes dig-ticker {
+  to { translate: -50% 0; }
+}
+
+/* Narrower screens: the readout goes, the instruments stack. */
+@media (max-width: 1199px) {
+  .dig-stage--live {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dig-readout {
+    display: none;
+  }
+
+  .dig-stage--live .out-link {
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: start;
+    min-height: 44px;
+    margin-top: calc(10px * var(--s));
+    padding: 0 calc(20px * var(--s));
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .dig--live .dig-gauges {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dig--live .dig-structure {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: calc(12px * var(--s));
+  }
+
+  .dig-key-note {
+    text-align: left;
+  }
+
+  /* On a phone the label is a one-line strip above each layer. */
+  .dig--live .dig-row {
+    min-height: 0;
+  }
+
+  .dig--live .dig-label {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: calc(10px * var(--s));
+  }
+
+  .dig-now {
+    margin: 0 0 0 auto;
+    padding: 0;
+  }
+
+  .dig-tables li + li::before {
+    display: none;
+  }
+
+  /* The request line hugs the screen edge on a phone: no room for the drill. */
+  .lvl--dig-live.is-playing .drill {
+    display: none;
+  }
+
+  .dig-type {
+    white-space: normal;
+  }
+
+  .lvl--dig-live.is-playing .dig-type {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lvl--dig-live .drill {
+    display: none !important;
+  }
+
+  .lvl--dig-live * {
+    animation: none !important;
+  }
+}
+
 /* ==========================================================================
    B6: core sample
    ========================================================================== */
@@ -2058,6 +2755,460 @@ button {
 .bedrock span {
   padding: calc(4px * var(--s)) calc(10px * var(--s));
   background: var(--bedrock);
+}
+
+/* --------------------------------------------------------------------------
+   B7 on the homepage: piles under load. A 9 s loop (only while the floor is on
+   screen, .is-playing): the pile driver drives one pile every 3 s (--step 0–2),
+   and that pile shows its proof. At rest everything is in its finished state.
+   -------------------------------------------------------------------------- */
+.lvl--piles .lvl-inner {
+  max-width: calc(var(--wrap) + calc(236px * var(--s)));
+}
+
+.pile-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) calc(220px * var(--s));
+  gap: calc(20px * var(--s));
+  align-items: start;
+}
+
+.pile-site {
+  position: relative;
+  min-width: 0;
+}
+
+/* Loads press down from above, between the piles. */
+.pile-loads {
+  display: flex;
+  justify-content: space-between;
+  height: calc(44px * var(--s));
+  padding: 0 calc(4px * var(--s));
+  color: var(--chalk-dim);
+  font-size: 0.53rem;
+}
+
+.pile-loads span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  white-space: pre-line;
+  line-height: 1.25;
+}
+
+.pile-loads i {
+  font-style: normal;
+  font-size: 0.8125rem;
+  line-height: 1;
+  color: var(--signal);
+}
+
+.pile-cap {
+  display: grid;
+  place-items: center;
+  height: calc(14px * var(--s));
+  background: var(--chalk);
+  color: var(--bedrock);
+  font-size: 0.5rem;
+}
+
+.pile-driver {
+  position: absolute;
+  top: calc(-8px * var(--s));
+  left: var(--c0, 16%);
+  z-index: 2;
+  display: none;
+  place-items: center;
+  width: calc(88px * var(--s));
+  height: calc(26px * var(--s));
+  margin-left: calc(-44px * var(--s));
+  border: 2px solid var(--bedrock);
+  background: var(--chalk);
+  color: var(--bedrock);
+  font-size: 0.5rem;
+}
+
+/* The piles: concrete columns hanging from the cap, pointed at the foot. */
+.piles--live {
+  gap: calc(26px * var(--s));
+  padding: 0 calc(16px * var(--s));
+}
+
+.piles--live .pile {
+  position: relative;
+  min-height: 0;
+  gap: calc(10px * var(--s));
+  padding: calc(16px * var(--s)) calc(18px * var(--s)) calc(30px * var(--s));
+  border: 1px solid #6e6a62;
+  border-top: 0;
+  background-image: radial-gradient(#3d3b36 1px, transparent 1.3px);
+  background-size: calc(9px * var(--s)) calc(9px * var(--s));
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - calc(18px * var(--s))), 50% 100%, 0 calc(100% - calc(18px * var(--s))));
+}
+
+.piles--live .pile h3 {
+  font-size: clamp(1.75rem, 1.3rem + 1vw, 2.125rem);
+}
+
+.piles--live .pile p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.pile-no {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(8px * var(--s));
+}
+
+.pile-led {
+  display: inline-block;
+  flex: none;
+  width: calc(10px * var(--s));
+  height: calc(10px * var(--s));
+  border-radius: 50%;
+  background: #9fd3cb;
+  box-shadow: 0 0 calc(8px * var(--s)) rgb(159 211 203 / 0.6);
+}
+
+/* The LED by each pile's number is for phones; wide screens have the load test panel. */
+.pile .pile-led {
+  display: none;
+}
+
+.pile-thud {
+  position: absolute;
+  top: calc(26px * var(--s));
+  z-index: 1;
+  width: calc(120px * var(--s));
+  height: calc(36px * var(--s));
+  margin-left: calc(-60px * var(--s));
+  border: 2px solid var(--signal);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pile-proof {
+  display: flex;
+  flex-direction: column;
+  gap: calc(7px * var(--s));
+  margin-top: calc(4px * var(--s));
+  padding: calc(10px * var(--s));
+  border: 1px solid #6e6a62;
+  background: #22211e;
+  font-size: 0.5625rem;
+}
+
+.pile-proof-title {
+  color: var(--chalk-dim);
+}
+
+.proof-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 calc(6px * var(--s));
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.proof-out {
+  color: #9fd3cb;
+}
+
+.proof-row.is-bad,
+.proof-row.is-bad .proof-out {
+  color: #f2b48f;
+}
+
+.proof-bar-label {
+  display: flex;
+  flex-direction: column;
+  gap: calc(3px * var(--s));
+}
+
+.proof-bar {
+  display: block;
+  height: calc(9px * var(--s));
+  transform-origin: left;
+}
+
+.proof-bar--slow {
+  width: 100%;
+  background: #f2b48f;
+}
+
+.proof-bar--fast {
+  width: 22%;
+  background: #9fd3cb;
+}
+
+.proof-fix {
+  color: var(--signal);
+}
+
+.proof-note {
+  color: var(--chalk-dim);
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.proof-tick b {
+  font-weight: 400;
+  color: #9fd3cb;
+}
+
+.proof-update {
+  align-self: flex-start;
+  padding: calc(6px * var(--s)) calc(8px * var(--s));
+  background: var(--chalk);
+  color: var(--bedrock);
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.lvl--piles .bedrock {
+  height: calc(56px * var(--s));
+  margin-top: calc(-2px * var(--s));
+}
+
+/* Load test panel */
+.pile-test {
+  margin-top: calc(44px * var(--s));
+  border: 1px solid #6e6a62;
+  background: #22211e;
+  font-size: 0.5625rem;
+}
+
+.pile-test p {
+  margin: 0;
+  padding: calc(9px * var(--s)) calc(10px * var(--s));
+}
+
+.pile-test-head {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #6e6a62;
+  font-size: 0.625rem;
+}
+
+.pile-test-head span {
+  color: var(--signal);
+}
+
+.pile-test ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pile-test li {
+  display: flex;
+  align-items: center;
+  gap: calc(10px * var(--s));
+  padding: calc(10px * var(--s));
+  border-bottom: 1px solid #3a3732;
+}
+
+.pile-test-foot {
+  color: #9fd3cb;
+}
+
+/* ---- The loop ---- */
+.lvl--piles.is-playing .pile-driver {
+  display: grid;
+  animation: pile-driver 9s infinite both;
+}
+
+.lvl--piles.is-playing .pile-loads i {
+  animation: pile-load 1.4s ease-in infinite;
+  animation-delay: calc(var(--k) * 0.35s);
+}
+
+.lvl--piles.is-playing .piles--live .pile {
+  animation: pile-drive 9s infinite both;
+  animation-delay: calc(var(--step) * 3s - 9s);
+}
+
+.lvl--piles.is-playing .pile-thud {
+  animation: pile-thud 9s infinite both;
+  animation-delay: calc(var(--step) * 3s - 9s);
+}
+
+.lvl--piles.is-playing .pile-led {
+  animation: pile-led 9s infinite both;
+  animation-delay: calc(var(--step) * 3s - 9s);
+}
+
+.lvl--piles.is-playing .proof-row {
+  animation: proof-row 9s infinite both;
+  animation-delay: calc(var(--k) * 0.25s);
+}
+
+.lvl--piles.is-playing .proof-row.is-bad {
+  animation: proof-bad 9s infinite both;
+}
+
+.lvl--piles.is-playing .proof-bar--slow {
+  animation: proof-slow 9s infinite both;
+}
+
+.lvl--piles.is-playing .proof-fix {
+  animation: proof-fix 9s infinite both;
+}
+
+.lvl--piles.is-playing .proof-bar--fast {
+  animation: proof-fast 9s infinite both;
+}
+
+.lvl--piles.is-playing .proof-tick {
+  animation: proof-tick 9s infinite both;
+  animation-delay: calc(var(--k) * 0.2s);
+}
+
+.lvl--piles.is-playing .proof-update {
+  animation: proof-update 9s infinite both;
+}
+
+/* Struck, lifted, then it fades out and reappears over the next pile, so it never
+   slides across the load labels. */
+@keyframes pile-driver {
+  0% { left: var(--c0); top: calc(-8px * var(--s)); opacity: 1; }
+  4% { left: var(--c0); top: calc(32px * var(--s)); }
+  6%, 28% { left: var(--c0); top: calc(-8px * var(--s)); opacity: 1; }
+  30% { left: var(--c0); opacity: 0; }
+  31% { left: var(--c1); opacity: 0; }
+  33.3% { left: var(--c1); top: calc(-8px * var(--s)); opacity: 1; }
+  37% { left: var(--c1); top: calc(32px * var(--s)); }
+  39%, 61% { left: var(--c1); top: calc(-8px * var(--s)); opacity: 1; }
+  63% { left: var(--c1); opacity: 0; }
+  64% { left: var(--c2); opacity: 0; }
+  66.6% { left: var(--c2); top: calc(-8px * var(--s)); opacity: 1; }
+  70% { left: var(--c2); top: calc(32px * var(--s)); }
+  72%, 94% { left: var(--c2); top: calc(-8px * var(--s)); opacity: 1; }
+  96% { left: var(--c2); opacity: 0; }
+  97% { left: var(--c0); top: calc(-8px * var(--s)); opacity: 0; }
+  100% { left: var(--c0); top: calc(-8px * var(--s)); opacity: 1; }
+}
+
+@keyframes pile-load {
+  0% { translate: 0 calc(-6px * var(--s)); opacity: 0; }
+  40% { opacity: 1; }
+  100% { translate: 0 calc(8px * var(--s)); opacity: 0; }
+}
+
+/* Each pile's own 3 s: struck, sinks a touch, outline orange while it proves itself. */
+@keyframes pile-drive {
+  0%, 3.8% { translate: 0 0; border-color: #6e6a62; }
+  4.6% { translate: 0 calc(5px * var(--s)); border-color: var(--signal); }
+  6%, 30% { translate: 0 0; border-color: var(--signal); }
+  33%, 100% { translate: 0 0; border-color: #6e6a62; }
+}
+
+@keyframes pile-thud {
+  0%, 3.5% { opacity: 0; scale: 0.4; }
+  4.5% { opacity: 1; scale: 1; }
+  9%, 100% { opacity: 0; scale: 1.6; }
+}
+
+@keyframes pile-led {
+  0%, 4% { background: #3a3732; box-shadow: none; }
+  6%, 100% { background: #9fd3cb; box-shadow: 0 0 calc(8px * var(--s)) rgb(159 211 203 / 0.6); }
+}
+
+/* Pile 01 (0–3 s): fields come in raw and leave clean; the broken one is sent back. */
+@keyframes proof-row {
+  0%, 1% { opacity: 1; }
+  2%, 6% { opacity: 0; translate: calc(-10px * var(--s)) 0; }
+  9%, 100% { opacity: 1; translate: 0 0; }
+}
+
+@keyframes proof-bad {
+  0%, 1% { opacity: 0.5; }
+  2%, 14% { opacity: 0; }
+  17%, 20% { opacity: 1; translate: 0 0; }
+  23% { translate: -4px 0; }
+  24% { translate: 4px 0; }
+  25% { translate: -3px 0; }
+  27%, 100% { opacity: 0.5; translate: 0 0; }
+}
+
+/* Pile 02 (3–6 s): profile, fix, profile again. */
+@keyframes proof-slow {
+  0%, 36% { scale: 1 1; }
+  37%, 38% { scale: 0 1; }
+  44%, 100% { scale: 1 1; }
+}
+
+@keyframes proof-fix {
+  0%, 36% { opacity: 1; }
+  37%, 45% { opacity: 0; }
+  48%, 100% { opacity: 1; }
+}
+
+@keyframes proof-fast {
+  0%, 36% { scale: 1 1; }
+  37%, 48% { scale: 0 1; }
+  56%, 100% { scale: 1 1; }
+}
+
+/* Pile 03 (6–9 s): the pull request collects its ticks, then the update goes out. */
+@keyframes proof-tick {
+  0%, 69% { opacity: 1; }
+  70%, 72% { opacity: 0.25; }
+  75%, 100% { opacity: 1; }
+}
+
+@keyframes proof-update {
+  0%, 69% { opacity: 1; translate: 0 0; }
+  70%, 84% { opacity: 0; translate: 0 calc(8px * var(--s)); }
+  88%, 100% { opacity: 1; translate: 0 0; }
+}
+
+@media (max-width: 1199px) {
+  .pile-stage {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pile-test {
+    display: none;
+  }
+
+  .pile .pile-led {
+    display: inline-block;
+  }
+
+  .pile-thud {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .lvl--piles .pile-driver {
+    display: none !important;
+  }
+
+  .pile-loads {
+    font-size: 0.5rem;
+  }
+
+  .piles--live {
+    gap: calc(18px * var(--s));
+    padding: 0 calc(12px * var(--s));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lvl--piles .pile-driver {
+    display: none !important;
+  }
+
+  .lvl--piles * {
+    animation: none !important;
+  }
 }
 
 /* ==========================================================================

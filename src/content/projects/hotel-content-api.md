@@ -29,6 +29,32 @@ dataModel:
   - "rooms"
   - "images"
   - "amenities"
+excavation:
+  raw:
+    - { supplier: "A", text: "EXAMPLE GRAND - DHAKA" }
+    - { supplier: "B", text: "example grand dhaka" }
+    - { supplier: "C", text: "Exmpl Grand Htl Dhk" }
+  clean: "DAC0412 · Example Grand Dhaka"
+  feeds: ["A xml", "B json", "C xml", "D json", "E xml", "F json"]
+  keys:
+    - { name: "Key 1 · content", ok: true }
+    - { name: "Key 2 · rooms", ok: true }
+    - { name: "Key 3 · images", ok: false }
+  answer: '{ "id": "DAC0412", "name": "Example Grand Dhaka", "rooms": [ … ], "images": [ … ] }'
+  outcome: "One clean answer per hotel, for every client"
+  readout:
+    - "3 spellings → 1 record"
+    - "6 feeds · 3 client keys"
+    - "request → cache → answer"
+    - "4 tables written"
+    - "clean JSON sent"
+  log:
+    - "normalize · supplier B · DAC0412 · name, stars, geo ✓"
+    - "dedupe · A + B + C → DAC0412"
+    - "cache · set properties:DAC0412"
+    - "auth · key 2 · scope rooms ✓"
+    - "reject · key 3 · images not in scope"
+    - "write · rooms × 3 · images × 12"
 galleryCaptions:
   - "API usage dashboard"
   - "B2B clients and their scopes"
