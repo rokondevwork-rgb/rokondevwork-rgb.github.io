@@ -666,12 +666,6 @@ button {
   max-width: 38ch;
 }
 
-.split {
-  display: flex;
-  gap: calc(64px * var(--s));
-  align-items: flex-start;
-}
-
 /* A link out of a level to its full page. */
 .out-link {
   display: inline-flex;
@@ -957,9 +951,24 @@ button {
 /* ==========================================================================
    B1: service entrance
    ========================================================================== */
+/* Photo | words, with the facts and the link under the words. Wide screens move the facts
+   into a third column (see "Wide screens"). */
+.about {
+  display: grid;
+  grid-template-columns: calc(420px * var(--s)) minmax(0, 1fr);
+  grid-template-areas:
+    "photo text"
+    "photo facts"
+    "photo more";
+  grid-template-rows: auto auto 1fr;
+  column-gap: calc(64px * var(--s));
+  row-gap: calc(28px * var(--s));
+  align-items: start;
+}
+
 .site-photo {
+  grid-area: photo;
   margin: 0;
-  flex: 0 0 calc(420px * var(--s));
   display: grid;
   gap: calc(14px * var(--s));
 }
@@ -1027,10 +1036,22 @@ button {
 }
 
 .about-text {
-  flex: 1 1 calc(480px * var(--s));
+  grid-area: text;
   min-width: 0;
   display: grid;
   gap: calc(28px * var(--s));
+}
+
+.about-facts {
+  grid-area: facts;
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: calc(18px * var(--s));
+}
+
+.about-more {
+  grid-area: more;
 }
 
 .about-text blockquote {
@@ -1097,6 +1118,85 @@ button {
   height: calc(8px * var(--s));
   border-radius: 50%;
   background: var(--signal);
+}
+
+/* On site now: only on wide screens, under the title block. */
+.site-now {
+  display: none;
+  border: 1px solid var(--ink);
+}
+
+.site-now-live {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(6px * var(--s));
+  color: var(--signal-text);
+}
+
+.site-now-live::before {
+  content: "";
+  width: calc(7px * var(--s));
+  height: calc(7px * var(--s));
+  border-radius: 50%;
+  background: var(--signal);
+  animation: visit-pulse 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-now-live::before {
+    animation: none;
+  }
+}
+
+.site-now dl {
+  display: grid;
+  margin: 0;
+}
+
+.site-now dl > div {
+  padding: calc(10px * var(--s)) calc(14px * var(--s));
+  border-bottom: 1px solid var(--hatch);
+}
+
+.site-now dl > div:last-child {
+  border-bottom: 0;
+}
+
+.site-now dt {
+  color: var(--pencil);
+}
+
+.site-now dd {
+  display: grid;
+  gap: calc(2px * var(--s));
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.site-now dd a {
+  color: var(--ink);
+  text-decoration-color: var(--signal);
+}
+
+.site-now dd a:hover {
+  color: var(--signal-text);
+}
+
+.site-now-time dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: calc(4px * var(--s)) calc(12px * var(--s));
+  /* The clock's tall figures need room under the label. */
+  padding-top: calc(8px * var(--s));
+}
+
+.site-now-time .sign {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--teal);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ==========================================================================
@@ -4970,8 +5070,9 @@ button {
 }
 
 /* B1 */
-.site-photo {
-  flex-basis: calc(340px * var(--s));
+.about {
+  grid-template-columns: calc(340px * var(--s)) minmax(0, 1fr);
+  row-gap: calc(18px * var(--s));
 }
 
 .site-photo-frame img {
@@ -4990,20 +5091,20 @@ button {
   font-size: 1.0625rem;
 }
 
-.about-text .title-block dl {
+.about .title-block dl {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.about-text .title-block dl > div {
+.about .title-block dl > div {
   border-right: 1px solid var(--hatch);
   border-bottom: 1px solid var(--hatch);
 }
 
-.about-text .title-block dl > div:nth-child(3n) {
+.about .title-block dl > div:nth-child(3n) {
   border-right: 0;
 }
 
-.about-text .title-block dl > div:nth-last-child(-n + 3) {
+.about .title-block dl > div:nth-last-child(-n + 3) {
   border-bottom: 0;
 }
 
@@ -5186,6 +5287,137 @@ button {
 
 .shaft-foot {
   bottom: calc(24px * var(--s));
+}
+
+/* ==========================================================================
+   Wide screens: every floor uses the extra width instead of leaving the right
+   side empty. Wide screens are often no taller than a laptop, so the floors
+   spread sideways (third columns, wider panels) rather than growing taller.
+   ========================================================================== */
+@media (min-width: 1600px) {
+  .lvl-inner,
+  .lvl--plant .lvl-inner,
+  .lvl--dig-live .lvl-inner,
+  .lvl--piles .lvl-inner {
+    max-width: calc(2100px * var(--s));
+  }
+
+  /* B1: photo | words | facts, with "On site now" under the title block. */
+  .about {
+    grid-template-columns: calc(340px * var(--s)) minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "photo text facts"
+      "photo more facts";
+    grid-template-rows: auto 1fr;
+  }
+
+  .about-text p {
+    max-width: 72ch;
+  }
+
+  /* The About page shows the same block on a sheet, which is otherwise narrower. */
+  .sheet > .about {
+    max-width: calc(2100px * var(--s));
+  }
+
+  .site-now {
+    display: block;
+  }
+
+  .about .title-block {
+    max-width: none;
+  }
+
+  .about .title-block dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .about .title-block dl > div:nth-child(odd) {
+    border-right: 1px solid var(--hatch);
+  }
+
+  .about .title-block dl > div:nth-child(even) {
+    border-right: 0;
+  }
+
+  .about .title-block dl > div:nth-last-child(n + 3) {
+    border-bottom: 1px solid var(--hatch);
+  }
+
+  .about .title-block dl > div:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+
+  /* B2: longer pipes and a bigger normaliser between the hopper and the record. */
+  .plant-scene {
+    --pipe: calc(170px * var(--s));
+    grid-template-columns: minmax(0, 1fr) var(--pipe) calc(300px * var(--s)) var(--pipe) minmax(0, 1fr);
+  }
+
+  /* B3: the pipes spread across the trench; the panel shows the pipe and the flows side by side. */
+  .pipes {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .pipe {
+    width: 100%;
+  }
+
+  .pipe-panel {
+    flex-basis: calc(720px * var(--s));
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .flow-btns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* B4: wider rooms get taller screenshots. */
+  .plan--row .room-shot img,
+  .plan--row .room:not(.room--large):not(.room--mid) .room-shot img {
+    height: calc(190px * var(--s));
+  }
+
+  /* B5: the architecture chain and the tables spread along their layers. */
+  .chain li + li::before {
+    width: calc(72px * var(--s));
+  }
+
+  .dig-tables {
+    column-gap: calc(64px * var(--s));
+  }
+
+  .dig-tables li {
+    width: calc(210px * var(--s));
+  }
+
+  .dig-tables li + li::before {
+    width: calc(64px * var(--s));
+  }
+
+  /* B5 and B7: roomier side panels. */
+  .dig-stage--live {
+    grid-template-columns: minmax(0, 1fr) calc(300px * var(--s));
+  }
+
+  .pile-stage {
+    grid-template-columns: minmax(0, 1fr) calc(280px * var(--s));
+  }
+
+  /* B6: the role's points in two columns. */
+  .role ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    column-gap: calc(48px * var(--s));
+  }
+
+  /* B8: a wider intercom beside the contact details. */
+  .contact-wrap .terminal {
+    flex-basis: calc(820px * var(--s));
+  }
 }
 
 /* B2 on laptop-height screens: tighter lines and pipework, so the plant still fits one screen. */
@@ -5472,12 +5704,22 @@ button {
     display: none;
   }
 
-  .split,
   .trench-wrap,
   .contact-wrap,
   .role {
     flex-direction: column;
     gap: calc(32px * var(--s));
+  }
+
+  .about {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "photo"
+      "text"
+      "facts"
+      "more";
+    grid-template-rows: none;
+    row-gap: calc(32px * var(--s));
   }
 
   .site-photo,
@@ -5756,6 +5998,20 @@ button {
     font-size: calc(104px * var(--s));
     top: calc(var(--slab-y) - 0.44em);
     left: calc(22px * var(--s));
+  }
+
+  /* B1: one fact per row; three columns are too narrow on a phone. */
+  .about .title-block dl {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .about .title-block dl > div:nth-child(n) {
+    border-right: 0;
+    border-bottom: 1px solid var(--hatch);
+  }
+
+  .about .title-block dl > div:last-child {
+    border-bottom: 0;
   }
 
   .plant-scene {

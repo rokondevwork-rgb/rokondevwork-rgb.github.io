@@ -1,9 +1,15 @@
 ---
-/** The engineer: taped site photo, the quote, a short story and the title block of facts. */
+/**
+ * The engineer: taped site photo, the quote, a short story and the title block of facts.
+ * On wide screens the facts move into a third column, joined by "On site now": Dhaka's local
+ * time against the visitor's own, the current role and the latest field note.
+ */
 import { Picture } from "astro:assets";
 import Icon from "./Icon.astro";
 import { SITE } from "../consts";
-import { EDUCATION, QUOTE } from "../lib/data";
+import { EDUCATION, QUOTE, ROLES } from "../lib/data";
+import { getPublishedPosts } from "../lib/content";
+import { formatDate } from "../lib/format";
 import photo from "../assets/rokon_photo.png";
 
 interface Props {
@@ -14,9 +20,11 @@ interface Props {
 }
 
 const { more = false, eager = false } = Astro.props;
+const current = ROLES.find((r) => r.current) ?? ROLES[ROLES.length - 1];
+const [latest] = await getPublishedPosts();
 ---
 
-<div class="split">
+<div class="about">
   <figure class="site-photo">
     <div class="site-photo-frame">
       <Picture
@@ -46,6 +54,9 @@ const { more = false, eager = false } = Astro.props;
       integrating third-party hotel APIs, and serving clean, normalised content through FastAPI
       services on MySQL and PostgreSQL.
     </p>
+  </div>
+
+  <div class="about-facts">
     <div class="title-block">
       <div class="title-block-head mono"><span>Title block</span><span class="pencil">Sheet B1</span></div>
       <dl>
@@ -57,6 +68,73 @@ const { more = false, eager = false } = Astro.props;
         <div><dt class="mono">Status</dt><dd class="status">Open to roles + freelance</dd></div>
       </dl>
     </div>
-    {more && <div><a class="out-link" href="/about/">More About Me <Icon name="right" /></a></div>}
+
+    <section class="site-now" aria-label="On site now" data-site-now>
+      <div class="title-block-head mono"><span>On site now</span><span class="site-now-live">Live</span></div>
+      <dl>
+        <div class="site-now-time">
+          <dt class="mono">Local time · Dhaka</dt>
+          <dd>
+            <span class="sign" data-now-time>UTC+6</span>
+            <span class="mono pencil" data-now-when>Dhaka, Bangladesh</span>
+          </dd>
+        </div>
+        <div>
+          <dt class="mono">Current role</dt>
+          <dd>{current.role} · {current.company}<span class="mono pencil">{current.dates}</span></dd>
+        </div>
+        {
+          latest && (
+            <div>
+              <dt class="mono">Latest field note</dt>
+              <dd>
+                <a href={`/blog/${latest.id}/`}>{latest.data.title}</a>
+                <span class="mono pencil">{formatDate(latest.data.pubDate)}</span>
+              </dd>
+            </div>
+          )
+        }
+      </dl>
+    </section>
   </div>
+
+  {
+    more && (
+      <div class="about-more">
+        <a class="out-link" href="/about/">
+          More About Me <Icon name="right" />
+        </a>
+      </div>
+    )
+  }
 </div>
+
+<script>
+  // On site now: Dhaka's clock, and how far ahead of (or behind) the visitor it is.
+  // Dhaka is UTC+6 all year, with no daylight saving.
+  const clock = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Dhaka", hour: "2-digit", minute: "2-digit", hour12: false });
+  const day = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Dhaka", weekday: "short", day: "numeric", month: "short" });
+
+  const gap = (now: Date) => {
+    const ahead = 360 + now.getTimezoneOffset();
+    if (ahead === 0) return "same time as you";
+    const abs = Math.abs(ahead);
+    const h = Math.floor(abs / 60);
+    const m = abs % 60;
+    const span = [h && `${h} h`, m && `${m} min`].filter(Boolean).join(" ");
+    return `${span} ${ahead > 0 ? "ahead of" : "behind"} you`;
+  };
+
+  for (const card of document.querySelectorAll<HTMLElement>("[data-site-now]")) {
+    const time = card.querySelector<HTMLElement>("[data-now-time]");
+    const when = card.querySelector<HTMLElement>("[data-now-when]");
+    if (!time || !when) continue;
+    const tick = () => {
+      const now = new Date();
+      time.textContent = clock.format(now);
+      when.textContent = `${day.format(now)} · ${gap(now)}`;
+    };
+    tick();
+    window.setInterval(tick, 15000);
+  }
+</script>
