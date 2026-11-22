@@ -73,6 +73,30 @@ export function floorForPath(path: string): string | undefined {
   return undefined;
 }
 
+/**
+ * B2: the hopper, one sample supplier fragment per line, with what the normaliser does to it.
+ * The plant room's CSS times one fragment every 1.4 s, so it expects exactly seven.
+ */
+export const PLANT_FEEDS = [
+  { text: '<Hotel Code="DAC0412">', fix: "id" },
+  { text: '"name": "EXAMPLE GRAND - DHAKA"', fix: "case" },
+  { text: "<HotelName>Example Grand Dhaka</HotelName>", fix: "dup" },
+  { text: '"star_rating": "4*",', fix: "4*→4" },
+  { text: "<Lat>23.79</Lat><Lng>90.40", fix: "geo" },
+  { text: '"rooms": "  120 "', fix: "trim" },
+  { text: "<amenity>wifi_free</amenity>", fix: "map" },
+];
+
+/** B2: the one clean record the fragments become (six lines; the third fragment is a duplicate). */
+export const PLANT_RECORD = [
+  '"hotel_id": "DAC0412",',
+  '"name": "Example Grand Dhaka",',
+  '"stars": 4,',
+  '"geo": { "lat": 23.79, "lng": 90.40 },',
+  '"rooms": 120,',
+  '"amenities": ["wifi"]',
+];
+
 /** B2: the four disciplines, drawn as machines in the plant room. */
 export const MACHINES = [
   {

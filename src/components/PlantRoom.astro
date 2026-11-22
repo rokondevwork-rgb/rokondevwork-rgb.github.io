@@ -1,0 +1,187 @@
+---
+/**
+ * B2 Plant room: one normaliser feeds the four machines. While the floor is on screen a 12 s
+ * loop drops the supplier fragments out of the hopper one at a time, each lighting its line of
+ * the clean record, and the manifold opens one machine's valve every 3 s. At rest, and with
+ * reduced motion, every part shows its finished state.
+ * Put it inside a Level with class "lvl--plant".
+ */
+import { MACHINES, PLANT_FEEDS, PLANT_RECORD } from "../lib/data";
+
+const tones = ["var(--h-teal)", "var(--h-clay)", "var(--h-indigo)", "var(--h-mulberry)"];
+const lamps = ["Validate", "Map", "Dedupe"];
+// ETL belt: mixed supplier shapes go in, identical clean blocks come out.
+const rawBits = [
+  { c: "#ff6a3d", shape: "round" },
+  { c: "#d98bb8", shape: "square" },
+  { c: "#9daae8", shape: "diamond" },
+  { c: "#d9a45a", shape: "round" },
+  { c: "#b7c46a", shape: "square" },
+];
+const rawBelt = [...rawBits, ...rawBits, ...rawBits];
+const cleanBelt = Array.from({ length: 8 });
+const tableRows = [92, 78, 88, 70, 84, 90];
+const docLines = [100, 86, 94, 70, 90];
+const inCount = PLANT_FEEDS.length;
+---
+
+<div class="plant" data-plant>
+  <div
+    class="plant-scene"
+    role="img"
+    aria-label={`Normalisation, with sample data: ${inCount} raw supplier fragments in, one clean record out, one duplicate merged`}
+  >
+    <div class="hopper" aria-hidden="true">
+      <p class="plant-label mono"><span>Raw supplier feeds · sample</span><span>{inCount} fragments</span></p>
+      <ol class="hopper-box" role="list">
+        {
+          PLANT_FEEDS.map((f) => (
+            <li class="feed data">
+              <span>{f.text}</span>
+              <span class="feed-fix mono">{f.fix}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <span class="plant-flow" aria-hidden="true"></span>
+
+    <div class="normaliser" aria-hidden="true">
+      <svg viewBox="0 0 72 72"><g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="36" cy="36" r="22"></circle><circle cx="36" cy="36" r="8"></circle><path d="M36 6v8M36 58v8M6 36h8M58 36h8M15 15l6 6M51 51l6 6M15 57l6-6M51 21l6-6"></path></g></svg>
+      <span class="sign">Normaliser</span>
+      <span class="normaliser-lamps">
+        {lamps.map((lamp, k) => <span class="lamp mono" style={`--k: ${k}`}>{lamp}</span>)}
+      </span>
+    </div>
+
+    <span class="plant-flow plant-flow--stored" aria-hidden="true"></span>
+
+    <div class="record" aria-hidden="true">
+      <p class="plant-label plant-label--stored mono">
+        <span>One clean record</span>
+        <span class="record-done">✓ {inCount} in · 1 out · 1 duplicate</span>
+      </p>
+      <div class="record-box data">
+        <span>{"{"}</span>
+        {/* One line each: the box keeps white space, so a line break here would show. */}
+        {PLANT_RECORD.map((line, k) => <span class="rec">{`  ${line}`}{k === 1 && <span class="rec-merged mono">merged ×2</span>}</span>)}
+        <span>{"}"}</span>
+      </div>
+    </div>
+  </div>
+
+  <ul class="machines" role="list">
+    {
+      MACHINES.map((m, i) => (
+        <li class="machine" style={`--tone: ${tones[i]}; --k: ${i}`}>
+          <div class="machine-card">
+            <div class="machine-head" aria-hidden="true">
+              <span class="machine-code sign">{m.code}</span>
+              <span class="machine-state mono">
+                <span class="machine-led" />
+                Running
+              </span>
+            </div>
+
+            <div class={`mviz mviz--${m.code.toLowerCase()} mono`} aria-hidden="true">
+              {m.code === "API" && (
+                <>
+                  <span class="mviz-corner">Client</span>
+                  <span class="mviz-corner mviz-corner--r">API</span>
+                  <span class="mviz-wire" />
+                  <span class="mviz-packet" />
+                  <span class="mviz-req">GET /hotels/DAC0412</span>
+                  <span class="mviz-ok">200 · json</span>
+                </>
+              )}
+              {m.code === "ETL" && (
+                <>
+                  <span class="mviz-corner">Feeds in</span>
+                  <span class="mviz-corner mviz-corner--r">Clean out</span>
+                  <span class="mviz-belt mviz-belt--in">
+                    <span>
+                      {rawBelt.map((b) => (
+                        <i class={`is-${b.shape}`} style={`--c: ${b.c}`} />
+                      ))}
+                    </span>
+                  </span>
+                  <span class="mviz-belt mviz-belt--out">
+                    <span>
+                      {cleanBelt.map(() => (
+                        <i />
+                      ))}
+                    </span>
+                  </span>
+                  <span class="mviz-gate" />
+                  <span class="mviz-floor" />
+                </>
+              )}
+              {m.code === "SQL" && (
+                <>
+                  <span class="mviz-rows">
+                    {tableRows.map((w) => (
+                      <i style={`--w: ${w}%`} />
+                    ))}
+                    <span class="mviz-sweep" />
+                  </span>
+                  <span class="mviz-scan">
+                    Full scan
+                    <br />
+                    row by row
+                  </span>
+                  <span class="mviz-index">
+                    Index
+                    <br />
+                    (city, stars)
+                  </span>
+                </>
+              )}
+              {m.code === "AI" && (
+                <>
+                  <span class="mviz-doc">
+                    {docLines.map((w) => (
+                      <i style={`--w: ${w}%`} />
+                    ))}
+                  </span>
+                  <span class="mviz-arrow">→</span>
+                  <span class="mviz-out">
+                    <span class="mviz-out-label">Summary</span>
+                    <span class="mviz-type">hearing moved · 2 docs due</span>
+                    <span class="mviz-tagline">tag: urgent · sample</span>
+                  </span>
+                </>
+              )}
+            </div>
+
+            <div class="machine-body">
+              <h3 class="sign">{m.name}</h3>
+              <p>{m.line}</p>
+              <ul class="machine-tags mono" role="list">
+                {m.calls.map((c) => (
+                  <li>{c}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<script>
+  // Run the plant only while its floor is on screen; it starts again from the top each time.
+  {
+    const plant = document.querySelector<HTMLElement>("[data-plant]");
+    const section = plant?.closest<HTMLElement>(".lvl");
+    if (plant && section) {
+      const still = matchMedia("(prefers-reduced-motion: reduce)");
+      new IntersectionObserver(
+        ([entry]) => section.classList.toggle("is-playing", entry.isIntersecting && !still.matches),
+        // The middle of the screen, so a floor taller than the screen (phones) still plays.
+        { rootMargin: "-25% 0px -25% 0px" },
+      ).observe(section);
+    }
+  }
+</script>
