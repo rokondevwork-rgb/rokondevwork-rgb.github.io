@@ -42,7 +42,7 @@ const large = await Promise.all(
 );
 const offset = hero ? 1 : 0;
 const exhibitNo = (i: number) => String(i + 1).padStart(2, "0");
-const { Content } = await render(project);
+const { Content, headings } = await render(project);
 const hasBody = Boolean(project.body?.trim());
 const vault = (p: CollectionEntry<"projects">) => `V-${String(p.data.order).padStart(2, "0")}`;
 const tones = ["var(--h-teal)", "var(--h-mulberry)", "var(--h-clay)", "var(--h-indigo)", "var(--h-olive)"];
@@ -60,10 +60,23 @@ const layers = [
 const num = (name: string) => String(layers.indexOf(name) + 1).padStart(2, "0");
 const layerTones = ["var(--h-teal)", "var(--h-clay)", "var(--signal-text)", "var(--h-olive)", "var(--h-indigo)", "var(--h-mulberry)"];
 const layerTone = (name: string) => layerTones[layers.indexOf(name) % layerTones.length];
+// Each layer's name and what it holds: shown on the layer and in the side index.
+const layerNames: Record<string, [name: string, holds: string]> = {
+  surface: ["Surface", "The problem"],
+  topsoil: ["Topsoil", "Constraints"],
+  structure: ["Structure", "Request path"],
+  foundations: ["Foundations", "Data model"],
+  record: ["Field record", "What I built"],
+  bedrock: ["Bedrock", "Outcomes"],
+};
+// The link's hostname, allowed to wrap before each dot when its title-block cell is narrow.
+const hostParts = link ? new URL(link).hostname.split(".") : [];
+// The field record's own headings, listed under it in the side index when there are a few.
+const recordSections = headings.filter((h) => h.depth === 2);
 ---
 
 <Base title={title} description={summary} sheet={`Excavation sheet · ${vault(project)}`}>
-  <div class="sheet" style={`--tone: ${tone}`}>
+  <div class="sheet sheet--wide sheet--case" style={`--tone: ${tone}`}>
     <a class="mono ico" href="/projects/" style="color: var(--ink); text-decoration: none; min-height: 44px; margin-bottom: 24px"><Icon name="left" /> Back to the Vaults</a>
 
     <div class="sheet-hero">
@@ -77,12 +90,14 @@ const layerTone = (name: string) => layerTones[layers.indexOf(name) % layerTones
         <dl>
           {role && <div><dt class="mono">Role</dt><dd>{role}</dd></div>}
           {domain && <div><dt class="mono">Domain</dt><dd>{domain}</dd></div>}
-          {link && <div><dt class="mono">Link</dt><dd><a href={link} rel="noopener">{new URL(link).hostname}</a></dd></div>}
+          {link && <div><dt class="mono">Link</dt><dd><a href={link} rel="noopener">{hostParts.map((part, i) => (i ? <><wbr />.{part}</> : part))}</a></dd></div>}
           <div style="grid-column: 1 / -1"><dt class="mono">Stack</dt><dd class="mono" style="color: var(--teal); font-size: 0.75rem">{stack.join(" · ")}</dd></div>
         </dl>
       </div>
     </div>
 
+    {/* Wide screens: the lead exhibit with the others stacked beside it. */}
+    <div class="case-exhibits">
     {
       hero && (
         <figure class="exhibit">
@@ -122,11 +137,15 @@ const layerTone = (name: string) => layerTones[layers.indexOf(name) % layerTones
         </section>
       )
     }
+    </div>
 
+    {/* Wide screens: the layers with a side index that stays in view while you read. */}
+    <div class="case-body">
+    <div class="case-layers">
     {
       problem && (
-        <section class="layer" aria-labelledby="layer-surface" style={`--tone: ${layerTone("surface")}`}>
-          <div class="layer-label"><span class="sign" aria-hidden="true">{num("surface")}</span><h2 id="layer-surface" class="mono">Surface</h2><span class="mono pencil">The problem</span></div>
+        <section class="layer" id="sheet-surface" data-layer="surface" aria-labelledby="layer-surface" style={`--tone: ${layerTone("surface")}`}>
+          <div class="layer-label"><span class="sign" aria-hidden="true">{num("surface")}</span><h2 id="layer-surface" class="mono">{layerNames.surface[0]}</h2><span class="mono pencil">{layerNames.surface[1]}</span></div>
           <div class="layer-body"><p class="serif"><span class="reveal">{problem}</span></p></div>
         </section>
       )
@@ -134,8 +153,8 @@ const layerTone = (name: string) => layerTones[layers.indexOf(name) % layerTones
 
     {
       constraints && constraints.length > 0 && (
-        <section class="layer" aria-labelledby="layer-topsoil" style={`--tone: ${layerTone("topsoil")}`}>
-          <div class="layer-label"><span class="sign" aria-hidden="true">{num("topsoil")}</span><h2 id="layer-topsoil" class="mono">Topsoil</h2><span class="mono pencil">Constraints</span></div>
+        <section class="layer" id="sheet-topsoil" data-layer="topsoil" aria-labelledby="layer-topsoil" style={`--tone: ${layerTone("topsoil")}`}>
+          <div class="layer-label"><span class="sign" aria-hidden="true">{num("topsoil")}</span><h2 id="layer-topsoil" class="mono">{layerNames.topsoil[0]}</h2><span class="mono pencil">{layerNames.topsoil[1]}</span></div>
           <div class="layer-body">
             <ul class="constraint-grid" role="list">
               {constraints.map((c) => (
@@ -153,8 +172,8 @@ const layerTone = (name: string) => layerTones[layers.indexOf(name) % layerTones
 
     {
       architecture && architecture.length > 0 && (
-        <section class="layer" aria-labelledby="layer-structure" style={`--tone: ${layerTone("structure")}`}>
-          <div class="layer-label"><span class="sign" aria-hidden="true">{num("structure")}</span><h2 id="layer-structure" class="mono">Structure</h2><span class="mono pencil">Request path</span></div>
+        <section class="layer" id="sheet-structure" data-layer="structure" aria-labelledby="layer-structure" style={`--tone: ${layerTone("structure")}`}>
+          <div class="layer-label"><span class="sign" aria-hidden="true">{num("structure")}</span><h2 id="layer-structure" class="mono">{layerNames.structure[0]}</h2><span class="mono pencil">{layerNames.structure[1]}</span></div>
           <div class="layer-body">
             <ol class="chain mono">
               {architecture.map((n) => (
@@ -169,8 +188,8 @@ const layerTone = (name: string) => layerTones[layers.indexOf(name) % layerTones
 
     {
       dataModel && dataModel.length > 0 && (
-        <section class="layer" aria-labelledby="layer-foundations" style={`--tone: ${layerTone("foundations")}`}>
-          <div class="layer-label"><span class="sign" aria-hidden="true">{num("foundations")}</span><h2 id="layer-foundations" class="mono">Foundations</h2><span class="mono pencil">Data model</span></div>
+        <section class="layer" id="sheet-foundations" data-layer="foundations" aria-labelledby="layer-foundations" style={`--tone: ${layerTone("foundations")}`}>
+          <div class="layer-label"><span class="sign" aria-hidden="true">{num("foundations")}</span><h2 id="layer-foundations" class="mono">{layerNames.foundations[0]}</h2><span class="mono pencil">{layerNames.foundations[1]}</span></div>
           <div class="layer-body">
             <ul class="tables mono" role="list">
               {dataModel.map((t) => <li>{t}</li>)}
@@ -182,8 +201,8 @@ const layerTone = (name: string) => layerTones[layers.indexOf(name) % layerTones
 
     {
       hasBody && (
-        <section class="layer" aria-labelledby="layer-record" style={`--tone: ${layerTone("record")}`}>
-          <div class="layer-label"><span class="sign" aria-hidden="true">{num("record")}</span><h2 id="layer-record" class="mono">Field record</h2><span class="mono pencil">What I built</span></div>
+        <section class="layer" id="sheet-record" data-layer="record" aria-labelledby="layer-record" style={`--tone: ${layerTone("record")}`}>
+          <div class="layer-label"><span class="sign" aria-hidden="true">{num("record")}</span><h2 id="layer-record" class="mono">{layerNames.record[0]}</h2><span class="mono pencil">{layerNames.record[1]}</span></div>
           <div class="layer-body prose">
             <Content />
           </div>
@@ -193,8 +212,8 @@ const layerTone = (name: string) => layerTones[layers.indexOf(name) % layerTones
 
     {
       results && results.length > 0 && (
-        <section class="layer" aria-labelledby="layer-bedrock" style={`--tone: ${layerTone("bedrock")}`}>
-          <div class="layer-label"><span class="sign" aria-hidden="true">{num("bedrock")}</span><h2 id="layer-bedrock" class="mono">Bedrock</h2><span class="mono pencil">Outcomes</span></div>
+        <section class="layer" id="sheet-bedrock" data-layer="bedrock" aria-labelledby="layer-bedrock" style={`--tone: ${layerTone("bedrock")}`}>
+          <div class="layer-label"><span class="sign" aria-hidden="true">{num("bedrock")}</span><h2 id="layer-bedrock" class="mono">{layerNames.bedrock[0]}</h2><span class="mono pencil">{layerNames.bedrock[1]}</span></div>
           <div class="layer-body">
             <ul class="results" role="list">
               {results.map((r) => <li>{r}</li>)}
@@ -209,6 +228,41 @@ const layerTone = (name: string) => layerTones[layers.indexOf(name) % layerTones
         <p class="results">Case study coming soon. Add it in <code>src/content/projects/{project.id}.md</code>. (Only shown in dev.)</p>
       )
     }
+    </div>
+
+    {
+      layers.length > 0 && (
+        <aside class="case-rail" aria-label="On this sheet">
+          <nav class="case-index" aria-label="Layers">
+            <div class="title-block-head mono"><span>Excavation log</span><span class="pencil">{layers.length} {layers.length === 1 ? "layer" : "layers"}</span></div>
+            <ol class="case-index-list" role="list">
+              {layers.map((name) => (
+                <li style={`--tone: ${layerTone(name)}`}>
+                  <a href={`#sheet-${name}`} data-index-link={name}>
+                    <span class="sign" aria-hidden="true">{num(name)}</span>
+                    <span class="mono">{layerNames[name][0]}</span>
+                    <span class="mono pencil">{layerNames[name][1]}</span>
+                  </a>
+                  {name === "record" && recordSections.length > 1 && (
+                    <ol class="case-index-sub" role="list">
+                      {recordSections.map((h) => (
+                        <li><a href={`#${h.slug}`}>{h.text}</a></li>
+                      ))}
+                    </ol>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </nav>
+          <a class="case-next" href={`/projects/${next.id}/`}>
+            <span class="mono pencil">Next vault · {vault(next)}</span>
+            <span class="sign">{next.data.title}</span>
+            <Icon name="right" />
+          </a>
+        </aside>
+      )
+    }
+    </div>
   </div>
 
   {
@@ -289,5 +343,25 @@ const layerTone = (name: string) => layerTones[layers.indexOf(name) % layerTones
       img.removeAttribute("src");
       opener?.focus();
     });
+  }
+
+  /* Side index (wide screens only): mark the layer that is being read. */
+  {
+    const indexLinks = new Map<string, HTMLAnchorElement>();
+    document.querySelectorAll<HTMLAnchorElement>("[data-index-link]").forEach((a) => indexLinks.set(a.dataset.indexLink ?? "", a));
+    if (indexLinks.size) {
+      const reading = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            indexLinks.forEach((a) => a.removeAttribute("aria-current"));
+            indexLinks.get((entry.target as HTMLElement).dataset.layer ?? "")?.setAttribute("aria-current", "location");
+          }
+        },
+        // A thin band a third of the way down the screen: the layer crossing it is the one being read.
+        { rootMargin: "-33% 0px -62% 0px" },
+      );
+      document.querySelectorAll<HTMLElement>(".layer[data-layer]").forEach((layer) => reading.observe(layer));
+    }
   }
 </script>

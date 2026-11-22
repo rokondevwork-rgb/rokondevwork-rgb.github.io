@@ -39,6 +39,12 @@ if (!row && small.length) {
   if (rows.length) rows.push("corridor");
   rows.push(small);
 }
+// Wide screens (the Projects page): two large rooms a row and the small rooms in one even row,
+// so none is left alone on a row of its own. More than six small rooms wrap into even rows.
+// The grid gets just enough columns for both: the lowest common multiple of 2 and the row size.
+const perRow = small.length <= 6 ? Math.max(small.length, 1) : Math.ceil(small.length / Math.ceil(small.length / 5));
+const wideCols = perRow % 2 === 0 ? perRow : perRow * 2;
+const wideGrid = `--wide-cols: ${wideCols}; --wide-large: ${wideCols / 2}; --wide-small: ${wideCols / perRow}`;
 ---
 
 {
@@ -62,7 +68,7 @@ if (!row && small.length) {
   <div class="plan-tag mono" aria-hidden="true">
     <span>Plan view</span><span>Not to scale</span><span class="ico">N <Icon name="up" size={12} /></span>
   </div>
-  <ul class="rooms" role="list">
+  <ul class="rooms" role="list" style={row ? undefined : wideGrid}>
     {
       rows.map((row) =>
         row === "corridor" ? (

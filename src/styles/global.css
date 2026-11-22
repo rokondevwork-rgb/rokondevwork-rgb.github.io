@@ -1104,6 +1104,8 @@ button {
   margin: 0;
   font-size: 1rem;
   font-weight: 500;
+  /* Long links (a project's hostname) wrap inside their cell instead of running out of it. */
+  overflow-wrap: anywhere;
 }
 
 .status {
@@ -4365,6 +4367,12 @@ button {
   flex: 0 0 calc(420px * var(--s));
 }
 
+/* The stack runs the full width under the other facts: one rule above it, whichever cells are set. */
+.sheet-hero .title-block dl > div:last-child {
+  margin-top: -1px;
+  border-top: 1px solid var(--hatch);
+}
+
 .exhibit {
   margin: 0 0 calc(72px * var(--s));
   padding: calc(14px * var(--s));
@@ -4842,6 +4850,108 @@ button {
   height: calc(3px * var(--s));
   margin-top: 0.7em;
   background: var(--signal);
+}
+
+/* Case-study side index: the layers as jump links, beside them on wide screens only. */
+.case-rail {
+  display: none;
+}
+
+.case-index {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+
+.case-index-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.case-index-list > li + li {
+  border-top: 1px solid var(--hatch);
+}
+
+.case-index-list > li > a {
+  display: grid;
+  grid-template-columns: calc(52px * var(--s)) minmax(0, 1fr);
+  column-gap: calc(12px * var(--s));
+  align-items: baseline;
+  padding: calc(10px * var(--s)) calc(14px * var(--s));
+  color: var(--ink);
+  text-decoration: none;
+  transition:
+    background-color var(--tick) var(--ease),
+    box-shadow var(--tick) var(--ease);
+}
+
+.case-index-list > li > a .sign {
+  grid-row: span 2;
+  align-self: center;
+  font-size: 2rem;
+  color: var(--tone, var(--ink));
+}
+
+.case-index-list > li > a:hover,
+.case-index-list > li > a[aria-current] {
+  background: var(--vellum);
+}
+
+.case-index-list > li > a[aria-current] {
+  box-shadow: inset calc(4px * var(--s)) 0 0 var(--tone, var(--signal));
+}
+
+.case-index-sub {
+  display: grid;
+  margin: 0;
+  padding: 0 calc(14px * var(--s)) calc(10px * var(--s)) calc(78px * var(--s));
+  list-style: none;
+  font-size: 0.875rem;
+  line-height: 1.3;
+}
+
+.case-index-sub a {
+  display: block;
+  padding: calc(4px * var(--s)) 0;
+  color: var(--pencil);
+  text-decoration: none;
+}
+
+.case-index-sub a:hover {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--signal);
+}
+
+.case-next {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: calc(4px * var(--s)) calc(12px * var(--s));
+  margin-top: calc(16px * var(--s));
+  padding: calc(14px * var(--s));
+  border: 1px solid var(--ink);
+  background: var(--vellum);
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color var(--tick) var(--ease);
+}
+
+.case-next .pencil {
+  grid-column: 1 / -1;
+}
+
+.case-next .sign {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.case-next:hover {
+  border-color: var(--signal);
+}
+
+.case-next:hover svg {
+  color: var(--signal);
 }
 
 /* Field notes: a drawing register */
@@ -5417,6 +5527,127 @@ button {
   /* B8: a wider intercom beside the contact details. */
   .contact-wrap .terminal {
     flex-basis: calc(820px * var(--s));
+  }
+
+  /* Projects and case studies: the sheet uses the full width too. */
+  .sheet--wide > * {
+    max-width: calc(2100px * var(--s));
+  }
+
+  /* Projects: two large rooms a row and the small rooms in one row (VaultPlan sets the columns). */
+  .sheet--wide .rooms {
+    grid-template-columns: repeat(var(--wide-cols, 12), minmax(0, 1fr));
+  }
+
+  .sheet--wide .room {
+    grid-column: span var(--wide-small, 3);
+  }
+
+  .sheet--wide .room--large {
+    grid-column: span var(--wide-large, 6);
+  }
+
+  .sheet--wide .room--large .room-shot img {
+    height: calc(300px * var(--s));
+  }
+
+  .sheet--wide .room:not(.room--large):not(.room--mid) .room-shot img {
+    height: calc(160px * var(--s));
+  }
+
+  /* Case study: a main column and a side column, from the title down to the layers. */
+  .sheet--case {
+    --side: clamp(calc(400px * var(--s)), 25vw - 80px, calc(480px * var(--s)));
+    --gutter: calc(64px * var(--s));
+  }
+
+  .sheet--case .sheet-hero,
+  .case-exhibits:has(> .exhibit + .exhibit-set),
+  .case-body:has(> .case-rail) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--side);
+    column-gap: var(--gutter);
+    align-items: start;
+  }
+
+  .sheet--case .sheet-hero {
+    align-items: end;
+  }
+
+  .sheet--case .sheet-hero .title-block {
+    max-width: none;
+  }
+
+  /* The lead exhibit, with the others stacked beside it at its height. */
+  .case-exhibits:has(> .exhibit + .exhibit-set) {
+    margin-bottom: calc(72px * var(--s));
+  }
+
+  .case-exhibits > .exhibit:has(+ .exhibit-set) {
+    margin: 0;
+  }
+
+  /* Size containment: the stack never makes the row taller than the lead exhibit (or its minimum). */
+  .case-exhibits > .exhibit + .exhibit-set {
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    min-height: calc(720px * var(--s));
+    margin: 0;
+    contain: size;
+  }
+
+  .case-exhibits .exhibit-set-head {
+    flex: none;
+  }
+
+  .case-exhibits .exhibit-grid[data-count] {
+    --cols: 1;
+    flex: 1 1 0;
+    min-height: 0;
+    grid-auto-rows: minmax(0, 1fr);
+  }
+
+  .case-exhibits .exhibit-grid li,
+  .case-exhibits .exhibit-grid figure {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .case-exhibits .exhibit-grid figure {
+    flex: 1 1 auto;
+  }
+
+  .case-exhibits .exhibit-thumb {
+    flex: 1 1 0;
+    min-height: 0;
+    aspect-ratio: auto;
+  }
+
+  /* One caption line each, so the pictures keep their height; the viewer shows the full caption. */
+  .case-exhibits .exhibit-grid figcaption {
+    flex-wrap: nowrap;
+  }
+
+  .case-exhibits .exhibit-grid figcaption > :first-child {
+    flex: none;
+  }
+
+  .case-exhibits .exhibit-grid figcaption .pencil {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* The side index stays in view while the layers scroll past. */
+  .case-rail {
+    display: block;
+    position: sticky;
+    top: calc(32px * var(--s));
+    max-height: calc(100svh - calc(64px * var(--s)));
+    overflow-y: auto;
   }
 }
 
