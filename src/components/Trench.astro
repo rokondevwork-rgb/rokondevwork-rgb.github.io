@@ -17,9 +17,9 @@ const first = tools.find((t) => t.name === initial) ?? tools[0];
 const toolData = Object.fromEntries(tools.map((t) => [t.name, { works: t.works, used: t.usedIn, layer: t.layer, paint: t.paint, tone: t.tone }]));
 ---
 
-<div class="trench-wrap" data-trench-wrap>
+<div class="trench-wrap" data-trench-wrap data-swipe="Card">
   <script is:inline type="application/json" data-trench-data set:html={JSON.stringify({ tools: toolData, flows: TRENCH_FLOWS })} />
-  <div class="trench has-pick" data-trench>
+  <div class="trench has-pick" data-trench data-slide>
     <div class="trench-wall trench-wall--l hatch-earth" aria-hidden="true"></div>
     <div class="trench-body" data-trench-body>
       <svg class="trench-lines" aria-hidden="true" data-trench-lines>
@@ -59,7 +59,7 @@ const toolData = Object.fromEntries(tools.map((t) => [t.name, { works: t.works, 
     <div class="trench-wall trench-wall--r hatch-earth" aria-hidden="true"></div>
   </div>
 
-  <aside class="pipe-panel" aria-label="Selected tool">
+  <aside class="pipe-panel" aria-label="Selected tool" data-slide>
     <div class="pipe-panel-live" aria-live="polite">
       <span class="mono pencil" data-pipe-kicker>Selected pipe</span>
       <span class="sign" data-pipe-name>{first.name}</span>

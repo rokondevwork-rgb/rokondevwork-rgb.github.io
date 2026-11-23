@@ -25,13 +25,13 @@ const docLines = [100, 86, 94, 70, 90];
 const inCount = PLANT_FEEDS.length;
 ---
 
-<div class="plant" data-plant>
+<div class="plant" data-plant data-swipe="Card">
   <div
     class="plant-scene"
     role="img"
     aria-label={`Normalisation, with sample data: ${inCount} raw supplier fragments in, one clean record out, one duplicate merged`}
   >
-    <div class="hopper" aria-hidden="true">
+    <div class="hopper" aria-hidden="true" data-slide>
       <p class="plant-label mono"><span>Raw supplier feeds · sample</span><span>{inCount} fragments</span></p>
       <ol class="hopper-box" role="list">
         {
@@ -47,26 +47,29 @@ const inCount = PLANT_FEEDS.length;
 
     <span class="plant-flow" aria-hidden="true"></span>
 
-    <div class="normaliser" aria-hidden="true">
-      <svg viewBox="0 0 72 72"><g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="36" cy="36" r="22"></circle><circle cx="36" cy="36" r="8"></circle><path d="M36 6v8M36 58v8M6 36h8M58 36h8M15 15l6 6M51 51l6 6M15 57l6-6M51 21l6-6"></path></g></svg>
-      <span class="sign">Normaliser</span>
-      <span class="normaliser-lamps">
-        {lamps.map((lamp, k) => <span class="lamp mono" style={`--k: ${k}`}>{lamp}</span>)}
-      </span>
-    </div>
+    <!-- Only a box on floors on phones and tablets: the normaliser and its record share a card. -->
+    <div class="plant-out" data-slide>
+      <div class="normaliser" aria-hidden="true">
+        <svg viewBox="0 0 72 72"><g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="36" cy="36" r="22"></circle><circle cx="36" cy="36" r="8"></circle><path d="M36 6v8M36 58v8M6 36h8M58 36h8M15 15l6 6M51 51l6 6M15 57l6-6M51 21l6-6"></path></g></svg>
+        <span class="sign">Normaliser</span>
+        <span class="normaliser-lamps">
+          {lamps.map((lamp, k) => <span class="lamp mono" style={`--k: ${k}`}>{lamp}</span>)}
+        </span>
+      </div>
 
-    <span class="plant-flow plant-flow--stored" aria-hidden="true"></span>
+      <span class="plant-flow plant-flow--stored" aria-hidden="true"></span>
 
-    <div class="record" aria-hidden="true">
-      <p class="plant-label plant-label--stored mono">
-        <span>One clean record</span>
-        <span class="record-done">✓ {inCount} in · 1 out · 1 duplicate</span>
-      </p>
-      <div class="record-box data">
-        <span>{"{"}</span>
-        {/* One line each: the box keeps white space, so a line break here would show. */}
-        {PLANT_RECORD.map((line, k) => <span class="rec">{`  ${line}`}{k === 1 && <span class="rec-merged mono">merged ×2</span>}</span>)}
-        <span>{"}"}</span>
+      <div class="record" aria-hidden="true">
+        <p class="plant-label plant-label--stored mono">
+          <span>One clean record</span>
+          <span class="record-done">✓ {inCount} in · 1 out · 1 duplicate</span>
+        </p>
+        <div class="record-box data">
+          <span>{"{"}</span>
+          {/* One line each: the box keeps white space, so a line break here would show. */}
+          {PLANT_RECORD.map((line, k) => <span class="rec">{`  ${line}`}{k === 1 && <span class="rec-merged mono">merged ×2</span>}</span>)}
+          <span>{"}"}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -74,7 +77,7 @@ const inCount = PLANT_FEEDS.length;
   <ul class="machines" role="list">
     {
       MACHINES.map((m, i) => (
-        <li class="machine" style={`--tone: ${tones[i]}; --k: ${i}`}>
+        <li class="machine" style={`--tone: ${tones[i]}; --k: ${i}`} data-slide>
           <div class="machine-card">
             <div class="machine-head" aria-hidden="true">
               <span class="machine-code sign">{m.code}</span>

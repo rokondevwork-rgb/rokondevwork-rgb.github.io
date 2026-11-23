@@ -50,3 +50,9 @@ const headingId = `${floor.id}-title`;
     <slot />
   </div>
 </section>
+
+<script>
+  // Phones and tablets: rows of cards inside a floor slide sideways; this adds their pagers.
+  import { initSwipePagers } from "../scripts/swipe-pager";
+  initSwipePagers();
+</script>

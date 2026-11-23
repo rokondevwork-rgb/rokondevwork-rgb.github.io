@@ -140,7 +140,7 @@ const flagStrips = Array.from({ length: 15 }, (_, k) => k);
   <!-- B3 · Technology ecosystem -->
   <Level floor={B3} title="Utility trench" sub="The technology ecosystem. <em>Every tool is a pipe, painted like a real utility line.</em>" band="earth" tone="var(--h-clay)">
     <Trench />
-    <p class="mono pencil" style="margin: 14px 0 0 18px">Tap a pipe to trace it · or play a flow · no skill levels, only real connections</p>
+    <p class="trench-hint mono pencil">Tap a pipe to trace it · or play a flow · no skill levels, only real connections</p>
   </Level>
 
   <!-- B4 · Featured projects -->
@@ -168,7 +168,7 @@ const flagStrips = Array.from({ length: 15 }, (_, k) => k);
           </span>
         )}
         <div class:list={["dig-stage", { "dig-stage--live": ex }]}>
-          <div class:list={["dig", { "dig--live": ex }]} data-dig-live={ex ? "" : undefined}>
+          <div class:list={["dig", { "dig--live": ex }]} data-dig-live={ex ? "" : undefined} data-swipe="Layer">
             {dig.data.problem && (
               <div class="dig-row" style="--step: 0">
                 <div class="dig-label mono">01 · Surface<span class="pencil">The problem</span>{ex && <span class="dig-now">● digging</span>}</div>
@@ -333,7 +333,7 @@ const flagStrips = Array.from({ length: 15 }, (_, k) => k);
     <span class="response-shaft" aria-hidden="true"></span>
     <span class="response-label mono ico" aria-hidden="true">Response <Icon name="up" /></span>
 
-    <div class="contact-wrap">
+    <div class="contact-wrap" data-swipe="Card">
       <div class="contact-main">
         <p class="serif"><span class="reveal">You’ve seen what’s underneath.</span> <em class="reveal" style="--fill: var(--signal-text)">Let’s build something on top of it.</em></p>
         <div style="display: grid; gap: 12px">

@@ -24,7 +24,7 @@ const pileTones = ["#ece6da", "#f2b48f", "#9fd3cb"];
     <span class="pile-driver mono" aria-hidden="true"><span>Pile driver</span></span>
     <div class="pile-cap mono" aria-hidden="true"><span>Pile cap · everything I build rests here</span></div>
     {PRINCIPLES.map((_, i) => <span class="pile-thud" style={`--step: ${i}; left: var(--c${i})`} aria-hidden="true" />)}
-    <ol class="piles piles--live" role="list">
+    <ol class="piles piles--live" role="list" data-swipe="Pile">
       {
         PRINCIPLES.map((p, i) => {
           const proof = PILE_PROOFS[i];

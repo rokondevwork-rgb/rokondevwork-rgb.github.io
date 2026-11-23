@@ -68,7 +68,7 @@ const wideGrid = `--wide-cols: ${wideCols}; --wide-large: ${wideCols / 2}; --wid
   <div class="plan-tag mono" aria-hidden="true">
     <span>Plan view</span><span>Not to scale</span><span class="ico">N <Icon name="up" size={12} /></span>
   </div>
-  <ul class="rooms" role="list" style={row ? undefined : wideGrid}>
+  <ul class="rooms" role="list" style={row ? undefined : wideGrid} data-swipe={row ? "Project" : undefined}>
     {
       rows.map((row) =>
         row === "corridor" ? (

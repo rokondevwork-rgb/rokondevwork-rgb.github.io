@@ -2296,6 +2296,10 @@ button {
   opacity: 0.8;
 }
 
+.trench-hint {
+  margin: calc(14px * var(--s)) 0 0 calc(18px * var(--s));
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .trench-line {
     animation: trench-dash 0.9s linear infinite;
@@ -7221,6 +7225,836 @@ button {
     grid-template-columns: minmax(0, 1fr);
     gap: calc(4px * var(--s));
     padding: calc(16px * var(--s));
+  }
+}
+
+/* ==========================================================================
+   One floor per window on phones and tablets
+   As on the desktop, every floor of a page built from floors (home, about)
+   fills one screen, and the scroll snaps from floor to floor. To make room
+   the heading sits beside the numeral, and rows of things (machines,
+   projects, layers, piles, the contact cards) become cards that slide
+   sideways, with a pager under them (scripts/swipe-pager.ts). Nothing is
+   left out: it is one swipe away. Landscape phones are too short for this
+   and keep the long floors.
+   ========================================================================== */
+/* Wrappers that only become boxes here; elsewhere their children lay out as before. */
+.about-slides,
+.plant-out {
+  display: contents;
+}
+
+.swipe-pager {
+  display: none;
+}
+
+@media (max-width: 1199px) and (min-height: 500px) {
+  :root {
+    --slab-y: 52px;
+    /* The floor numeral; the heading starts just after it. */
+    --num: clamp(80px, 11vw, 112px);
+    /* Card width: one card and a sliver of the next on a phone, two on a tablet. */
+    --slide: calc(100% - 22px);
+    --slide-gap: 12px;
+  }
+
+  html.snap {
+    scroll-snap-type: y mandatory;
+  }
+
+  .snap .lvl {
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+    padding-top: calc(var(--slab-y) + 28px);
+    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+  }
+
+  .snap .lvl-inner {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .snap .lvl-num {
+    font-size: var(--num);
+  }
+
+  .snap .lvl-head {
+    gap: 6px;
+    margin-bottom: 14px;
+    padding: 0;
+  }
+
+  .snap .lvl-head h2 {
+    padding-left: calc(var(--num) * 1.08);
+    font-size: clamp(1.75rem, 1rem + 3.4vw, 3rem);
+    line-height: 0.95;
+  }
+
+  .snap .lvl-head p {
+    font-size: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);
+    line-height: 1.2;
+    max-width: 52ch;
+  }
+
+  .snap .out-link {
+    margin-top: 10px;
+    min-height: 44px;
+    padding: 0 18px;
+    font-size: 0.9375rem;
+  }
+
+  /* A link straight under the floor's content keeps its own width (the floor is a flex column). */
+  .snap .lvl-inner > .out-link {
+    align-self: flex-start;
+  }
+
+  /* L0: exactly one screen. */
+  .snap .street {
+    height: 100svh;
+    min-height: 500px;
+  }
+
+  .snap .street-hint {
+    bottom: calc(24px + env(safe-area-inset-bottom));
+  }
+
+  /* The sliding row */
+  .lvl [data-swipe] {
+    display: grid;
+    grid-template: none / none;
+    grid-auto-flow: column;
+    grid-auto-columns: var(--slide);
+    gap: var(--slide-gap);
+    align-items: stretch;
+    /* Room for the photo's tape, focus rings and lifted cards, which the scroller would clip. */
+    margin: -10px 0 0;
+    padding: 10px 2px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 2px;
+    scrollbar-width: none;
+  }
+
+  .lvl [data-swipe]::-webkit-scrollbar {
+    display: none;
+  }
+
+  .lvl [data-swipe] > *,
+  .lvl [data-swipe] [data-slide] {
+    grid-area: auto;
+    min-width: 0;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  .lvl .swipe-pager:not([hidden]) {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    color: var(--pencil);
+    font-size: 0.625rem;
+  }
+
+  .swipe-step {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 1px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .swipe-step:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  .swipe-dots {
+    display: flex;
+    padding: 0 4px;
+  }
+
+  .swipe-dot {
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 34px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+
+  .swipe-dot::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border: 1px solid var(--ink);
+    transition:
+      width var(--settle) var(--ease),
+      background-color var(--settle) var(--ease);
+  }
+
+  .swipe-dot[aria-current]::before {
+    width: 16px;
+    border-color: var(--signal);
+    background: var(--signal);
+  }
+
+  .swipe-count {
+    margin-left: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* B1: photo | words | title block */
+  .lvl .about {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .lvl .site-photo {
+    align-content: start;
+    gap: 10px;
+    padding: 8px 6px 0;
+  }
+
+  .lvl .site-photo-frame {
+    rotate: -1.5deg;
+  }
+
+  .lvl .site-photo-frame img {
+    height: clamp(160px, 100svh - 410px, 460px);
+  }
+
+  .lvl .about-text {
+    align-content: start;
+    gap: 12px;
+  }
+
+  .lvl .about-text blockquote {
+    font-size: 1.375rem;
+    line-height: 1.1;
+  }
+
+  .lvl .about-text p {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .lvl .about .title-block dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lvl .about .title-block dl > div:nth-child(n) {
+    padding: 8px 10px;
+    border-right: 0;
+    border-bottom: 1px solid var(--hatch);
+  }
+
+  .lvl .about .title-block dl > div:nth-child(odd) {
+    border-right: 1px solid var(--hatch);
+  }
+
+  .lvl .about .title-block dl > div:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+
+  .lvl .about .title-block dd {
+    font-size: 0.875rem;
+    line-height: 1.35;
+  }
+
+  /* B2: hopper | normaliser and record | the four machines */
+  .lvl .plant-scene,
+  .lvl .machines {
+    display: contents;
+  }
+
+  .lvl .plant-flow {
+    display: none;
+  }
+
+  .lvl .hopper,
+  .lvl .record {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .lvl .hopper-box,
+  .lvl .record-box {
+    flex: 1 1 auto;
+    align-content: start;
+  }
+
+  .lvl .plant-out {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .lvl .record {
+    flex: 1 1 auto;
+  }
+
+  .lvl .machine {
+    display: flex;
+    padding-top: 0;
+  }
+
+  .lvl .machine-card {
+    flex: 1 1 auto;
+  }
+
+  /* B3: the trench | the selected pipe and the flows. The row takes the rest of the screen,
+     and the trench's layers share that height. */
+  .lvl .trench-wrap {
+    flex: 1 1 auto;
+  }
+
+  .lvl .trench-body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .lvl .trench-layer {
+    flex: 1 1 auto;
+  }
+
+  .lvl .trench-wall {
+    flex-basis: 8px;
+  }
+
+  .lvl .trench-layer {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 4px;
+    padding: 2px 4px 2px 2px;
+  }
+
+  /* The layer name runs up the trench wall, so the pipes get the whole width. */
+  .lvl .trench-layer h3 {
+    flex: none;
+    justify-content: center;
+    gap: 4px;
+    writing-mode: vertical-rl;
+    rotate: 180deg;
+    font-size: 0.4375rem;
+    font-stretch: 100%;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  /* The pipes already wear the layer's paint. */
+  .lvl .trench-swatch {
+    display: none;
+  }
+
+  .lvl .trench-hint {
+    margin: 4px 0 0;
+    font-size: 0.5625rem;
+  }
+
+  .lvl .pipes {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: start;
+    gap: 0;
+  }
+
+  .lvl .pipe {
+    gap: 2px;
+    padding: 1px 0;
+  }
+
+  .lvl .pipe-ring {
+    width: 22px;
+    height: 22px;
+    border-width: 2px;
+  }
+
+  .lvl .pipe-ring::after {
+    width: 8px;
+    height: 8px;
+  }
+
+  .lvl .pipe .mono {
+    padding: 0 1px;
+    font-size: 0.5rem;
+    letter-spacing: 0;
+  }
+
+  .lvl .pipe[data-step]::before {
+    left: calc(50% + 8px);
+    min-width: 14px;
+    height: 14px;
+    line-height: 14px;
+  }
+
+  .lvl .trench-grit {
+    height: 10px;
+  }
+
+  /* The panel takes the trench's height and never adds to it: a long flow scrolls inside. */
+  .lvl .pipe-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: auto;
+    max-width: none;
+    contain: size;
+  }
+
+  .lvl .pipe-panel-live {
+    flex: 1 1 auto;
+    min-height: 0;
+    align-content: start;
+    gap: 6px;
+    padding: 12px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .lvl .pipe-panel .sign {
+    font-size: 2rem;
+  }
+
+  .lvl .pipe-panel dl {
+    gap: 8px;
+  }
+
+  .lvl .pipe-panel dd {
+    margin-top: 4px;
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  .lvl .pipe-panel .tags {
+    gap: 4px;
+  }
+
+  .lvl .pipe-panel .tags li {
+    padding: 1px 5px;
+    font-size: 0.5625rem;
+  }
+
+  .lvl .flow-picker {
+    flex: none;
+    gap: 4px;
+  }
+
+  .lvl .flow-btns {
+    gap: 4px;
+  }
+
+  .lvl .flow-btn {
+    gap: 0;
+    min-height: 38px;
+    padding: 4px 8px;
+    font-size: 0.6875rem;
+  }
+
+  /* B4: one project per card */
+  .lvl .plan--row {
+    padding: 34px 10px 10px;
+  }
+
+  .lvl .plan--row .room {
+    padding: 12px;
+  }
+
+  .lvl .plan--row .room-shot img,
+  .lvl .plan--row .room:not(.room--large):not(.room--mid) .room-shot img {
+    height: clamp(110px, 100svh - 540px, 300px);
+  }
+
+  .lvl .plan--row .room p.serif {
+    font-size: 1.0625rem;
+  }
+
+  /* B5: one layer per card */
+  .lvl .dig {
+    border: 0;
+  }
+
+  .lvl .dig-row,
+  .lvl .dig-row:last-child {
+    flex-direction: column;
+    border: 1px solid var(--ink);
+  }
+
+  .lvl .dig-stage--live {
+    row-gap: 6px;
+    margin-bottom: 0;
+  }
+
+  .lvl .dig-label,
+  .lvl .dig--live .dig-label {
+    flex: none;
+    flex-direction: row;
+    align-items: baseline;
+    column-gap: 10px;
+    flex-wrap: nowrap;
+    padding: 8px 12px;
+    white-space: nowrap;
+  }
+
+  .lvl .dig-now {
+    margin: 0 0 0 auto;
+    padding: 0;
+  }
+
+  .lvl .dig--live .dig-row {
+    min-height: 0;
+  }
+
+  .lvl .dig-body,
+  .lvl .dig--live .dig-body {
+    align-self: stretch;
+    justify-content: flex-start;
+    padding: 12px;
+  }
+
+  .lvl .dig-log {
+    height: 30px;
+  }
+
+  .lvl .dig-body .serif {
+    font-size: 1.375rem;
+  }
+
+  .lvl .dig--live .dig-gauges {
+    gap: 8px;
+  }
+
+  .lvl .dig-gauge {
+    gap: 4px;
+    padding: 6px 8px;
+  }
+
+  .lvl .drill {
+    display: none !important;
+  }
+
+  /* B6: the core lies on its side again, as on the desktop; tap a band for that role. */
+  .lvl .core {
+    flex-direction: row;
+    height: 96px;
+    padding-top: 14px;
+  }
+
+  .lvl .core-edu {
+    flex: 0 0 30px;
+    border: 1.5px solid var(--ink);
+    border-right: 0;
+    border-radius: 48px 0 0 48px;
+  }
+
+  .lvl .core-edu[aria-pressed="true"] {
+    translate: 0 -10px;
+    border: 2px solid var(--signal);
+    border-right: 0;
+  }
+
+  .lvl .band {
+    flex: var(--months) 1 0px;
+    min-width: min-content;
+    gap: 4px;
+    padding: 8px 5px;
+    border-top: 1.5px solid var(--ink);
+    border-left-width: 1px;
+  }
+
+  .lvl .band:last-of-type {
+    border-top: 1.5px solid var(--ink);
+    border-right: 1.5px dashed var(--ink);
+  }
+
+  .lvl .band[aria-pressed="true"] {
+    translate: 0 -10px;
+    border-top: 4px solid var(--signal);
+    border-left: 1px solid var(--ink);
+  }
+
+  /* Small enough that the shortest role's name fits its share of the core. */
+  .lvl .band .sign {
+    font-size: clamp(0.75rem, 3.2vw, 1.0625rem);
+    line-height: 1;
+  }
+
+  .lvl .band .mono {
+    font-size: 0.5rem;
+  }
+
+  .lvl .core-drill {
+    flex: 0 0 16px;
+    padding: 0;
+    font-size: 0.5rem;
+  }
+
+  .lvl .core-drill span {
+    writing-mode: vertical-rl;
+  }
+
+  .lvl .roles {
+    margin-top: 14px;
+    padding-top: 14px;
+  }
+
+  .lvl .role {
+    gap: 12px;
+  }
+
+  .lvl .role-head {
+    gap: 2px;
+  }
+
+  .lvl .role-head .sign {
+    font-size: 1.75rem;
+  }
+
+  .lvl .role ul {
+    gap: 6px;
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  /* B7: one pile per card, standing on the bedrock; the pager goes under the bedrock. */
+  .lvl .pile-site {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .lvl .pile-site > .swipe-pager {
+    order: 1;
+    margin-top: 4px;
+  }
+
+  .lvl .piles--live {
+    margin-bottom: -10px;
+    padding-inline: 2px;
+  }
+
+  .lvl .pile {
+    min-height: 0;
+    gap: 6px;
+    padding: 12px;
+  }
+
+  .lvl .pile h3 {
+    font-size: 1.625rem;
+  }
+
+  .lvl .pile p {
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+
+  .lvl .pile-loads {
+    height: 34px;
+  }
+
+  .lvl .bedrock {
+    height: 32px;
+  }
+
+  /* B8: the ways to reach me | the intercom */
+  .lvl .contact-wrap {
+    flex: 1 1 auto;
+  }
+
+  .lvl .contact-main {
+    align-content: start;
+    gap: 10px;
+  }
+
+  .lvl .contact-main > p.serif {
+    font-size: 1.4375rem;
+    line-height: 1.05;
+  }
+
+  .lvl .contact-main .copy-button {
+    min-height: 36px;
+    padding-block: 6px;
+  }
+
+  .lvl .big-email {
+    font-size: clamp(1.5rem, 1rem + 3vw, 2.25rem);
+  }
+
+  .lvl .links-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lvl .links-grid li:nth-child(odd) {
+    border-right: 1px solid var(--hatch);
+  }
+
+  .lvl .links-grid a {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 2px;
+    min-height: 0;
+    padding: 6px 8px;
+    font-size: 0.8125rem;
+  }
+
+  .lvl .links-grid a {
+    position: relative;
+  }
+
+  .lvl .links-grid a > span {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  /* The arrow moves up beside the label, so a long handle keeps the whole line. */
+  .lvl .links-grid .ico svg {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+  }
+
+  .lvl .contact-wrap .terminal {
+    display: flex;
+    flex-direction: column;
+    width: auto;
+    max-width: none;
+  }
+
+  /* The log fills whatever height the card has, and scrolls inside it. */
+  .lvl .contact-wrap .terminal-log {
+    flex: 1 1 0;
+    min-height: 96px;
+    max-height: none;
+  }
+
+  .lvl .contact-wrap .terminal-chips {
+    gap: 4px;
+    padding: 0 12px 12px;
+  }
+
+  .lvl .contact-wrap .terminal-chips button {
+    min-height: 32px;
+    padding: 3px 8px;
+  }
+
+  .lvl--last.lvl--last {
+    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+  }
+
+  .lvl .response-line {
+    display: none;
+  }
+
+  /* The right-hand gap leaves the call button its corner. */
+  .lvl .shaft-foot {
+    position: static;
+    justify-content: flex-start;
+    margin-top: 6px;
+    padding-right: 76px;
+    gap: 6px 14px;
+    font-size: 0.5625rem;
+  }
+
+  .lvl .shaft-foot .out-link {
+    margin: 0;
+    min-height: 40px;
+    padding: 0 12px;
+    font-size: 0.625rem;
+  }
+}
+
+/* L0 on a phone: the name and the voice under it shrink with the screen's height. */
+@media (max-width: 760px) and (min-height: 500px) {
+  .snap .street {
+    --ground: clamp(150px, 27%, 260px);
+    --name-size: min(clamp(4.5rem, 25vw, 7rem), 13svh);
+  }
+
+  .snap .street-voice p.serif {
+    font-size: clamp(1.625rem, 4.4svh, 2.125rem);
+  }
+}
+
+/* Narrow phones (360 px and the like): a little smaller type where the words run longest. */
+@media (max-width: 379px) and (min-height: 500px) {
+  .lvl .about-text blockquote {
+    font-size: 1.25rem;
+  }
+
+  .lvl .about-text p {
+    font-size: 0.8125rem;
+  }
+
+  .lvl .links-grid a {
+    font-size: 0.75rem;
+  }
+
+  .lvl .dig-body .serif {
+    font-size: 1.25rem;
+  }
+
+  .lvl .contact-main > p.serif {
+    font-size: 1.3125rem;
+  }
+}
+
+/* Short phones (iPhone SE and the like): a smaller heading. A floor that still runs a little
+   past the screen snaps loosely, so all of it stays reachable. */
+@media (max-width: 1199px) and (min-height: 500px) and (max-height: 620px) {
+  :root {
+    --slab-y: 44px;
+    --num: 68px;
+  }
+
+  html.snap {
+    scroll-snap-type: y proximity;
+  }
+
+  .snap .lvl {
+    padding-top: calc(var(--slab-y) + 20px);
+  }
+
+  .snap .lvl-head {
+    margin-bottom: 10px;
+  }
+
+  .snap .lvl-head h2 {
+    font-size: 1.625rem;
+  }
+
+  .snap .lvl-head p {
+    font-size: 0.875rem;
+  }
+}
+
+/* Tablets: two cards side by side. */
+@media (min-width: 700px) and (max-width: 1199px) and (min-height: 500px) {
+  :root {
+    --slide: calc(50% - 22px);
+  }
+
+  /* B3: the trench and its panel both fit, the trench wider. */
+  .lvl .trench-wrap {
+    grid-auto-columns: auto;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  }
+
+  /* B8: the address stays on one line in a half-width card. */
+  .lvl .big-email {
+    font-size: 1.75rem;
   }
 }
 
