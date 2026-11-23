@@ -5020,6 +5020,13 @@ button {
   max-width: 22ch;
 }
 
+/* A field note reads as one column in the middle of the sheet. The heading takes the text's
+   width, so its left edge lines up with the paragraphs below it. */
+.sheet--post > * {
+  max-width: 68ch;
+  margin-inline: auto;
+}
+
 /* News radio: news */
 .radio {
   margin: 0;
