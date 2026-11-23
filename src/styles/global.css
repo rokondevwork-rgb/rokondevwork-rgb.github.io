@@ -749,22 +749,23 @@ button {
   height: calc(22px * var(--s));
 }
 
+/* The building is drawn 104 x 214; everything on it is placed in those units of --bw / 104. */
 .street-building {
   position: absolute;
-  left: calc(84px * var(--s));
-  top: calc(var(--ground) - calc(214px * var(--s)));
-  width: calc(104px * var(--s));
-  height: calc(214px * var(--s));
+  left: var(--bx);
+  top: calc(var(--ground) - var(--bw) * 214 / 104);
+  width: var(--bw);
+  height: calc(var(--bw) * 214 / 104);
   color: var(--ink);
 }
 
-/* The flag on the roof: its pole stands on the top of the building's spire (x 52, y 8). */
+/* The flag on the roof: its pole (40 x 50) stands on the top of the building's spire (x 52, y 8). */
 .street-flag {
   position: absolute;
-  left: calc(84px * var(--s) + calc(51px * var(--s)));
-  top: calc(var(--ground) - calc(214px * var(--s)) + calc(8px * var(--s)) - calc(50px * var(--s)));
-  width: calc(40px * var(--s));
-  height: calc(50px * var(--s));
+  left: calc(var(--bx) + var(--bw) * 51 / 104);
+  top: calc(var(--ground) - var(--bw) * (214 - 8 + 50) / 104);
+  width: calc(var(--bw) * 40 / 104);
+  height: calc(var(--bw) * 50 / 104);
   overflow: visible;
   color: var(--ink);
 }
@@ -819,8 +820,8 @@ button {
 
 .street-callout {
   position: absolute;
-  left: calc(196px * var(--s));
-  top: calc(var(--ground) - calc(154px * var(--s)));
+  left: calc(var(--bx) + var(--bw) + calc(8px * var(--s)));
+  top: calc(var(--ground) - var(--bw) * 154 / 104);
   display: flex;
   align-items: center;
   gap: calc(8px * var(--s));
@@ -850,11 +851,15 @@ button {
 .street {
   --ground: 40%;
   --name-size: clamp(5.5rem, 11.6vw, 11rem);
+  /* Where the name starts, and the building's width and left edge. */
+  --nx: var(--lane);
+  --bw: calc(104px * var(--s));
+  --bx: calc(84px * var(--s));
 }
 
 .street-md {
   position: absolute;
-  left: var(--lane);
+  left: var(--nx);
   top: calc(var(--ground) - 0.4 * var(--name-size) - calc(30px * var(--s)));
   color: var(--pencil);
 }
@@ -869,7 +874,7 @@ button {
 
 .street-name > span {
   position: absolute;
-  left: calc(var(--lane) - calc(8px * var(--s)));
+  left: calc(var(--nx) - calc(8px * var(--s)));
   white-space: nowrap;
 }
 
@@ -889,10 +894,6 @@ button {
 
 .street-name .under {
   top: calc(var(--ground) + 0.42em);
-}
-
-.street-name .m-only {
-  display: none;
 }
 
 .street-voice {
@@ -7143,54 +7144,54 @@ button {
     display: none;
   }
 
+  /* L0 on a phone is the desktop drawing made smaller: the building with its flag at the left
+     edge, and the name on two lines right after it, sized so "ROKUNUZZAMAN" (about 5.93em)
+     fills the rest of the width. The voice goes under the name. */
   .street {
-    --ground: 30%;
-    --name-size: clamp(4.5rem, 25vw, 7rem);
+    --ground: clamp(200px, 42%, 400px);
+    --bw: clamp(40px, 11vw, 80px);
+    --bx: calc(12px * var(--s));
+    --nx: calc(var(--bx) + var(--bw) + calc(4px * var(--s)));
+    --name-size: calc((100vw - var(--nx) - 8px) / 6);
     height: max(calc(780px * var(--s)), 100svh);
-  }
-
-  /* No room for the building beside the name on a phone: only the survey label stays above ground. */
-  .street-building,
-  .street-flag,
-  .street-callout,
-  .survey-post {
-    display: none;
   }
 
   .street-strip .wide {
     display: none;
   }
 
+  .street-callout {
+    top: calc(var(--ground) - var(--bw) * 214 / 104 + calc(4px * var(--s)));
+  }
+
+  .street-callout::before {
+    width: calc(16px * var(--s));
+  }
+
+  /* At the right edge, with its post standing just clear of the top of the name. */
   .survey {
-    top: calc(var(--ground) - calc(110px * var(--s)));
-    right: auto;
-    left: var(--lane);
-    justify-items: start;
+    top: auto;
+    bottom: calc(100% - var(--ground) + 0.4 * var(--name-size) + calc(6px * var(--s)));
+    right: calc(16px * var(--s));
+  }
+
+  .survey-post span {
+    height: calc(36px * var(--s));
   }
 
   .street-voice p.serif {
     font-size: 2.125rem;
   }
 
-  /* On a phone the name breaks over three lines: the first straddles the ground. */
-  .street-name .d-only {
-    display: none;
-  }
-
-  .street-name .m-only {
-    display: inline;
-  }
-
-  .street-name .under-1 {
-    top: calc(var(--ground) + 0.42em);
-  }
-
-  .street-name .under-2 {
-    top: calc(var(--ground) + 1.24em);
-  }
-
-  .street-voice {
-    top: calc(var(--ground) + 2.3 * var(--name-size));
+  /* The request leaves by the building's door, as on the desktop, then turns under the ground to
+     the line down the left edge. */
+  .street .req {
+    --turn: calc(44px * var(--s));
+    width: calc(var(--bx) + var(--bw) / 2 + 1px - var(--line-x));
+    background:
+      linear-gradient(var(--signal) 0 0) right top / 2px var(--turn) no-repeat,
+      linear-gradient(var(--signal) 0 0) left var(--turn) / 100% 2px no-repeat,
+      linear-gradient(var(--signal) 0 0) left var(--turn) / 2px 100% no-repeat;
   }
 
   .links-grid {
@@ -7996,15 +7997,18 @@ button {
   }
 }
 
-/* L0 on a phone: the name and the voice under it shrink with the screen's height. */
+/* L0 on a phone: the voice under the name shrinks with the screen's height. */
 @media (max-width: 760px) and (min-height: 500px) {
-  .snap .street {
-    --ground: clamp(150px, 27%, 260px);
-    --name-size: min(clamp(4.5rem, 25vw, 7rem), 13svh);
-  }
-
   .snap .street-voice p.serif {
     font-size: clamp(1.625rem, 4.4svh, 2.125rem);
+  }
+}
+
+/* L0 on a short tablet (1024 x 700 and the like): a smaller building, so the flag stays clear of
+   the sheet line at the top. The street is one screen tall and the ground at 40% of it. */
+@media (min-width: 761px) and (max-width: 1199px) and (min-height: 500px) {
+  .snap .street {
+    --bw: min(calc(104px * var(--s)), (40svh - 60px) * 104 / 256);
   }
 }
 
