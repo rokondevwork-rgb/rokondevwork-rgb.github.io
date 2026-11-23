@@ -4801,6 +4801,15 @@ button {
   font-size: 1rem;
 }
 
+/* On a phone a wide table scrolls sideways instead of running off the page, where the page's
+   overflow clip would hide its last columns. */
+@media (max-width: 760px) {
+  .prose table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
 .prose th,
 .prose td {
   padding: calc(10px * var(--s)) calc(12px * var(--s));
@@ -5025,6 +5034,495 @@ button {
 .sheet--post > * {
   max-width: 68ch;
   margin-inline: auto;
+}
+
+/* Figures in a field note: inline SVG drawings written straight into the Markdown. They follow
+   the theme through the colour tokens. With motion allowed they animate (and pause off screen,
+   see the post page script); with reduced motion each one is a still drawing that reads on its
+   own. On a phone the drawing scrolls sideways rather than shrinking its labels to nothing. */
+.prose .fig {
+  --fig-tone: var(--tone, var(--h-indigo));
+  --glow: color-mix(in srgb, var(--fig-tone) 34%, var(--paper));
+  margin: 2.2em 0;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+}
+
+.prose .fig-art {
+  overflow-x: auto;
+  padding: calc(8px * var(--s)) 0;
+}
+
+.prose .fig svg {
+  display: block;
+  width: 100%;
+  min-width: 520px;
+  height: auto;
+}
+
+.prose .fig figcaption {
+  display: flex;
+  gap: calc(12px * var(--s));
+  align-items: baseline;
+  padding: calc(12px * var(--s)) calc(16px * var(--s));
+  border-top: 1px solid var(--ink);
+  background: var(--vellum);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--pencil);
+}
+
+.prose .fig figcaption b {
+  flex: none;
+  font-family: var(--font-mono), monospace;
+  font-stretch: 112.5%;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.fig text {
+  font-family: var(--font-body), sans-serif;
+  font-size: 14px;
+  fill: var(--ink);
+}
+
+.fig .t-strong {
+  font-weight: 600;
+}
+
+.fig .t-small {
+  font-size: 12px;
+  fill: var(--pencil);
+}
+
+.fig .t-mono {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  fill: var(--pencil);
+}
+
+.fig .t-sign {
+  font-family: var(--font-sign), sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: 0.02em;
+}
+
+.fig .t-big {
+  font-family: var(--font-serif), serif;
+  font-size: 34px;
+}
+
+.fig .t-mid {
+  text-anchor: middle;
+}
+
+.fig .t-end {
+  text-anchor: end;
+}
+
+.fig .s-line {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.5px;
+}
+
+.fig .s-faint {
+  fill: none;
+  stroke: var(--hatch);
+  stroke-width: 1.2px;
+}
+
+.fig .s-dash {
+  stroke-dasharray: 5 5;
+}
+
+.fig .s-head {
+  fill: var(--ink);
+}
+
+.fig .s-box,
+.fig .s-key,
+.fig .s-out,
+.fig .s-node {
+  fill: var(--fill);
+  stroke: var(--ink);
+  stroke-width: 1.5px;
+}
+
+.fig .s-box {
+  --fill: var(--vellum);
+}
+
+.fig .s-key {
+  --fill: color-mix(in srgb, var(--fig-tone) 16%, var(--paper));
+  stroke: var(--fig-tone);
+  stroke-width: 2px;
+}
+
+.fig .s-out {
+  --fill: var(--paper);
+  stroke: var(--signal);
+  stroke-width: 2px;
+}
+
+.fig .s-node {
+  --fill: var(--paper);
+}
+
+.fig .s-node--lit {
+  --fill: var(--fig-tone);
+}
+
+.fig .s-ring {
+  fill: color-mix(in srgb, var(--fig-tone) 10%, transparent);
+  stroke: var(--ink);
+  stroke-width: 1.5px;
+}
+
+.fig .s-edges {
+  fill: none;
+  stroke: var(--hatch);
+  stroke-width: 1.2px;
+}
+
+.fig .s-track {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1px;
+}
+
+.fig .s-bar {
+  fill: var(--signal);
+  transform-box: fill-box;
+  transform-origin: 0 50%;
+  transform: scaleX(0.24);
+}
+
+.fig .s-winter {
+  fill: color-mix(in srgb, var(--teal) 14%, transparent);
+}
+
+.fig .s-curve {
+  fill: none;
+  stroke: var(--signal);
+  stroke-width: 2.5px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.fig .s-mark {
+  fill: var(--paper);
+  stroke: var(--ink);
+  stroke-width: 1.5px;
+}
+
+.fig .s-hatch {
+  stroke: var(--pencil);
+  stroke-width: 1.5px;
+}
+
+.fig .s-wall {
+  stroke: var(--ink);
+  stroke-width: 1.5px;
+}
+
+.fig .s-flow,
+.fig .s-orbit,
+.fig .s-ping {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* A moving dot is a 0.5% dash with round caps, slid along its path (pathLength="100"). */
+  .fig .s-flow,
+  .fig .s-orbit {
+    display: inline;
+    fill: none;
+    stroke: var(--signal);
+    stroke-width: 9px;
+    stroke-linecap: round;
+    stroke-dasharray: 0.5 200;
+  }
+
+  .fig .s-flow {
+    opacity: 0;
+    animation: fig-dot var(--cycle, 8s) linear var(--at, 0s) infinite backwards;
+  }
+
+  .fig .s-flow--back {
+    stroke: var(--teal);
+  }
+
+  .fig .s-orbit {
+    animation: fig-orbit var(--cycle, 4s) linear infinite;
+  }
+
+  .fig .s-ping {
+    display: inline;
+    fill: none;
+    stroke: var(--signal);
+    stroke-width: 2px;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: fig-ping 2s ease-out infinite;
+  }
+
+  .fig .a-glow {
+    animation: fig-glow var(--cycle, 8s) ease var(--at, 0s) infinite backwards;
+  }
+
+  .fig .a-turn {
+    animation: fig-turn var(--cycle, 10s) linear var(--at, 0s) infinite backwards;
+  }
+
+  .fig .a-turn-text {
+    animation: fig-turn-text var(--cycle, 10s) linear var(--at, 0s) infinite backwards;
+  }
+
+  .fig .a-wave {
+    animation: fig-wave var(--cycle, 6s) linear var(--at, 0s) infinite backwards;
+  }
+
+  .fig .a-node {
+    animation: fig-node var(--cycle, 6s) linear var(--at, 0s) infinite backwards;
+  }
+
+  .fig .a-node-text {
+    animation: fig-node-text var(--cycle, 6s) linear var(--at, 0s) infinite backwards;
+  }
+
+  .fig .a-shrink {
+    animation: fig-shrink calc(var(--cycle, 4s) * 4) var(--ease) infinite;
+  }
+
+  .fig .a-draw {
+    stroke-dasharray: 100;
+    animation: fig-draw var(--cycle, 10s) var(--ease-hydraulic) infinite;
+  }
+
+  .fig .a-late {
+    animation: fig-late var(--cycle, 10s) linear var(--at, 0s) infinite backwards;
+  }
+
+  .fig[data-paused] * {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes fig-dot {
+  0% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+  2% {
+    opacity: 1;
+  }
+  20% {
+    stroke-dashoffset: -100;
+    opacity: 1;
+  }
+  23%,
+  100% {
+    stroke-dashoffset: -100;
+    opacity: 0;
+  }
+}
+
+@keyframes fig-orbit {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+
+@keyframes fig-ping {
+  from {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(3.2);
+    opacity: 0;
+  }
+}
+
+@keyframes fig-glow {
+  0%,
+  24%,
+  100% {
+    fill: var(--fill);
+  }
+  4%,
+  18% {
+    fill: var(--glow);
+  }
+}
+
+@keyframes fig-turn {
+  0%,
+  25%,
+  100% {
+    stroke: var(--ink);
+    stroke-width: 1.5px;
+  }
+  2%,
+  23% {
+    stroke: var(--signal);
+    stroke-width: 3px;
+  }
+}
+
+@keyframes fig-turn-text {
+  0%,
+  25%,
+  100% {
+    fill: var(--ink);
+  }
+  2%,
+  23% {
+    fill: var(--signal-text);
+  }
+}
+
+@keyframes fig-wave {
+  0%,
+  22%,
+  100% {
+    stroke: var(--hatch);
+  }
+  4%,
+  16% {
+    stroke: var(--signal);
+  }
+}
+
+@keyframes fig-node {
+  0%,
+  50%,
+  100% {
+    fill: var(--paper);
+  }
+  6%,
+  40% {
+    fill: var(--fig-tone);
+  }
+}
+
+@keyframes fig-node-text {
+  0%,
+  50%,
+  100% {
+    fill: var(--pencil);
+  }
+  6%,
+  40% {
+    fill: var(--signal-text);
+  }
+}
+
+@keyframes fig-shrink {
+  0%,
+  20% {
+    transform: scaleX(1);
+  }
+  24%,
+  45% {
+    transform: scaleX(0.62);
+  }
+  49%,
+  70% {
+    transform: scaleX(0.42);
+  }
+  74%,
+  100% {
+    transform: scaleX(0.24);
+  }
+}
+
+@keyframes fig-draw {
+  0% {
+    stroke-dashoffset: 100;
+    opacity: 1;
+  }
+  40%,
+  90% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  97%,
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes fig-late {
+  0%,
+  40% {
+    opacity: 0;
+  }
+  45%,
+  90% {
+    opacity: 1;
+  }
+  96%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* "Test yourself" questions: the answer opens under the question. */
+.prose details {
+  border: 1px solid var(--hatch);
+  background: var(--paper);
+}
+
+.prose details + details {
+  margin-top: -1px;
+}
+
+.prose summary {
+  display: flex;
+  gap: calc(12px * var(--s));
+  align-items: baseline;
+  min-height: calc(44px * var(--s));
+  padding: calc(12px * var(--s)) calc(16px * var(--s));
+  cursor: pointer;
+  font-weight: 600;
+  list-style: none;
+}
+
+.prose summary::-webkit-details-marker {
+  display: none;
+}
+
+.prose summary::before {
+  content: "+";
+  flex: none;
+  width: 1ch;
+  font-family: var(--font-mono), monospace;
+  font-weight: 400;
+  color: var(--signal-text);
+}
+
+.prose details[open] summary::before {
+  content: "−";
+}
+
+.prose summary:hover {
+  background: var(--vellum);
+}
+
+.prose details > p {
+  margin: 0;
+  padding: 0 calc(16px * var(--s)) calc(16px * var(--s)) calc(16px * var(--s) + 1ch + 12px * var(--s));
 }
 
 /* News radio: news */

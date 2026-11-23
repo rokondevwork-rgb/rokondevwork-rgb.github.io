@@ -34,3 +34,14 @@ const { Content } = await render(post);
     </div>
   </article>
 </Base>
+
+<script>
+  // Animated figures in a field note run only while they are on screen.
+  const figures = document.querySelectorAll<HTMLElement>(".prose .fig");
+  if (figures.length && "IntersectionObserver" in window) {
+    const watch = new IntersectionObserver((entries) => {
+      for (const entry of entries) entry.target.toggleAttribute("data-paused", !entry.isIntersecting);
+    });
+    figures.forEach((figure) => watch.observe(figure));
+  }
+</script>
