@@ -595,3 +595,7 @@ Click a question to see the answer.
 <summary>5. Backpropagation was popular in 1986. Why did deep learning only take off in 2012?</summary>
 <p>Because three things finally came together: enough labelled data (ImageNet), fast GPUs, and better ways to train deep networks.</p>
 </details>
+
+---
+
+**Next:** [Day 2: how AI actually works, and ANI vs AGI vs ASI](/blog/day-2-understanding-ai/).
