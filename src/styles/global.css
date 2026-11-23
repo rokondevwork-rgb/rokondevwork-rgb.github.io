@@ -5822,6 +5822,26 @@ button {
   color: var(--pencil);
 }
 
+/* A story the visitor has opened on this device: a stamp above its title (news.astro). */
+.radio-seen {
+  display: none;
+  align-items: center;
+  gap: calc(5px * var(--s));
+  width: fit-content;
+  margin-bottom: calc(6px * var(--s));
+  padding: 0 calc(7px * var(--s)) 0 calc(5px * var(--s));
+  border: 1px solid currentColor;
+  color: var(--tone);
+}
+
+.radio-seen svg {
+  flex: none;
+}
+
+.radio li[data-seen] .radio-seen {
+  display: flex;
+}
+
 .radio-note {
   margin-top: calc(24px * var(--s));
   color: var(--pencil);

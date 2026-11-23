@@ -56,11 +56,17 @@ const iso = (seconds: number) => new Date(seconds * 1000).toISOString();
       stories.length > 0 ? (
         <ol class="radio" role="list">
           {stories.map((story) => (
-            <li>
+            <li data-story={story.id}>
               <time class="mono" datetime={iso(story.time)} data-time={story.time}>
                 {timeAgo(story.time, fetchedAt)}
               </time>
               <div>
+                <span class="radio-seen mono" aria-hidden="true">
+                  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+                    <path d="M3 8.5l3.5 3.5L13 4.5" />
+                  </svg>
+                  Viewed
+                </span>
                 <h2>
                   <a href={story.url} target="_blank" rel="noopener noreferrer" aria-describedby="news-new-tab">
                     {story.title}
@@ -95,6 +101,7 @@ const iso = (seconds: number) => new Date(seconds * 1000).toISOString();
     </p>
     <!-- Read out with every story link (aria-describedby), so screen reader users know too. -->
     <span id="news-new-tab" hidden>Opens in a new tab</span>
+    <span id="news-seen" hidden>Viewed.</span>
   </div>
 </Base>
 
@@ -106,4 +113,62 @@ const iso = (seconds: number) => new Date(seconds * 1000).toISOString();
   for (const el of document.querySelectorAll<HTMLElement>("time[data-time]")) {
     el.textContent = timeAgo(Number(el.dataset.time), now);
   }
+
+  // Viewed stories: opening a story (its title or its comments) stamps it "Viewed" above the
+  // title. Remembered on this device only, as story id -> when it was opened (Unix seconds).
+  // Stories leave the list within about a day, so entries older than a week are dropped.
+  const KEY = "news-seen";
+  const KEEP = 7 * 24 * 3600;
+  type Seen = Record<string, number>;
+
+  const load = (): Seen => {
+    try {
+      const stored: unknown = JSON.parse(localStorage.getItem(KEY) ?? "{}");
+      return stored && typeof stored === "object" && !Array.isArray(stored) ? (stored as Seen) : {};
+    } catch {
+      return {};
+    }
+  };
+  const save = (seen: Seen) => {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(seen));
+    } catch {
+      // Storage blocked (private mode, site data off): the stamps last until the page closes.
+    }
+  };
+
+  const list = document.querySelector<HTMLElement>(".radio");
+  const items = [...document.querySelectorAll<HTMLElement>(".radio li[data-story]")];
+  const show = (seen: Seen) => {
+    for (const li of items) {
+      const on = typeof seen[li.dataset.story ?? ""] === "number";
+      li.toggleAttribute("data-seen", on);
+      for (const a of li.querySelectorAll("a")) {
+        a.setAttribute("aria-describedby", on ? "news-seen news-new-tab" : "news-new-tab");
+      }
+    }
+  };
+
+  let seen = load();
+  const fresh = Object.fromEntries(Object.entries(seen).filter(([, t]) => typeof t === "number" && now - t < KEEP));
+  if (Object.keys(fresh).length !== Object.keys(seen).length) save(fresh);
+  seen = fresh;
+  show(seen);
+
+  // A left click (or Enter) and a middle click both open the story in a new tab.
+  const opened = (event: MouseEvent) => {
+    if (event.type === "auxclick" && event.button !== 1) return;
+    const target = event.target as Element;
+    const id = target.closest<HTMLElement>("li[data-story]")?.dataset.story;
+    if (!id || !target.closest("a")) return;
+    seen = { ...load(), ...seen, [id]: Math.floor(Date.now() / 1000) };
+    save(seen);
+    show(seen);
+  };
+  list?.addEventListener("click", opened);
+  list?.addEventListener("auxclick", opened);
+  // The same list open in another tab.
+  addEventListener("storage", (event) => {
+    if (event.key === KEY) show((seen = load()));
+  });
 </script>
