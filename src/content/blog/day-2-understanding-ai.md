@@ -630,3 +630,7 @@ Click a question to see the answer.
 <summary>5. Is ChatGPT ANI, AGI or ASI?</summary>
 <p>By the usual definition, ANI. It is very broad, but it isn't reliably human-level at everything and it doesn't keep learning. Some researchers see early signs of general intelligence in it, so this is debated.</p>
 </details>
+
+---
+
+**Next:** [Day 3: machine learning, and supervised vs unsupervised vs reinforcement learning](/blog/day-3-machine-learning/).
